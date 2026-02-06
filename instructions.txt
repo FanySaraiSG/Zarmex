@@ -1,0 +1,37 @@
+//Ejecutar primero para encender
+php artisan serve
+
+//Luego esta migracion para activar seeder que agregara todos los datos en automatico cargados en seeders
+//Se emigraran datos de: Categorias, color, empleados, productos y topproductos
+php artisan migrate --seed
+
+//Cambiar de inmediato los productos mas vendidos
+
+--Version 1.9.2.
+//Se actualizaron las rutas de admin, soporte y tecnico
+//Contiene la ultima actualizacion de nuevo catalogo de imagenes 
+//Funciona el carousel para mas imagenes del ver mas
+//Ya pueden hacer comentarios clientes registrados y en el panel de administrador pueden borrarlos, asi como en la parte inferior de
+cada producto se veran los comentarios que le pertenecen a cada producto
+//Las imagenes de los mas vendidos estan del mismo tamaño todas
+
+--Version 1.9.3.
+//Cambios en la tabla de mantenimiento/reparacion y formulario, vista de tabla cambiada con un update de status con filtros por status
+//Opcion de barra de busqueda funcional
+
+--Version 1.9.4.
+//Css funcionales
+//Cambio en los login 
+//Tabla para cambiar Nosotros asi como sedeers funcionales
+//Filtrado de Comentarios 
+//Filtrado de Soporte y quejas
+//Catalogo con cuatro lineas de descripcion actualizado
+
+--Version 1.9.6.
+//CRUD direcciones funcional
+//Carrito de compras funcional
+//Pago Paypal funcional, vista de pedidos por cliente y empleado
+//Empleado puede modificar el estado del pedido asi como ver sus detalles
+//Vista de solicitudes de servicios y reportes
+//Busqueda con boton
+//Tamaño agregado

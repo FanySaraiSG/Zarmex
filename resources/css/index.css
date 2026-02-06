@@ -1,0 +1,351 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #ffffff; /* Fondo de la página */
+    color: #ffffff; /* Texto */
+}
+
+/* Actualización para el banner */
+.content-area {
+    text-align: center;
+    margin: 0; /* Elimina márgenes del contenedor */
+}
+
+.content-area img {
+    width: 100%; /* El banner ocupa todo el ancho de la página */
+    height: auto; /* Mantiene la proporción de la imagen */
+    display: block; /* Elimina los espacios blancos alrededor de la imagen */
+}
+
+.products {
+    margin: 40px 20px;
+}
+
+.products h2 {
+    text-align: center;
+    color: #28666e;
+    font-size: 2em;
+    margin: 20px 0;
+}
+
+.card-container {
+    display: flex;
+    justify-content: space-between; /* Espacio uniforme entre los productos */
+    gap: 20px; /* Espacio entre las tarjetas */
+    flex-wrap: wrap; /* Permite que los productos se ajusten a diferentes tamaños de pantalla */
+}
+
+.card {
+    flex: 1 1 calc(20% - 20px); /* Cada tarjeta ocupa el 20% del contenedor menos el margen */
+    box-sizing: border-box; /* Incluye el padding y el borde dentro del ancho */
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    padding: 25px; /* Aumentado */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    max-width: 300px; /* Aumentado */
+}
+
+.card img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 20px; /* Aumentado */
+}
+
+.card h3 {
+    color: #28666e;
+    font-size: 1.4em; /* Aumentado */
+    margin-bottom: 15px; /* Aumentado */
+}
+
+.card p {
+    color: #555;
+    font-size: 1em; /* Aumentado */
+    margin-bottom: 20px; /* Aumentado */
+}
+
+.card button {
+    background-color: #28666e;
+    color: #fedc97;
+    border: none;
+    border-radius: 5px;
+    padding: 12px 20px; /* Aumentado */
+    cursor: pointer;
+    font-size: 1.1em; /* Aumentado */
+    transition: background-color 0.3s ease;
+}
+
+.card button a{
+    background-color: #28666e;
+    color: #fedc97;
+    border: none;
+    border-radius: 5px;
+    padding: 12px 20px; /* Aumentado */
+    cursor: pointer;
+    font-size: 1.1em; /* Aumentado */
+    transition: background-color 0.3s ease;
+}
+
+.card button:hover {
+    background-color: #7c9885;
+}
+
+.card:hover {
+    transform: scale(1.08); /* Aumentado ligeramente */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* Aumentado */
+}
+
+/* Estilos para la sección de comentarios */
+.testimonials {
+    margin: 60px 20px; /* Aumentado para darle más espacio a la sección */
+    padding: 40px; /* Aumentado para mayor espacio interno */
+    background-color: #f9f9f9; /* Fondo más claro */
+    border-radius: 15px; /* Bordes más redondeados */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1); /* Sombra más pronunciada */
+}
+
+.testimonials h2 {
+    text-align: center;
+    color: #28666e;
+    margin-bottom: 30px;
+    font-size: 2em; /* Título más grande */
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.testimonial-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); /* Aumentado el tamaño mínimo */
+    gap: 30px;
+    justify-items: center;
+}
+
+.testimonial {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 12px; /* Bordes más suaves */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Sombra más fuerte */
+    padding: 30px;
+    text-align: center;
+    position: relative;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.testimonial:hover {
+    transform: scale(1.05); /* Efecto de aumento al pasar el ratón */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2); /* Sombra más fuerte */
+}
+
+.testimonial .user-icon {
+    width: 90px; /* Aumentado tamaño del ícono */
+    height: 90px; /* Aumentado tamaño del ícono */
+    border-radius: 50%;
+    background-color: #ddd;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.8em; /* Aumentado tamaño del icono */
+    color: #28666e;
+    overflow: hidden;
+}
+
+.testimonial .user-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.testimonial p {
+    color: #555;
+    font-size: 1.3em; /* Aumentado tamaño del texto */
+    margin-bottom: 20px; /* Más espacio entre el texto y el nombre */
+    line-height: 1.6; /* Mejor legibilidad */
+}
+
+.testimonial h4 {
+    color: #28666e;
+    font-weight: bold;
+    font-size: 1.6em; /* Aumentado tamaño del nombre */
+    margin-bottom: 15px; /* Más espacio entre el nombre y las estrellas */
+}
+
+/* Estilo de estrellas */
+.stars {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px; /* Más espacio entre las estrellas y el texto */
+}
+
+.stars i {
+    color: #ffcc00;
+    font-size: 1.6em; /* Aumentado tamaño de las estrellas */
+    margin: 0 5px; /* Más espacio entre las estrellas */
+}
+
+.stars i.inactive {
+    color: #ccc;
+}
+
+/*inicia footer*/
+footer {
+    background-color: #28666e;
+    color: #fedc97;
+    padding: 20px; /* Espacio general del footer */
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+footer .footer-section {
+    margin: 0;
+    flex: 1 1 calc(33% - 40px); /* Secciones con espacio uniforme */
+    min-width: 250px; /* Ancho mínimo para cada sección */
+    text-align: center; /* Centra el contenido de cada sección */
+}
+
+footer .footer-section h3 {
+    color: #ffffff;
+    margin-bottom: 10px;
+    font-size: 1.5em; /* Aumenta el tamaño del título */
+    border-bottom: 2px solid #fedc97;
+    padding-bottom: 5px;
+}
+
+footer .footer-section ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+footer .footer-section ul li {
+    margin: 10px 0; /* Aumenta el espacio entre las líneas */
+    font-size: 1.2em; /* Aumenta el tamaño de las letras */
+    line-height: 1.6; /* Aumenta la separación entre las líneas */
+}
+
+footer .footer-section ul li a {
+    color: #fedc97;
+    text-decoration: none;
+    font-size: 1em;
+    transition: color 0.3s ease;
+}
+
+footer .footer-section ul li a:hover {
+    color: #ffffff;
+}
+
+footer .social-icons a {
+    font-size: 2.5em; /* Aumenta un poco más el tamaño de los íconos */
+    color: #fedc97;
+    transition: color 0.3s ease;
+}
+
+footer .social-icons a:hover {
+    color: #ffffff;
+}
+
+footer .social-icons {
+    display: flex;
+    justify-content: center;
+    gap: 40px; /* Aumenta la separación entre los íconos */
+}
+
+
+
+footer .footer-title {
+    margin-top: 160px; /* Mucho más espacio para moverlo cerca del copyright */
+    font-size: 5em;
+    font-weight: bold;
+    color: #fedc97;
+    text-transform: uppercase; /* Convierte a mayúsculas */
+    font-family: 'Arial', sans-serif; /* Fuente estándar o personalizada */
+    text-align: center; /* Centra la palabra ZARMEX */
+}
+
+footer .copyright {
+    text-align: center;
+    font-size: 0.9em;
+    margin-top: 20px;
+    width: 100%;
+    color: #ffffff;
+    border-top: 1px solid #fedc97;
+    padding-top: 10px;
+}
+
+/* Estilos generales del carrusel */
+#carouselBanner {
+    max-width: 100%;
+    height: auto;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Estilo para las imágenes del carrusel con dimensiones fijas */
+#carouselBanner .carousel-item img {
+    width: 1137px; /* Ancho fijo de 1137 px */
+    height: 436px; /* Altura fija de 436 px */
+    object-fit: cover; /* Ajusta la imagen sin deformarla */
+    border-radius: 15px;
+    transition: transform 0.5s ease-in-out;
+}
+
+/* Efecto de zoom suave en las imágenes al pasar */
+#carouselBanner .carousel-item:hover img {
+    transform: scale(1.05);
+}
+
+/* Estilo de los indicadores (puntos de navegación) */
+.carousel-indicators button {
+    background-color: rgba(255, 255, 255, 0.5);
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: none;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.carousel-indicators .active {
+    background-color: white;
+}
+
+/* Estilos personalizados para las flechas de navegación */
+.carousel-control-prev, 
+.carousel-control-next {
+    width: 5%;
+    opacity: 0.8;
+    transition: opacity 0.3s;
+}
+
+.carousel-control-prev:hover, 
+.carousel-control-next:hover {
+    opacity: 1;
+}
+
+/* Iconos de navegación más estilizados */
+.carousel-control-prev-icon, 
+.carousel-control-next-icon {
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 50%;
+    padding: 10px;
+    transition: background-color 0.3s ease-in-out;
+}
+
+.carousel-control-prev:hover .carousel-control-prev-icon,
+.carousel-control-next:hover .carousel-control-next-icon {
+    background-color: rgba(0, 0, 0, 0.8);
+}

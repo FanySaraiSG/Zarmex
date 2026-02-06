@@ -1,0 +1,101 @@
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 260px;
+    height: 100vh;
+    background-color: #28666e;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    z-index: 1000;
+}
+
+/* LOGO ARRIBA */
+.sidebar-top {
+    display: flex;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.sidebar-logo img {
+    width: 140px;
+}
+
+/* Navegación */
+.sidebar-nav {
+    flex-grow: 1;
+}
+
+.menu {
+    list-style: none;
+    padding: 0;
+}
+
+.menu-item {
+    margin-bottom: 15px;
+}
+
+.menu-item > a,
+.menu-item > span {
+    color: #fedc97;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.menu-item > a:hover,
+.menu-item > span:hover {
+    color: #ffffff;
+}
+
+/* Submenú */
+.submenu {
+    list-style: none;
+    padding-left: 15px;
+    margin-top: 8px;
+}
+
+.submenu li a {
+    color: #ffffff;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.submenu li a:hover {
+    text-decoration: underline;
+}
+
+/* Parte inferior */
+.sidebar-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Buscador */
+.search-container {
+    display: flex;
+    gap: 5px;
+}
+
+/* Iconos */
+.icon-link {
+    color: #fedc97;
+    font-size: 20px;
+}
+
+.icon-link:hover {
+    color: #ffffff;
+}
+
+/* Auth */
+.auth-link {
+    color: #fedc97;
+    text-decoration: none;
+}
+
+.auth-link:hover {
+    text-decoration: underline;
+}

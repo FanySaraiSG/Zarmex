@@ -1,0 +1,228 @@
+/* FONTS GOOGLE */
+@import url('https://fonts.googleapis.com/css2?family=Quicksand&display=swap');
+
+/* VARIABLES */
+:root {
+    --blanco: #E0E0E0;
+    --azul-opacidad: #184463;
+    --bg-menu: #28666e;
+    --bg-body: #C7E1FF;
+}
+
+/* GENERALES */
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Quicksand', sans-serif;
+    color: var(--blanco);
+}
+
+/* =======================================================
+   HEADER / TOP MENU VIEJO (DESACTIVADO)
+   Motivo: se usa HEADER ZX NUEVO (header.css)
+   ======================================================= */
+
+/*
+.top-menu {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.top-menu .logo {
+    display: flex;
+    align-items: center;
+}
+
+.top-menu .logo img {
+    width: 40px;
+    transition: width .3s ease;
+}
+
+.top-menu .logo span {
+    font-size: 20px;
+    margin-left: 20px;
+    display: none;
+}
+
+.top-menu .toggle {
+    width: 30px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+}
+
+.top-menu .toggle i {
+    font-size: 35px;
+}
+
+.input-search {
+    width: 100%;
+    margin: 50px 0;
+    background-color: var(--azul-opacidad);
+    padding: 15px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+}
+
+.input-search i {
+    font-size: 30px;
+    margin-right: 20px;
+}
+
+.input-search .input {
+    border: none;
+    outline: none;
+    background-color: transparent;
+    width: 100%;
+    height: 30px;
+    color: var(--blanco);
+    font-size: 22px;
+    display: none;
+}
+*/
+
+/* =======================================================
+   LAYOUT (SE CONSERVA)
+   ======================================================= */
+
+.menu-dashboard {
+    flex-direction: row;
+    float: left;
+    max-width: 150px;
+    height: 100%;
+    background: var(--bg-menu);
+    padding: 20px;
+    transition: max-width .3s ease;
+}
+
+.menu-dashboard a{
+    text-decoration: none;
+    color: aliceblue;
+}
+
+/* ENLACES MENU */
+.menu .enlace{
+    width: 100%;
+    padding: 20px 0 20px 17px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    cursor: pointer;
+    font-size: 20px;
+    transition: all .3s ease;
+}
+
+.menu .enlace:hover {
+    background: var(--azul-opacidad);
+}
+
+.menu .enlace i {
+    margin-right: 20px;
+    font-size: 25px;
+}
+
+.menu .enlace span {
+    opacity: 0;
+    transition: opacity .3s ease;
+}
+
+.menu-dashboard.open {
+    max-width: 300px;
+}
+
+.menu-dashboard.open .menu .enlace {
+    width: auto;
+}
+
+.menu-dashboard.open .menu .enlace {
+    padding: 20px;
+}
+
+.menu-dashboard.open .menu .enlace span {
+    opacity: 1;
+}
+
+/* Css contenido */
+.body{
+    width: 100%;
+}
+
+.menu section{
+    flex-direction: row;
+    margin-left: 150px;
+    background-color: #28666e;
+}
+
+.menu{
+    padding: 3%;
+}
+
+.menu h1{
+    padding-top: 2%;
+    padding-bottom: 2%;
+    text-align: center;
+    color: rgb(255, 255, 255);
+}
+
+.menu-rol section{
+    flex-direction: row;
+    margin-left: 150px;
+    background-color: #28666e;
+}
+
+.menu-rol{
+    padding: 3%;
+}
+
+.menu-rol h1{
+    padding-top: 2%;
+    padding-bottom: 2%;
+    text-align: center;
+    color: rgb(255, 255, 255);
+}
+
+.datos {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 20px;
+}
+
+.div2 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 50%;
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.div2 img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 50%;
+}
+
+.div1 {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px;
+    background-color: #184463;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}

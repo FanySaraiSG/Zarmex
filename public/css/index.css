@@ -1,0 +1,273 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #ffffff;
+    color: #ffffff;
+}
+
+/* aqui termina el header */
+
+/* ================= BANNER ================= */
+.content-area img {
+    width: 100%;
+    height: 436px;
+    object-fit: cover;
+    border-radius: 15px;
+    transition: transform 0.5s ease-in-out;
+    display: block;
+}
+
+/* ================= PRODUCTOS ================= */
+.products {
+    margin: 40px 20px;
+}
+
+.products h2 {
+    text-align: center;
+    color: #28666e;
+    font-size: 2em;
+    margin: 20px 0;
+}
+
+/* ================= CONTENEDOR DE CARDS ================= */
+.card-container {
+    display: flex;
+    justify-content: center;     /* mejor centrado */
+    gap: 30px;                   /* más separación */
+    flex-wrap: wrap;
+}
+
+/* ================= CARD (MÁS GRANDE) ================= */
+.card {
+    flex: 1 1 calc(30% - 30px);  /* 🔥 más grande */
+    max-width: 380px;            /* 🔥 más ancha */
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 14px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
+    text-align: center;
+    padding: 30px;               /* 🔥 más padding */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Imagen más grande */
+.card img {
+    width: 100%;
+    height: 230px;               /* 🔥 imagen más grande */
+    object-fit: contain;
+    border-radius: 12px;
+    margin-bottom: 25px;
+}
+
+/* Título */
+.card h3 {
+    color: #28666e;
+    font-size: 1.6em;
+    margin-bottom: 18px;
+}
+
+/* Texto */
+.card p {
+    color: #555;
+    font-size: 1.05em;
+    margin-bottom: 22px;
+    line-height: 1.5;
+}
+
+/* Botones */
+.card button,
+.card button a {
+    background-color: #28666e;
+    color: #fedc97;
+    border: none;
+    border-radius: 6px;
+    padding: 14px 26px;
+    cursor: pointer;
+    font-size: 1.1em;
+    transition: background-color 0.3s ease;
+    text-decoration: none;
+}
+
+.card button:hover {
+    background-color: #7c9885;
+}
+
+/* Hover elegante */
+.card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.22);
+}
+
+/* ================= TESTIMONIALS (SIN CAMBIOS) ================= */
+.testimonials {
+    margin: 60px 20px;
+    padding: 40px;
+    background-color: #f9f9f9;
+    border-radius: 15px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.testimonials h2 {
+    text-align: center;
+    color: #28666e;
+    margin-bottom: 30px;
+    font-size: 2em;
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.testimonial-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 30px;
+    justify-items: center;
+}
+
+.testimonial {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.testimonial:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.testimonial .user-icon {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background-color: #ddd;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.8em;
+    color: #28666e;
+}
+
+.testimonial p {
+    color: #555;
+    font-size: 1.3em;
+    margin-bottom: 20px;
+    line-height: 1.6;
+}
+
+.testimonial h4 {
+    color: #28666e;
+    font-weight: bold;
+    font-size: 1.6em;
+    margin-bottom: 15px;
+}
+
+/* Estrellas */
+.stars {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.stars i {
+    color: #ffcc00;
+    font-size: 1.6em;
+    margin: 0 5px;
+}
+
+.stars i.inactive {
+    color: #ccc;
+}
+/* ================= CARDS HOME ================= */
+
+/* Contenedor */
+.card-container{
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+/* Card individual */
+.card{
+    width: 360px;              /* AQUÍ cambias tamaño */
+    background-color: #ffffff;
+    border-radius: 14px;
+    padding: 28px;
+    text-align: center;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+    transition: transform .3s ease, box-shadow .3s ease;
+}
+
+/* Imagen */
+.card img{
+    width: 100%;
+    height: 230px;
+    object-fit: contain;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+/* Título */
+.card h3{
+    color: #28666e;
+    font-size: 1.5em;
+    margin-bottom: 12px;
+}
+
+/* Texto */
+.card p{
+    color: #555;
+    font-size: 1em;
+    line-height: 1.5;
+    margin-bottom: 18px;
+}
+
+/* Botón */
+.card-button a{
+    display: inline-block;
+    background-color: #28666e;
+    color: #fedc97;
+    padding: 12px 24px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background-color .3s ease;
+}
+
+.card-button a:hover{
+    background-color: #7c9885;
+}
+
+/* Hover */
+.card:hover{
+    transform: scale(1.05);
+    box-shadow: 0 12px 22px rgba(0,0,0,0.25);
+}
+
+/* Responsive */
+@media (max-width: 992px){
+    .card{
+        width: 300px;
+    }
+}
+
+@media (max-width: 576px){
+    .card{
+        width: 100%;
+    }
+}
+
+/* ================= FOOTER (SIN CAMBIOS) ================= */
+/* todo tu footer queda igual */

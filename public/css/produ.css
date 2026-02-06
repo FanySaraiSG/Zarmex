@@ -1,0 +1,108 @@
+.search-container2 {
+    display: flex;
+    justify-content: center; /* Centra horizontalmente */
+    align-items: center; /* Centra verticalmente */
+    margin: 0 auto;
+    width: 100%;
+    padding: 20px 0;
+    gap: 10px; /* Espacio entre los elementos */
+}
+
+.search-container2 input[type="text"] {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1em;
+    width: 50%;
+}
+
+.search-container2 button {
+    padding: 8px 12px;
+    background-color: #28666e;
+    color: #fedc97;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.2em;
+    display: flex;
+    align-items: center;
+    gap: 5px; /* Espacio entre texto e ícono */
+}
+
+.search-container2 button:hover {
+    background-color: #7c9885;
+}
+
+.search-container2 .filter-icon {
+    font-size: 1.5em;
+    color: #28666e;
+    background-color: #fedc97;
+    padding: 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.search-container2 .filter-icon:hover {
+    background-color: #7c9885;
+    color: #ffffff;
+}
+
+/* Contenedor del ícono del filtro */
+.filter-icon {
+    position: relative;
+}
+
+/* Estilo inicial del menú desplegable (oculto) */
+/* Estilo inicial del menú desplegable (oculto) */
+.filter-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    min-width: 200px;
+    z-index: 1000;
+}
+
+.filter-dropdown ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.filter-dropdown ul li {
+    border-bottom: 1px solid #ccc;
+}
+
+.filter-dropdown ul li:last-child {
+    border-bottom: none;
+}
+
+.filter-dropdown ul li a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #28666e;
+    text-decoration: none;
+    padding: 10px 15px;
+    font-size: 0.7em; /* Tamaño más pequeño de las letras */
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.filter-dropdown ul li a i {
+    margin-left: 10px; /* Espacio entre texto e ícono */
+}
+
+.filter-dropdown ul li a:hover {
+    background-color: #7C8E7E; /* Fondo verde en hover */
+    color: #ffffff; /* Texto blanco en hover */
+}
+
+/* Mostrar el menú al hacer clic */
+.filter-icon.active .filter-dropdown {
+    display: block;
+}

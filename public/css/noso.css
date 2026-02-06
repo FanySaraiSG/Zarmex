@@ -1,0 +1,306 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Figtree:wght@300;400;600&display=swap');
+
+/* =========================
+   FONDO ÚNICO GLOBAL
+========================= */
+html, body {
+  background: #1f3f46;
+}
+
+/* =========================
+   HERO: Bienvenidos a Zarmex
+   Fondo único #1f3f46
+   Título negro, subtítulo blanco
+========================= */
+.zarmex-hero{
+  background: #1f3f46;
+  padding: 70px 0 40px;
+  text-align: center;
+  font-family: 'Figtree', sans-serif;
+}
+.zarmex-hero__title{
+  font-size: 3.2rem;
+  font-weight: 600;
+  color: #000000;  /* negro */
+  margin: 0 0 10px 0;
+}
+.zarmex-hero__subtitle{
+  font-size: 1.15rem;
+  max-width: 980px;
+  margin: 0 auto;
+  color: #ffffff;  /* blanco */
+}
+
+/* =========================
+   NOSOTROS V2 (SIN TEXTURAS)
+   Fondo único #1f3f46
+========================= */
+:root{
+  --nv2-bg: #1f3f46; /* tu fondo */
+  --nv2-card: rgba(255,255,255,0.68);
+  --nv2-border: rgba(198, 165, 106, 0.55);
+  --nv2-shadow: 0 14px 35px rgba(0,0,0,0.10);
+
+  --nv2-title: #2f3b34;
+  --nv2-text: #516057;
+  --nv2-accent: #c6a56a;
+}
+
+#nosotros_v2.nosotros-v2{
+  position: relative;
+  background: var(--nv2-bg);
+  padding: 40px 0 90px;
+  overflow: hidden;
+  font-family: 'Figtree', sans-serif;
+}
+
+/* QUITAMOS la textura: sin ::before */
+#nosotros_v2::before{ display: none; }
+
+#nosotros_v2 .container{
+  position: relative;
+  z-index: 1;
+  max-width: 1100px;
+}
+
+/* =========================
+   GRID estilo mockup
+========================= */
+.nosotros-v2__grid{
+  display:grid;
+  grid-template-columns: 1.08fr 0.92fr;
+  grid-template-areas:
+    "historia mision"
+    "valores  vision";
+  gap: 26px;
+}
+
+/* =========================
+   CARDS
+========================= */
+.nv2-card{
+  background: var(--nv2-card);
+  border: 1px solid var(--nv2-border);
+  border-radius: 18px;
+  box-shadow: var(--nv2-shadow);
+  padding: 22px;
+  position: relative;
+  overflow: hidden;
+}
+
+.nv2-card__title{
+  font-family: 'Cinzel', serif;
+  color: var(--nv2-title);
+  font-weight: 700;
+  font-size: 1.8rem;
+  margin: 0 0 12px 0;
+}
+
+.nv2-card__title--center{
+  text-align:center;
+  margin-bottom: 18px;
+}
+
+.nv2-card__text{
+  color: var(--nv2-text);
+  font-size: 1.05rem;
+  line-height: 1.65;
+  margin: 0;
+}
+
+/* Ubicaciones */
+.nv2-card--historia{ grid-area: historia; padding: 0; }
+.nv2-card--mision{ grid-area: mision; }
+.nv2-card--vision{ grid-area: vision; }
+.nv2-card--valores{ grid-area: valores; }
+
+/* =========================
+   HISTORIA layout interno
+========================= */
+.nv2-historia{
+  display:flex;
+  min-height: 260px;
+}
+
+.nv2-historia__media{
+  position: relative;
+  width: 46%;
+  min-height: 260px;
+  overflow: hidden;
+  border-radius: 18px 0 0 18px;
+}
+
+.nv2-historia__img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display:block;
+}
+
+/* Fade hacia el texto (ajustado al fondo #1f3f46) */
+.nv2-historia__fade{
+  position:absolute;
+  inset:0;
+  background: linear-gradient(
+    90deg,
+    rgba(0,0,0,0.00) 50%,
+    rgba(255,255,255,0.85) 88%,
+    rgba(255,255,255,1) 100%
+  );
+  pointer-events:none;
+}
+
+.nv2-historia__content{
+  width: 54%;
+  padding: 26px;
+  display:flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.nv2-card--historia .nv2-card__title{
+  margin-bottom: 10px;
+}
+
+/* Head con icono (Misión / Visión) */
+.nv2-card__head{
+  display:flex;
+  align-items:center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.nv2-icon{
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border: 1px solid rgba(198,165,106,0.55);
+  background: rgba(255,255,255,0.55);
+  color: var(--nv2-accent);
+  flex: 0 0 auto;
+}
+.nv2-card__head .nv2-card__title{ margin: 0; }
+
+/* =========================
+   VALORES (ESTILO COMO TU IMAGEN)
+========================= */
+.nv2-card--valores-v3{
+  background: #c7cece; /* gris verdoso como referencia */
+  border: 0;
+  padding: 28px 26px 30px;
+  border-radius: 22px;
+  box-shadow: 0 14px 35px rgba(0,0,0,0.16);
+}
+
+/* Título VALORES */
+.nv2-card--valores-v3 .nv2-card__title{
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 2.1rem;
+  color: #2f3b34;
+}
+
+/* Grid 3 arriba + 1 centrado abajo */
+.nv2-values--v3{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 26px 18px;
+  align-items: start;
+}
+
+.nv2-value--v3{
+  text-align: center;
+  padding: 6px 0;
+}
+
+.nv2-value__ico--v3{
+  width: 64px;
+  height: 64px;
+  border-radius: 999px;
+  margin: 0 auto 12px auto;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background: #f4f2ed;
+  border: 2px solid rgba(201,163,93,0.65);
+  color: #c9a35d;
+  font-size: 1.35rem;
+}
+
+.nv2-value__txt--v3{
+  color: #2f3b34;
+  font-size: 1.05rem;
+  line-height: 1.2;
+}
+
+/* Responsabilidad centrado abajo */
+.nv2-value--center-v3{
+  grid-column: 2 / 3;
+}
+
+/* Carousel controles */
+#carouselHistoriaV2 .carousel-control-prev-icon,
+#carouselHistoriaV2 .carousel-control-next-icon{
+  filter: drop-shadow(0 3px 10px rgba(0,0,0,0.35));
+}
+#carouselHistoriaV2 .carousel-control-prev,
+#carouselHistoriaV2 .carousel-control-next{
+  width: 16%;
+  opacity: 0.9;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 992px){
+  .nosotros-v2__grid{
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "historia"
+      "mision"
+      "vision"
+      "valores";
+  }
+
+  .nv2-historia{
+    flex-direction: column;
+  }
+
+  .nv2-historia__media{
+    width: 100%;
+    height: 280px;
+    border-radius: 18px 18px 0 0;
+  }
+
+  .nv2-historia__fade{
+    background: linear-gradient(180deg, rgba(0,0,0,0.00) 40%, rgba(255,255,255,0.92) 78%, rgba(255,255,255,1) 100%);
+  }
+
+  .nv2-historia__content{
+    width: 100%;
+    padding: 20px 22px 22px;
+  }
+
+  .zarmex-hero__title{
+    font-size: 2.6rem;
+  }
+
+  .nv2-values--v3{
+    grid-template-columns: 1fr 1fr;
+  }
+  .nv2-value--center-v3{
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 480px){
+  .nv2-values--v3{
+    grid-template-columns: 1fr;
+  }
+  .nv2-value--center-v3{
+    grid-column: auto;
+  }
+}

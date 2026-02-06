@@ -1,0 +1,221 @@
+/* Estilo para el formulario en una tarjeta */
+.form-container {
+    max-width: 1200px;  /* Hacer el formulario más ancho */
+    margin: 40px auto; /* Centrado con margen superior */
+    padding: 40px;
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); /* Sombra más suave */
+    font-size: 1.2em;
+    border: 1px solid #ddd; /* Borde suave */
+}
+
+/* Título principal de la tarjeta */
+.form-container h2 {
+    text-align: center;
+    color: #28666e; /* Color verde previo */
+    font-size: 2.8em;
+    margin-bottom: 30px;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* Estilo para cada grupo de campos dentro del formulario */
+.form-group {
+    margin-bottom: 30px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 1.3em;
+    color: #28666e; /* Color verde previo */
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+/* Estilo para los campos del formulario */
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-size: 1.1em;
+    box-sizing: border-box;
+    background-color: #f9f9f9;
+    transition: border-color 0.3s ease;
+}
+
+/* Estilo al enfocar los campos */
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #28666e; /* Color verde previo */
+    outline: none;
+    box-shadow: 0 0 5px rgba(40, 102, 110, 0.6);
+}
+
+/* Estilo para el textarea (campo de texto largo) */
+textarea {
+    height: 150px;
+    resize: vertical; /* Permite redimensionar solo verticalmente */
+}
+
+/* Estilo para el contenedor de los botones */
+.button-container {
+    text-align: center;
+    margin-top: 30px;
+}
+
+/* Estilo para el botón de enviar */
+.button-container button {
+    padding: 15px 30px;
+    background-color: #28666e; /* Color verde previo */
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.4em;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    width: 50%; /* Botón más grande */
+    margin: 0 auto;
+    display: block;
+}
+
+/* Estilo para el botón de enviar al hacer hover */
+.button-container button:hover {
+    background-color: #7c9885; /* Un verde más claro en hover */
+}
+
+/* Estilo para el botón de enviar cuando es presionado */
+.button-container button:active {
+    transform: scale(0.98);
+}
+
+/* Estilo para los mensajes de error o éxito */
+.error-message,
+.success-message {
+    text-align: center;
+    font-size: 1.3em;
+    padding: 15px;
+    margin-top: 20px;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+/* Estilo para el mensaje de error */
+.error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Estilo para el mensaje de éxito */
+.success-message {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+/* Estilo para los campos deshabilitados */
+input[disabled],
+select[disabled],
+textarea[disabled] {
+    background-color: #e9ecef;
+    cursor: not-allowed;
+}
+
+/* Estilo para los campos con error */
+input.error,
+select.error,
+textarea.error {
+    border: 1px solid #e74c3c;
+}
+
+input.error:focus,
+select.error:focus,
+textarea.error:focus {
+    border-color: #e74c3c;
+    outline: none;
+}
+
+/* Agregar una sombra sutil a los campos cuando están en foco */
+input:focus, select:focus, textarea:focus {
+    box-shadow: 0 0 8px rgba(40, 102, 110, 0.3);
+}
+
+/* Estilos para la tarjeta del formulario */
+.cardform {
+    width: 100%;
+    max-width: 1200px;  /* Aumentar el max-width para hacerlo más ancho */
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Estilos para los campos de entrada */
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+input[type="text"],
+textarea {
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color 0.3s;
+}
+
+input[type="text"]:focus,
+textarea:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+/* Hacer el área de texto más grande */
+textarea {
+    height: 120px;
+    resize: none;  /* Evitar que el usuario cambie el tamaño */
+}
+
+/* Estilo para el botón */
+.submit-btn {
+    background-color: #28666e; /* Color verde previo */
+    color: #fff;
+    border: none;
+    padding: 12px 25px;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+    width: auto;
+    align-self: center;
+}
+
+.submit-btn:hover {
+    background-color: #7c9885; /* Un verde más claro en hover */
+    transform: translateY(-2px);
+}
+
+.submit-btn:active {
+    transform: translateY(1px);
+}
+
+/* Espaciado adicional para que el formulario se vea más grande */
+.form-container h2 {
+    font-size: 40px;
+    margin-bottom: 20px;
+}
