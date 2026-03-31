@@ -377,3 +377,24 @@
     color: #ffc107;
     transform: scale(1.2);
 }
+.admin-page{
+  min-height: calc(100vh - 180px); /* evita que se “coma” el contenido */
+  padding: 30px 15px;
+  background: #f3f5f6;
+}
+
+.admin-shell{
+  max-width: 1200px;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 22px;
+  box-shadow: 0 12px 30px rgba(0,0,0,.12);
+}
+
+.admin-title{
+  text-align: center;
+  font-weight: 900;
+  color: #234d50;
+  margin: 10px 0 20px;
+}

@@ -10,46 +10,63 @@
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-  <!-- Font Awesome -->
+  <!-- Font Awesome (solo UNA vez) -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-  <!-- CSS Global (si está en public/css) -->
+  <!-- CSS Global -->
   <link rel="stylesheet" href="{{ asset('css/main.css') }}">
 
   <!-- Vite (Tailwind / JS) -->
   @vite(['resources/css/app.css', 'resources/js/app.js'])
-  <!-- CSS Header (si lo dejaste en public/css/header.css) -->
-  <link rel="stylesheet" href="{{ asset('css/header.css') }}">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <div style="position:relative; z-index:9999; color:white; font-size:40px;">
-  SI CARGA EL DASHBOARD
-  </div>
-
 </head>
 
 <body class="font-sans antialiased">
   <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
 
     {{-- HEADER --}}
+   @if(!request()->is('employees/*'))
+    {{-- HEADER NORMAL --}}
     @include('header')
+@else
+    {{-- SOLO BOTÓN CERRAR SESIÓN EN ADMIN --}}
+    @auth('employee')
+        <div class="admin-top-logout">
+            <form method="POST" action="{{ route('employee.logout') }}">
+                @csrf
+                <button type="submit" class="admin-logout-btn" title="Cerrar sesión">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </button>
+            </form>
+        </div>
+    @endauth
+@endif
+
+
 
     {{-- CONTENIDO --}}
     <main>
+      {{-- Para <x-app-layout> --}}
+      {{ $slot ?? '' }}
+
+      {{-- Para @extends + @section('content') --}}
       @yield('content')
     </main>
-     <a href="https://wa.me/525550518121"
-       class="whatsapp-float"
-       target="_blank"
-       aria-label="Chat en WhatsApp">
-        <i class="fab fa-whatsapp"></i>
-    </a>
+
     {{-- FOOTER --}}
-    @include('.footer')
+    @if(!request()->is('employees/*'))
+       @include('footer')
+    @endif
 
   </div>
-  <!-- Bootstrap JS (una sola vez) -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-  @include('components.whatsapp')
-
+@if(!request()->is('employees/*'))
+    <a href="https://wa.me/525581366555?text=Hola,%20estoy%20interesado%20en%20los%20productos%20de%20Zarmex"
+       target="_blank"
+       style="position:fixed;bottom:25px;right:25px;z-index:999999;background:#25D366;color:#fff;width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;text-decoration:none;font-weight:700;"
+       title="Contáctanos por WhatsApp">
+        WA
+    </a>
+@endif
+  <!-- Bootstrap JS (bundle con Popper) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

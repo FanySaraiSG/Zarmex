@@ -1,42 +1,164 @@
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Figtree:wght@300;400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&display=swap');
 
 /* =========================
-   FONDO ÚNICO GLOBAL
+   FONDO GLOBAL
 ========================= */
 html, body {
-  background: #1f3f46;
+  min-height: 100%;
 }
 
+body {
+  margin: 0;
+  background: linear-gradient(135deg, #4b8a7f, #2f5d62, #243c41);
+  background-attachment: fixed;
+}
 /* =========================
-   HERO: Bienvenidos a Zarmex
-   Fondo único #1f3f46
-   Título negro, subtítulo blanco
+   HERO
 ========================= */
 .zarmex-hero{
-  background: #1f3f46;
-  padding: 70px 0 40px;
+  padding: 45px 0 20px;
   text-align: center;
-  font-family: 'Figtree', sans-serif;
 }
+
 .zarmex-hero__title{
-  font-size: 3.2rem;
-  font-weight: 600;
-  color: #000000;  /* negro */
-  margin: 0 0 10px 0;
+  font-family: "Playfair Display", serif;
+  font-size: 3.8rem;
+  font-weight: 800;
+  color: #000;
+  margin: 0 0 12px 0;
+  line-height: 1.1;
 }
+
 .zarmex-hero__subtitle{
   font-size: 1.15rem;
   max-width: 980px;
   margin: 0 auto;
-  color: #ffffff;  /* blanco */
+  color: #fff;
 }
 
 /* =========================
-   NOSOTROS V2 (SIN TEXTURAS)
-   Fondo único #1f3f46
+   CARRUSEL (UNA SOLA VERSIÓN)
+========================= */
+
+.nosotros-carousel-container{
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 20px;
+  border-radius: 26px;
+
+  background: rgba(255,255,255,0.16);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+
+  border: 1px solid rgba(198, 165, 106, 0.55);
+
+  box-shadow:
+    0 26px 65px rgba(0,0,0,0.38),
+    inset 0 1px 0 rgba(255,255,255,0.22);
+
+  position: relative;
+  overflow: hidden;
+  transform: translateZ(0);
+}
+
+.nosotros-carousel-container::before{
+  content:"";
+  position:absolute;
+  top:-40%;
+  left:-20%;
+  width: 140%;
+  height: 80%;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.28), rgba(255,255,255,0.00) 60%);
+  pointer-events:none;
+}
+
+.nosotros-carousel-container::after{
+  content:"";
+  position:absolute;
+  inset: 20px;
+  border-radius: 18px;
+  pointer-events:none;
+  background: linear-gradient(
+    180deg,
+    rgba(0,0,0,0.18) 0%,
+    rgba(0,0,0,0.05) 40%,
+    rgba(0,0,0,0.18) 100%
+  );
+}
+
+.nosotros-carousel__img{
+  width: 100%;
+  height: 560px;
+  object-fit: cover;
+  border-radius: 18px;
+  display:block;
+  transform: scale(1.04);
+}
+
+#carouselNosotrosV2.carousel-fade .carousel-item{
+  transition: opacity 1.15s ease-in-out;
+}
+
+@keyframes kenburnsSoft{
+  from { transform: scale(1.04) translateY(0); }
+  to   { transform: scale(1.12) translateY(-6px); }
+}
+#carouselNosotrosV2 .carousel-item.active .nosotros-carousel__img{
+  animation: kenburnsSoft 6.5s ease-in-out both;
+}
+
+/* Indicadores */
+#carouselNosotrosV2 .carousel-indicators{
+  margin-bottom: 12px;
+  gap: 10px;
+}
+#carouselNosotrosV2 .carousel-indicators [data-bs-target]{
+  width: 11px;
+  height: 11px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.30);
+  border: 1px solid rgba(198, 165, 106, 0.70);
+  opacity: 1;
+  transition: transform .2s ease, background .2s ease, box-shadow .2s ease;
+}
+#carouselNosotrosV2 .carousel-indicators .active{
+  background: rgba(255,255,255,0.95);
+  transform: scale(1.22);
+  box-shadow: 0 0 0 4px rgba(198,165,106,0.25);
+}
+
+/* Controles */
+#carouselNosotrosV2 .carousel-control-prev,
+#carouselNosotrosV2 .carousel-control-next{
+  width: 12%;
+  opacity: 1;
+}
+#carouselNosotrosV2 .carousel-control-prev-icon,
+#carouselNosotrosV2 .carousel-control-next-icon{
+  width: 46px;
+  height: 46px;
+  border-radius: 999px;
+
+  background-color: rgba(255,255,255,0.18);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  border: 1px solid rgba(198, 165, 106, 0.55);
+  box-shadow: 0 18px 40px rgba(0,0,0,0.30);
+
+  background-size: 55% 55%;
+}
+#carouselNosotrosV2 .carousel-control-prev:hover .carousel-control-prev-icon,
+#carouselNosotrosV2 .carousel-control-next:hover .carousel-control-next-icon{
+  background-color: rgba(255,255,255,0.26);
+}
+
+/* =========================
+   NOSOTROS V2
 ========================= */
 :root{
-  --nv2-bg: #1f3f46; /* tu fondo */
+  
   --nv2-card: rgba(255,255,255,0.68);
   --nv2-border: rgba(198, 165, 106, 0.55);
   --nv2-shadow: 0 14px 35px rgba(0,0,0,0.10);
@@ -47,25 +169,15 @@ html, body {
 }
 
 #nosotros_v2.nosotros-v2{
-  position: relative;
   background: var(--nv2-bg);
-  padding: 40px 0 90px;
-  overflow: hidden;
+  padding: 30px 0 90px;
   font-family: 'Figtree', sans-serif;
 }
 
-/* QUITAMOS la textura: sin ::before */
-#nosotros_v2::before{ display: none; }
-
 #nosotros_v2 .container{
-  position: relative;
-  z-index: 1;
   max-width: 1100px;
 }
 
-/* =========================
-   GRID estilo mockup
-========================= */
 .nosotros-v2__grid{
   display:grid;
   grid-template-columns: 1.08fr 0.92fr;
@@ -75,24 +187,19 @@ html, body {
   gap: 26px;
 }
 
-/* =========================
-   CARDS
-========================= */
 .nv2-card{
   background: var(--nv2-card);
   border: 1px solid var(--nv2-border);
   border-radius: 18px;
   box-shadow: var(--nv2-shadow);
   padding: 22px;
-  position: relative;
-  overflow: hidden;
 }
 
 .nv2-card__title{
-  font-family: 'Cinzel', serif;
+  font-family: "Playfair Display", serif;
   color: var(--nv2-title);
-  font-weight: 700;
-  font-size: 1.8rem;
+  font-weight: 800;
+  font-size: 1.85rem;
   margin: 0 0 12px 0;
 }
 
@@ -106,63 +213,15 @@ html, body {
   font-size: 1.05rem;
   line-height: 1.65;
   margin: 0;
+  text-align: justify;
+  text-justify: inter-word;
 }
 
-/* Ubicaciones */
-.nv2-card--historia{ grid-area: historia; padding: 0; }
+.nv2-card--historia{ grid-area: historia; }
 .nv2-card--mision{ grid-area: mision; }
 .nv2-card--vision{ grid-area: vision; }
 .nv2-card--valores{ grid-area: valores; }
 
-/* =========================
-   HISTORIA layout interno
-========================= */
-.nv2-historia{
-  display:flex;
-  min-height: 260px;
-}
-
-.nv2-historia__media{
-  position: relative;
-  width: 46%;
-  min-height: 260px;
-  overflow: hidden;
-  border-radius: 18px 0 0 18px;
-}
-
-.nv2-historia__img{
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display:block;
-}
-
-/* Fade hacia el texto (ajustado al fondo #1f3f46) */
-.nv2-historia__fade{
-  position:absolute;
-  inset:0;
-  background: linear-gradient(
-    90deg,
-    rgba(0,0,0,0.00) 50%,
-    rgba(255,255,255,0.85) 88%,
-    rgba(255,255,255,1) 100%
-  );
-  pointer-events:none;
-}
-
-.nv2-historia__content{
-  width: 54%;
-  padding: 26px;
-  display:flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.nv2-card--historia .nv2-card__title{
-  margin-bottom: 10px;
-}
-
-/* Head con icono (Misión / Visión) */
 .nv2-card__head{
   display:flex;
   align-items:center;
@@ -185,17 +244,16 @@ html, body {
 .nv2-card__head .nv2-card__title{ margin: 0; }
 
 /* =========================
-   VALORES (ESTILO COMO TU IMAGEN)
+   VALORES (FIX CENTRADO)
 ========================= */
 .nv2-card--valores-v3{
-  background: #c7cece; /* gris verdoso como referencia */
+  background: #c7cece;
   border: 0;
   padding: 28px 26px 30px;
   border-radius: 22px;
   box-shadow: 0 14px 35px rgba(0,0,0,0.16);
 }
 
-/* Título VALORES */
 .nv2-card--valores-v3 .nv2-card__title{
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -203,58 +261,82 @@ html, body {
   color: #2f3b34;
 }
 
-/* Grid 3 arriba + 1 centrado abajo */
+/* 4 arriba y 4 abajo */
 .nv2-values--v3{
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 26px 18px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 34px 22px;
+  justify-items: center;
   align-items: start;
 }
 
 .nv2-value--v3{
   text-align: center;
-  padding: 6px 0;
+  width: 100%;
+  display:flex;
+  flex-direction: column;
+  align-items:center;
 }
 
+/* AQUÍ ESTÁ EL CENTRADO REAL DEL ÍCONO */
 .nv2-value__ico--v3{
-  width: 64px;
-  height: 64px;
+  width: 74px;
+  height: 74px;
   border-radius: 999px;
-  margin: 0 auto 12px auto;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background: #f4f2ed;
-  border: 2px solid rgba(201,163,93,0.65);
+
+  display: flex;              
+  align-items: center;        
+  justify-content: center;    
+
+  background: rgba(244, 242, 237, 0.95);
+  border: 2px solid rgba(201, 163, 93, 0.70);
+
   color: #c9a35d;
-  font-size: 1.35rem;
+  font-size: 1.55rem;
+
+  box-shadow:
+    0 10px 22px rgba(0,0,0,0.12),
+    inset 0 1px 0 rgba(255,255,255,0.55);
+
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+}
+
+/* Esto evita que el <i> “baje” por line-height */
+.nv2-value__ico--v3 i{
+  line-height: 1;
+  display: block;
 }
 
 .nv2-value__txt--v3{
+  margin-top: 10px;
+  font-size: 1.08rem;
+  font-weight: 500;
   color: #2f3b34;
-  font-size: 1.05rem;
   line-height: 1.2;
+  max-width: 190px;
 }
 
-/* Responsabilidad centrado abajo */
-.nv2-value--center-v3{
-  grid-column: 2 / 3;
+.nv2-value--v3:hover .nv2-value__ico--v3{
+  transform: translateY(-3px);
+  background: rgba(255,255,255,0.98);
+  box-shadow:
+    0 16px 30px rgba(0,0,0,0.16),
+    inset 0 1px 0 rgba(255,255,255,0.65);
 }
 
-/* Carousel controles */
-#carouselHistoriaV2 .carousel-control-prev-icon,
-#carouselHistoriaV2 .carousel-control-next-icon{
-  filter: drop-shadow(0 3px 10px rgba(0,0,0,0.35));
-}
-#carouselHistoriaV2 .carousel-control-prev,
-#carouselHistoriaV2 .carousel-control-next{
-  width: 16%;
-  opacity: 0.9;
+/* Responsive */
+@media (max-width: 992px){
+  .nv2-values--v3{ grid-template-columns: repeat(2, 1fr); }
+  .nosotros-carousel__img{ height: 360px; }
 }
 
-/* =========================
-   RESPONSIVE
-========================= */
+@media (max-width: 480px){
+  .nv2-values--v3{ grid-template-columns: 1fr; }
+  .nosotros-carousel-container{ padding: 14px; border-radius: 20px; }
+  .nosotros-carousel-container::after{ inset: 14px; border-radius: 14px; }
+  .nosotros-carousel__img{ height: 280px; border-radius: 14px; }
+}
+/* ===== RESPONSIVE: cuando se hace angosta la pantalla, 1 columna ===== */
 @media (max-width: 992px){
   .nosotros-v2__grid{
     grid-template-columns: 1fr;
@@ -263,44 +345,5 @@ html, body {
       "mision"
       "vision"
       "valores";
-  }
-
-  .nv2-historia{
-    flex-direction: column;
-  }
-
-  .nv2-historia__media{
-    width: 100%;
-    height: 280px;
-    border-radius: 18px 18px 0 0;
-  }
-
-  .nv2-historia__fade{
-    background: linear-gradient(180deg, rgba(0,0,0,0.00) 40%, rgba(255,255,255,0.92) 78%, rgba(255,255,255,1) 100%);
-  }
-
-  .nv2-historia__content{
-    width: 100%;
-    padding: 20px 22px 22px;
-  }
-
-  .zarmex-hero__title{
-    font-size: 2.6rem;
-  }
-
-  .nv2-values--v3{
-    grid-template-columns: 1fr 1fr;
-  }
-  .nv2-value--center-v3{
-    grid-column: span 2;
-  }
-}
-
-@media (max-width: 480px){
-  .nv2-values--v3{
-    grid-template-columns: 1fr;
-  }
-  .nv2-value--center-v3{
-    grid-column: auto;
   }
 }

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -9,11 +10,19 @@ class ImagenProducto extends Model
     use HasFactory;
 
     protected $table = 'imagenes_productos';
-    protected $primaryKey = 'id';   
-    public $incrementing = false; // No autoincremental
-    protected $keyType = 'string'; // ID es un string
 
-    protected $fillable = ['id', 'producto_id', 'ruta'];
+    protected $primaryKey = 'img_id';
+    public $incrementing = true;
+    protected $keyType = 'int';
+
+    // TABLA SÍ TIENE TIMESTAMPS
+    public $timestamps = true;
+
+    protected $fillable = [
+        'producto_id',
+        'ruta',
+        'orden',
+    ];
 
     public function producto()
     {

@@ -1,41 +1,80 @@
-<x-guest-layout>
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio de Sesión - Empleados</title>
 
-    <form method="POST" action="{{ route('employee.login') }}">
-        @csrf
+    <link rel="stylesheet" href="{{ asset('css/inicio.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
 
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Employee Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+    <header class="topbar">
+        <a href="{{ url('/') }}" class="back-btn" aria-label="Volver">
+            <i class="fa-solid fa-arrow-left"></i>
+        </a>
+
+        <div class="topbar-logo">
+            <img src="{{ asset('imagenes/Captura de pantalla 2025-01-19 134751.png') }}" alt="Zarmex">
         </div>
+    </header>
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
+    <main class="login-page">
+        <section class="login-card">
+            <div class="login-avatar">
+                <i class="fa-solid fa-user"></i>
+            </div>
 
-            <x-text-input id="password" class="block mt-1 w-full"
+            <h1>Inicio de Sesión - Empleados</h1>
+
+            <form method="POST" action="{{ route('employee.login') }}" class="login-form">
+                @csrf
+
+                <div class="form-group">
+                    <label for="email">Correo Electrónico</label>
+                    <div class="input-wrap">
+                        <span class="input-icon">
+                            <i class="fa-solid fa-user"></i>
+                        </span>
+                        <input
+                            id="email"
+                            type="email"
+                            name="email"
+                            placeholder="Tu correo"
+                            required
+                            autofocus
+                            value="{{ old('email') }}"
+                        >
+                    </div>
+                    @error('email')
+                        <span class="error-text">{{ $message }}</span>
+                    @enderror
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <div class="input-wrap">
+                        <span class="input-icon">
+                            <i class="fa-solid fa-lock"></i>
+                        </span>
+                        <input
+                            id="password"
                             type="password"
                             name="password"
-                            required autocomplete="current-password" />
+                            placeholder="Tu contraseña"
+                            required
+                        >
+                    </div>
+                    @error('password')
+                        <span class="error-text">{{ $message }}</span>
+                    @enderror
+                </div>
 
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
+                <button type="submit" class="login-btn">Ingresar</button>
+            </form>
+        </section>
+    </main>
 
-        <!-- Remember Me -->
-        <div class="block mt-4">
-            <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded dark:bg-gray-900 border-gray-300 dark:border-gray-700 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:focus:ring-indigo-600 dark:focus:ring-offset-gray-800" name="remember">
-                <span class="ms-2 text-sm text-gray-600 dark:text-gray-400">{{ __('Remember me') }}</span>
-            </label>
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button class="ms-3">
-                {{ __('Employee Log in') }}
-            </x-primary-button>
-        </div>
-    </form>
-</x-guest-layout>
+</body>
+</html>

@@ -96,15 +96,13 @@ class MantenimientoController extends Controller
     }
 
     public function destroy($id)
-    {
-        try {
-            $mantenimiento = Mantenimiento::findOrFail($id);
-            $mantenimiento->delete();
-            return redirect()->route('mantenimientos.index')->with('success', '¡Mantenimiento eliminado con éxito!');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Error al eliminar el mantenimiento: ' . $e->getMessage());
-        }
-    }
+{
+    $mantenimiento = Mantenimiento::findOrFail($id);
+    $mantenimiento->delete();
+
+    return redirect()->route('mantenimientos.index')
+        ->with('success', 'Mantenimiento eliminado correctamente');
+}
     public function updateStatus(Request $request, $id)
     {
         // Encuentra el mantenimiento por su id

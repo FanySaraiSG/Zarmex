@@ -11,13 +11,18 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;500;700&display=swap" rel="stylesheet">
+
 </head>
 
 <body class="antialiased">
     @include('.header')
     <main>
         <section class="products">
-            <h2>{{ $categoriaNombre }}</h2>
+            <h2 class="zx-title-playfair text-center">{{ $categoriaNombre }}</h2>
             <div class="search-container2">
                 <input type="text" placeholder="Buscar..." id="category-search-input">
                 <button id="search-button2">Buscar</button>
@@ -45,17 +50,14 @@
                         @endif
                         <div class="card-content">
                             <h1 style="color: #234d50; text-align:center; font-size: 40px;">{{ $producto->id }}</h1>
-                            <h3>{{ $producto->nombre }}</h3>
-                            <p
-                                style="text-align: justify; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical;">
+
+                            <p class="desc" style="overflow:hidden;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;">
                                 {{ $producto->descripcion }}
                             </p>
-                            <p class\="price" \></span>{{ number_format($producto->precio, 2) }} MXN</p>
-                            <div class="add-to-cart">
-                                <a href="{{ route('productos.vermas', ['id' => $producto->id]) }}" class="buy-btn">Ver
+                            <p class="price">{{ number_format($producto->precio, 2) }} MXN</p>
+                            <div class="vermas-center">
+                                <a href="{{ route('productos.vermas', ['id' => $producto->id]) }}" class="vermas-btn">Ver
                                     más</a>
-                                <button class="add-to-cart-btn"><i class="fas fa-shopping-cart"></i> Agregar al
-                                    carrito</button>
                             </div>
                             <div class="shipping-info"><i class="fas fa-truck-moving"></i> Envíos a todo México</div>
                         </div>
@@ -153,18 +155,6 @@
                         const sortType = event.target.id.replace('filter-', '');
                         sortProducts(sortType);
                         filterDropdown.classList.remove('show');
-                    });
-                });
-
-                // Funcionalidad para "Agregar al carrito"
-                document.querySelectorAll('.add-to-cart-btn').forEach(button => {
-                    button.addEventListener('click', function () {
-                        const productCard = this.closest('.card2'); // Encuentra el producto correspondiente
-                        const productId = productCard.querySelector('h1').textContent.trim(); // Obtiene el ID del producto
-                        const verMasUrl = productCard.querySelector('.buy-btn').href; // Obtiene la URL de "Ver más"
-
-                        alert("Tienes que elegir un color antes");
-                        window.location.href = verMasUrl; // Redirige al usuario a la página "Ver más"
                     });
                 });
 

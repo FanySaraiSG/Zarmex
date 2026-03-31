@@ -18,36 +18,6 @@
                 </div>
             </div>
 
-            {{-- Pedidos --}}
-            <div class="col">
-                <div class="card p-5 bg-custom shadow-lg text-center w-100">
-                    <i class="fas fa-shopping-cart fa-4x text-warning"></i>
-                    <h3 class="text-light mt-3">Pedidos</h3>
-                    <a href="/gestion-pedidos" class="btn btn-light mt-2">Ver pedidos</a>
-                </div>
-            </div>
-
-            {{-- Soporte: Reseñas --}}
-            <div class="col">
-                <div class="card p-5 bg-custom shadow-lg text-center w-100">
-                    <i class="fas fa-tools fa-4x text-success"></i>
-                    <h3 class="text-light mt-3">Reseñas</h3>
-                    <a href="/reseñas" class="btn btn-light mt-2">Gestionar Reseñas</a>
-                </div>
-            </div>
-
-            {{-- Comentarios --}}
-            <div class="col">
-                <div class="card p-5 bg-custom shadow-lg text-center w-100">
-                    <i class="fas fa-comments fa-4x text-info"></i>
-                    <h3 class="text-light mt-3">Comentarios</h3>
-                    <a href="{{ route('comentarios.index') }}" class="btn btn-light mt-2">Gestionar Comentarios</a>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
     <style>
         .bg-custom {
             background-color: #28666e;

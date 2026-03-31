@@ -779,7 +779,6 @@ textarea {
                     <div class="form-group">
                         <label for="seccion">Sección de la Imagen:</label>
                         <select class="form-control" id="seccion" name="seccion" required>
-                            <option value="logo" {{ $imagen->seccion == 'logo' ? 'selected' : '' }}>Logo</option>
                             <option value="banner" {{ $imagen->seccion == 'banner' ? 'selected' : '' }}>Banner</option>
                             <option value="nosotros_banner" {{ $imagen->seccion == 'nosotros_banner' ? 'selected' : '' }}>Nosotros Banner</option>
                             <option value="nosotros" {{ $imagen->seccion == 'nosotros' ? 'selected' : '' }}>Nosotros</option>

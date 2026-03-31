@@ -15,7 +15,7 @@
     <body class="bg-dark">
         <div class="container mt-5">
             <h1 class="text-center text-light mb-4">Tus Solicitudes</h1>
-            <a href="{{ route('dashboard') }}" class="btn btn-outline-light mb-3">Regresar</a>
+            <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-light mb-3">Regresar</a>
 
             {{-- Reportes --}}
             <h2 class="text-warning mb-3">Reporte de soporte y quejas</h2>

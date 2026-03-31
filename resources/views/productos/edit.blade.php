@@ -1,148 +1,187 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-
+<html lang="es">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <title>Editar Producto</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/formularios.css') }}">
-    <title>{{ config('app.name', 'Zarmex') }}</title>
+</head>
+<body>
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
+@auth('employee')
+@if(auth('employee')->user()->rol === 'admin')
 
-    @auth('employee')
-        @if(Auth::user()->rol === 'admin')
-        <html lang="es">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <meta http-equiv="X-UA-Compatible" content="ie=edge">
-                <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
-                    integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD"
-                    crossorigin="anonymous">
-            </head>
-            <body>
-                <section class="container mt-5">
-                    <div class="form-container">
-                        <h2>Editar Producto</h2>
-                        <div class="form-group d-flex justify-content-between mb-3">
-                            <a class="btn btn-secondary btn-sm" href="{{ route('productos.index') }}">Regresar</a>
-                        </div>
-                
-                        <form action="{{ route('productos.update', $producto->id) }}" method="post" enctype="multipart/form-data">
-                            @csrf
-                            @method('PUT')
-                
-                            <!-- Campo oculto para almacenar el ID original -->
-                            <input type="hidden" name="id_original" value="{{ $producto->id }}">
-                
-                            <div class="form-group">
-                                <label for="id">ID:</label>
-                                <input type="text" id="id" name="id" value="{{ $producto->id }}">
-                            </div>
-                
-                            <div class="form-group">
-                                <label for="nombre">Nombre:</label>
-                                <input type="text" id="nombre" name="nombre" value="{{ $producto->nombre }}" required>
-                            </div>
-                
-                            <div class="form-group">
-                                <label for="descripcion">Descripción:</label>
-                                <textarea id="descripcion" name="descripcion" rows="3">{{ $producto->descripcion }}</textarea>
-                            </div>
-                
-                            <div class="form-group">
-                                <label for="precio">Precio:</label>
-                                <input type="number" id="precio" name="precio" step="0.01" value="{{ $producto->precio }}" required>
-                            </div>
-                
-                            <div class="form-group">
-                                <label for="stock">Stock:</label>
-                                <input type="number" id="stock" name="stock" value="{{ $producto->stock }}" required>
-                            </div>
-                
-                            <div class="form-group">
-                                <label for="categoria_id">Categoría:</label>
-                                <select id="categoria_id" name="categoria_id" required>
-                                    @foreach($categorias as $categoria)
-                                        <option value="{{ $categoria->id_categoria }}" 
-                                            {{ $producto->categoria_id == $categoria->id_categoria ? 'selected' : '' }}>
-                                            {{ $categoria->nombre }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                
-                            <!-- Mostrar Imagen Actual -->
-                            <div class="form-group">
-                                <label>Imagen Actual:</label>
-                                @if($producto->imagen_url)
-                                    <p>{{ basename($producto->imagen_url) }}</p>
-                                    <img src="{{ asset($producto->imagen_url) }}" alt="{{ $producto->nombre }}" width="100">
-                                @else
-                                    <p>No hay imagen disponible</p>
-                                @endif
-                            </div>
-                
-                            <!-- Campo para subir nueva imagen -->
-                            <div class="form-group">
-                                <label for="imagen_url">Subir nueva imagen:</label>
-                                <input type="file" id="imagen_url" name="imagen_url" accept="image/*" onchange="mostrarNombre()">
-                                <small id="nombreImagenDisplay" class="form-text text-muted">Nombre de la nueva imagen: <span></span></small>
-                            </div>
-                            
-                
-                            <div class="form-group">
-                                <label for="fecha_creacion">Fecha de Creación:</label>
-                                <input type="datetime-local" id="fecha_creacion" name="fecha_creacion"
-                                    value="{{ $producto->fecha_creacion ? \Carbon\Carbon::parse($producto->fecha_creacion)->format('Y-m-d\TH:i') : '' }}">
-                            </div>
-                            <!-- Campos para las medidas -->
-                        <div class="form-group">
-                            <label for="largo">Largo (cm):</label>
-                            <input type="number" id="largo" name="largo" value="{{ $producto->medida->largo ?? '' }}" required>
-                        </div>
+<div class="edit-container">
 
-                        <div class="form-group">
-                            <label for="ancho">Ancho (cm):</label>
-                            <input type="number" id="ancho" name="ancho" value="{{ $producto->medida->ancho ?? '' }}" required>
-                        </div>
+    <div class="edit-card">
 
-                        <div class="form-group">
-                            <label for="altura">Altura (cm):</label>
-                            <input type="number" id="altura" name="altura" value="{{ $producto->medida->altura ?? '' }}" required>
-                        </div>
-                
-                            <div class="form-group">
-                                <button type="submit" class="submit-btn">Actualizar Producto</button>
-                            </div>
-                        </form>
-                
-                        <!-- Formulario para mostrar imágenes -->
-                        <form action="{{ route('productos.imagenes.show', $producto->id) }}" method="GET" style="display: inline;">
-                            <div>
-                                <button type="submit" class="submit-btn">Mostrar Imágenes</button>
-                            </div>
-                        </form>
+        <h2 class="edit-title">EDITAR PRODUCTO</h2>
+
+        <form action="{{ route('productos.update', $producto->id) }}"
+              method="POST"
+              enctype="multipart/form-data">
+
+            @csrf
+            @method('PUT')
+
+            <div class="field">
+                <label>ID:</label>
+                <input type="text" name="id" class="form-control" value="{{ $producto->id }}">
+            </div>
+
+            <div class="field">
+                <label>Descripción:</label>
+                <textarea name="descripcion" class="form-control">{{ $producto->descripcion }}</textarea>
+            </div>
+
+            <div class="field">
+                <label>Precio:</label>
+                <input type="number" step="0.01" name="precio" class="form-control" value="{{ $producto->precio }}">
+            </div>
+
+            <div class="field">
+                <label>Stock:</label>
+                <input type="number" name="stock" class="form-control" value="{{ $producto->stock }}">
+            </div>
+
+            <div class="field">
+                <label>Categoría:</label>
+                <select name="categoria_id" class="form-select">
+                    @foreach($categorias as $categoria)
+                        <option value="{{ $categoria->id_categoria }}"
+                            {{ $producto->categoria_id == $categoria->id_categoria ? 'selected' : '' }}>
+                            {{ $categoria->nombre }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <div class="field">
+                <label>Imagen Principal Actual:</label>
+                @if($producto->imagen_url)
+                    <div class="current-img">
+                        <img src="{{ asset($producto->imagen_url) }}?v={{ time() }}" style="max-width:140px;border-radius:12px;">
                     </div>
-                </section>
-                
-                <script>
-                    function mostrarNombre() {
-                        const input = document.getElementById('imagen_url');
-                        const display = document.getElementById('nombreImagenDisplay').querySelector('span');
-                        display.textContent = input.files.length > 0 ? input.files[0].name : 'No seleccionada';
-                    }
-                </script>
-                
-        @else
-            <div class="container mt-5">
-                <div class="alert alert-danger text-center">
-                    <h4>Access Denied</h4>
-                    <p>You do not have permission to view this page.</p>
-                    <a href="{{ route('dashboard') }}" class="btn btn-secondary">Go Back</a>
+                @endif
+            </div>
+
+            {{-- (Opcional) cambiar imagen principal --}}
+            <div class="field">
+                <label>Cambiar imagen principal (opcional):</label>
+                <input type="file" name="imagen_url" class="form-control" accept="image/*">
+            </div>
+
+            {{--  SUBIR MUCHAS IMÁGENES EXTRA --}}
+            <div class="field">
+                <label>Imagen Extra:</label>
+                <input type="file" name="imagenes[]" class="form-control" multiple accept="image/*">
+                <small style="opacity:.7;">Esta imágen se agregan al carrusel del producto.</small>
+            </div>
+
+            {{-- (Opcional) mostrar extras ya guardadas --}}
+            @if(isset($imagenesExtra) && $imagenesExtra->count())
+                <div class="field">
+                    <label>Imágenes extra guardadas:</label>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                        @foreach($imagenesExtra as $img)
+                            <img src="{{ asset($img->ruta) }}?v={{ time() }}"
+                                 style="width:80px;height:80px;object-fit:cover;border-radius:10px;border:1px solid #ddd;">
+                        @endforeach
+                    </div>
                 </div>
+            @endif
+
+            <!-- DOCUMENTOS -->
+            <!-- DOCUMENTOS -->
+<div class="docs-box">
+    <h6>Documentos del producto</h6>
+
+    <div class="mb-3">
+        <label>Garantía</label>
+
+        @if($producto->doc1_url)
+            <div class="mb-2">
+                <a href="{{ asset($producto->doc1_url) }}" target="_blank">Ver documento actual</a>
+            </div>
+
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" name="eliminar_doc1" value="1" id="eliminar_doc1">
+                <label class="form-check-label" for="eliminar_doc1">
+                    Eliminar garantía actual
+                </label>
             </div>
         @endif
-    @endauth
+
+        <input type="file" name="doc1" class="form-control">
+    </div>
+
+    <div class="mb-3">
+        <label>Manual</label>
+
+        @if($producto->doc2_url)
+            <div class="mb-2">
+                <a href="{{ asset($producto->doc2_url) }}" target="_blank">Ver documento actual</a>
+            </div>
+
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" name="eliminar_doc2" value="1" id="eliminar_doc2">
+                <label class="form-check-label" for="eliminar_doc2">
+                    Eliminar manual actual
+                </label>
+            </div>
+        @endif
+
+        <input type="file" name="doc2" class="form-control">
+    </div>
+
+    <div class="mb-3">
+        <label>Ficha Técnica</label>
+
+        @if($producto->doc3_url)
+            <div class="mb-2">
+                <a href="{{ asset($producto->doc3_url) }}" target="_blank">Ver documento actual</a>
+            </div>
+
+            <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" name="eliminar_doc3" value="1" id="eliminar_doc3">
+                <label class="form-check-label" for="eliminar_doc3">
+                    Eliminar ficha técnica actual
+                </label>
+            </div>
+        @endif
+
+        <input type="file" name="doc3" class="form-control">
+    </div>
+</div>
+
+            <!-- BOTONES -->
+            <div class="button-group">
+
+                <a href="{{ route('productos.imagenes.show', $producto->id) }}"
+                   class="btn btn-main btn-small">
+                    Mostrar Imágenes
+                </a>
+
+                <button type="submit" class="btn btn-main btn-small">
+                    Actualizar Producto
+                </button>
+
+                <a href="{{ route('productos.index') }}"
+                   class="btn btn-grey btn-small">
+                    Regresar
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+@endif
+@endauth
+
+</body>
+</html>

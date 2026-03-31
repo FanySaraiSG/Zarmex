@@ -24,11 +24,21 @@
 
     <div id="main-container" class="container">
         <div class="panel left" id="login-panel">
-            <h2>Iniciar Sesión</h2>
+            <div class="login-header">
+                <i class="fas fa-user-circle main-icon"></i>
+                <h2>Inicio de Sesión - Empleados</h2>
+            </div>
             <form method="POST" action="{{ route('login') }}">
                 @csrf
-                <input type="email" name="email" placeholder="Email" required autofocus value="{{ old('email') }}">
-                <input type="password" name="password" placeholder="Password" required>
+                <div class="input-icon-group">
+    <i class="fas fa-user"></i>
+    <input type="email" name="email" placeholder="Tu correo" required autofocus>
+</div>
+
+<div class="input-icon-group">
+    <i class="fas fa-lock"></i>
+    <input type="password" name="password" placeholder="Tu contraseña" required>
+</div>
                 
                 @error('email')
                     <span class="text-red-500 text-sm">{{ $message }}</span>

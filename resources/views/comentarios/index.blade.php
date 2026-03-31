@@ -58,8 +58,8 @@
                             @foreach ($comentarios as $comentario)
                                 <tr>
                                     <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $comentario->usuario->name }}</td>
-                                    <td>{{ $comentario->producto->nombre }}</td>
+                                    <td>{{ $comentario->usuario?->name ?? ($comentario->guest_name ?? 'Anónimo') }}</td>
+                                    <td>{{ optional($comentario->producto)->nombre ?? $comentario->producto_id }}</td>
                                     <td>{{ str_repeat('★', $comentario->calificacion) . str_repeat('☆', 5 - $comentario->calificacion) }}
                                     </td>
                                     <td>{{ $comentario->comentario }}</td>

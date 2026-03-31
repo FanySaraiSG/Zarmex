@@ -9,6 +9,9 @@
 
     <!-- Fonts -->
     <link rel="stylesheet" href="{{ asset('css/main.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="{{ asset('css/formularios.css') }}">
@@ -17,7 +20,6 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('js/whatsapp-drag.js') }}"></script>
 
-
     <style>
         /* Hace que el video del banner se vea como imagen (full width, sin deformarse) */
         .banner-media {
@@ -25,6 +27,32 @@
             height: 436px;      /* mismo alto que tu banner */
             object-fit: cover;  /* recorta bonito */
             display: block;
+        }
+
+        /* WHATSAPP FLOAT (AGREGADO) */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background-color: #25D366;
+            color: white;
+            border-radius: 50%;
+            font-size: 2em;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            z-index: 999999; /* importante para que no lo tape nada */
+            text-decoration: none;
+        }
+
+        .whatsapp-float:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+            color: white;
         }
     </style>
 </head>
@@ -35,73 +63,71 @@
     </div>
     <section>
         @php
-    $bannerImages = \App\Models\Imagen::where('seccion', 'banner')->get();
-@endphp
+            $bannerImages = \App\Models\Imagen::where('seccion', 'banner')->get();
+        @endphp
 
-@if($bannerImages->isNotEmpty())
-    <div id="carouselBanner"
-         class="carousel slide"
-         data-bs-ride="carousel"
-         data-bs-interval="5000">
+        @if($bannerImages->isNotEmpty())
+            <div id="carouselBanner"
+                 class="carousel slide"
+                 data-bs-ride="carousel"
+                 data-bs-interval="5000">
 
-        <div class="carousel-inner">
+                <div class="carousel-inner">
 
-            @foreach($bannerImages as $index => $image)
-                @php
-                    $extension = strtolower(pathinfo($image->imagen_url, PATHINFO_EXTENSION));
-                @endphp
+                    @foreach($bannerImages as $index => $image)
+                        @php
+                            $extension = strtolower(pathinfo($image->imagen_url, PATHINFO_EXTENSION));
+                        @endphp
 
-                <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
+                        <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
 
-                    {{-- SI ES VIDEO --}}
-                    @if(in_array($extension, ['mp4','webm','ogg']))
-                        <video class="d-block w-100"
-                               autoplay
-                               muted
-                               loop
-                               playsinline
-                               style="height:436px; object-fit:cover;">
-                            <source src="{{ asset($image->imagen_url) }}" type="video/{{ $extension }}">
-                            Tu navegador no soporta video HTML5
-                        </video>
+                            {{-- SI ES VIDEO --}}
+                            @if(in_array($extension, ['mp4','webm','ogg']))
+                                <video class="d-block w-100"
+                                       autoplay
+                                       muted
+                                       loop
+                                       playsinline
+                                       style="height:436px; object-fit:cover;">
+                                    <source src="{{ asset($image->imagen_url) }}" type="video/{{ $extension }}">
+                                    Tu navegador no soporta video HTML5
+                                </video>
 
-                    {{-- SI ES IMAGEN --}}
-                    @else
-                        <img src="{{ asset($image->imagen_url) }}"
-                             class="d-block w-100"
-                             alt="Banner"
-                             style="height:436px; object-fit:cover;">
-                    @endif
+                            {{-- SI ES IMAGEN --}}
+                            @else
+                                <img src="{{ asset($image->imagen_url) }}"
+                                     class="d-block w-100"
+                                     alt="Banner"
+                                     style="height:436px; object-fit:cover;">
+                            @endif
+
+                        </div>
+                    @endforeach
 
                 </div>
-            @endforeach
 
-        </div>
+                <button class="carousel-control-prev"
+                        type="button"
+                        data-bs-target="#carouselBanner"
+                        data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
 
-        <button class="carousel-control-prev"
-                type="button"
-                data-bs-target="#carouselBanner"
-                data-bs-slide="prev">
-            <span class="carousel-control-prev-icon"></span>
-        </button>
+                <button class="carousel-control-next"
+                        type="button"
+                        data-bs-target="#carouselBanner"
+                        data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
+            </div>
 
-        <button class="carousel-control-next"
-                type="button"
-                data-bs-target="#carouselBanner"
-                data-bs-slide="next">
-            <span class="carousel-control-next-icon"></span>
-        </button>
-    </div>
-
-@else
-    <div class="content-area">
-        <img src="{{ asset('imagenes/banner.jpeg') }}"
-             alt="Banner Predeterminado"
-             style="height:436px; object-fit:cover;">
-    </div>
-@endif
-
-        
+        @else
+            <div class="content-area">
+                <img src="{{ asset('imagenes/banner.jpeg') }}"
+                     alt="Banner Predeterminado"
+                     style="height:436px; object-fit:cover;">
+            </div>
+        @endif
 
         {{-- ===================== LOS MÁS VENDIDOS (CARRUSEL) ===================== --}}
         <section class="products">
@@ -175,10 +201,15 @@
                 .best-carousel .carousel-control-next{
                     width: 6%;
                 }
+                .zx-title-playfair{
+                  font-family: "Playfair Display", serif !important;
+                  font-weight: 700;
+                   letter-spacing: .5px;
+             }
+
             </style>
 
-            <h2 class="text-center" style="color:#28666e; font-size:2em; margin: 20px 0;">LOS MÁS VENDIDOS</h2>
-
+            <h2 class="text-center zx-title-playfair" style="color:#28666e; font-size:2em; margin: 20px 0;"> LOS MÁS VENDIDOS</h2>
             <div class="best-sellers-wrap">
                 <div id="topProductsCarousel" class="carousel slide best-carousel" data-bs-ride="carousel" data-bs-interval="4500">
                     <div class="carousel-inner">
@@ -227,24 +258,25 @@
 
         <section class="testimonials py-5">
             <div class="container">
-                <h2 class="text-center mb-5">Reseñas Destacadas</h2>
+                <h2 class="text-center mb-5 zx-title-playfair">Reseñas Destacadas</h2>
+
                 <div id="reseñasCarousel" class="carousel slide" data-bs-ride="carousel">
                     <div class="carousel-inner">
                         @foreach($reseñas->chunk(4) as $chunk)
                             <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
                                 <div class="row">
-                                    @foreach($chunk as $reseña)
+                                    @foreach($chunk as $review)
                                         <div class="col-md-3 mb-4">
                                             <div class="card h-100">
                                                 <div class="card-body">
                                                     <div class="stars mb-2">
                                                         @for($i = 1; $i <= 5; $i++)
-                                                            <i class="fas fa-star {{ $i <= $reseña->calificacion ? 'text-warning' : 'text-muted' }}"></i>
+                                                            <i class="fas fa-star {{ $i <= $review->calificacion ? 'text-warning' : 'text-muted' }}"></i>
                                                         @endfor
                                                     </div>
-                                                    <p class="card-text">{{ $reseña->descripcion }}</p>
+                                                    <p class="card-text">{{ $review->descripcion }}</p>
                                                     <h5 class="card-title mt-3">
-                                                        {{ $reseña->usuario->name ?? 'Usuario desconocido' }}
+                                                        {{ $review->guest_nombre ? $review->guest_nombre : 'Usuario desconocido' }}
                                                     </h5>
                                                 </div>
                                             </div>
@@ -270,6 +302,14 @@
         </main>
         @include('footer')
 
+        {{-- BOTÓN WHATSAPP --}}
+        <a href="https://wa.me/+525581366555?text=Hola,%20estoy%20interesado%20en%20los%20productos%20de%20Zarmex"
+           target="_blank"
+           class="whatsapp-float"
+           title="Contáctanos por WhatsApp">
+            <i class="fab fa-whatsapp"></i>
+        </a>
+
     {{-- ===== JS para controlar video en carrusel ===== --}}
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -277,7 +317,7 @@
             if (!banner) return;
 
             const bsCarousel = bootstrap.Carousel.getOrCreateInstance(banner, {
-                interval: 5000,   // para imágenes (si hay video, se controla por "ended")
+                interval: 5000,
                 ride: true
             });
 
@@ -294,32 +334,17 @@
                 const video = active.querySelector('video.banner-video');
 
                 if (video) {
-                    // Si es video: pausa el carrusel y reproduce
                     bsCarousel.pause();
-
-                    // algunos navegadores bloquean autoplay con audio; por eso va muted
-                    video.play().catch(() => { /* si falla autoplay, el usuario le da play */ });
-
-                    // cuando termine, avanza al siguiente slide
-                    video.onended = () => {
-                        bsCarousel.next();
-                    };
+                    video.play().catch(() => {});
+                    video.onended = () => bsCarousel.next();
                 } else {
-                    // Si es imagen: reanuda carrusel
                     bsCarousel.cycle();
                 }
             }
 
-            // Cuando cambie de slide, detén videos y luego reproduce el que toque
-            banner.addEventListener('slide.bs.carousel', () => {
-                pauseAllVideos();
-            });
+            banner.addEventListener('slide.bs.carousel', () => pauseAllVideos());
+            banner.addEventListener('slid.bs.carousel', () => handleActiveSlide());
 
-            banner.addEventListener('slid.bs.carousel', () => {
-                handleActiveSlide();
-            });
-
-            // Inicial
             handleActiveSlide();
         });
     </script>

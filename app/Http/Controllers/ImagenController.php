@@ -7,151 +7,149 @@ use Illuminate\Http\Request;
 
 class ImagenController extends Controller
 {
-    // Mostrar todas las imágenes
+    // Mostrar todas las imágenes (admin)
     public function indexImagen()
     {
-        $imagenes = Imagen::all();
-        $logoImage = $this->getLogoImage();
+        $imagenes = Imagen::orderBy('id', 'desc')->get();
         return view('imagenes.index', compact('imagenes'));
     }
 
-    // Mostrar el formulario para crear una nueva imagen
+    // Formulario crear (admin)
     public function createImagen()
     {
         return view('imagenes.create');
     }
 
-    // Almacenar una nueva imagen
+    // Guardar imagen (admin)
     public function storeImagen(Request $request)
     {
         $request->validate([
-            'nombre' => 'required|string|max:255',
-            'imagen' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'nombre'  => 'required|string|max:255',
+            'imagen'  => 'required|file|mimes:jpeg,png,jpg,gif,webp|max:5120',
             'seccion' => 'required|string|max:255',
         ]);
 
-        // Lógica para verificar secciones con límite de imágenes
+        // Reglas por sección
         if ($request->seccion === 'banner') {
             $existingImagesCount = Imagen::where('seccion', 'banner')->count();
             if ($existingImagesCount >= 6) {
-                return redirect()->back()->withErrors(['seccion' => 'Ya se han subido 6 imágenes en la sección banner.']);
-            }
-        } elseif ($request->seccion === 'nosotros_banner') {
-            $existingImagesCount = Imagen::where('seccion', 'nosotros_banner')->count();
-            if ($existingImagesCount >= 3) {
-                return redirect()->back()->withErrors(['seccion' => 'Ya se han subido 3 imágenes en la sección nosotros_banner.']);
+                return redirect()->back()->withErrors([
+                    'seccion' => 'Ya se han subido 6 imágenes en la sección banner.'
+                ])->withInput();
             }
         }
 
-        $imagen = $request->file('imagen');
-        $nombreImagen = $imagen->getClientOriginalName();
-        $rutaImagen = 'imagenes/' . $nombreImagen;
 
-        $imagen->move(public_path('imagenes'), $nombreImagen);
+
+        $file = $request->file('imagen');
+        $originalName = $file->getClientOriginalName();
+
+        // nombre ÚNICO en DB (evita "Duplicate entry ... nombre_unique")
+        // guardo un nombre "seguro" y único, pero conservando el original dentro del string
+        $safeName = time() . '_' . preg_replace('/\s+/', '_', $originalName);
+        $rutaImagen = 'imagenes/' . $safeName;
+
+        $file->move(public_path('imagenes'), $safeName);
 
         Imagen::create([
-            'nombre' => $nombreImagen,
-            'imagen_url' => $rutaImagen,
-            'seccion' => $request->seccion,
+            // OJO: si tu columna "nombre" es UNIQUE, aquí debe ser único
+            'nombre'    => $request->nombre . '_' . time(),
+            'imagen_url'=> $rutaImagen,
+            'seccion'   => $request->seccion,
         ]);
 
         return redirect()->route('imagenes.index')->with('success', 'Imagen subida correctamente.');
+        $img = Image::make($image->getRealPath())
+        ->fit(1200, 1200, function ($constraint) {
+            $constraint->upsize();
+        });
+
+Storage::put('public/productos/'.$nombre, (string) $img->encode());
     }
 
-    // Mostrar una imagen específica
+    // Ver una imagen
     public function showImagen($id)
     {
-        $imagen = Imagen::findOrFail($id); // Obtener la imagen por ID
-        return view('imagenes.show', compact('imagen')); // Retornar la vista de la imagen
+        $imagen = Imagen::findOrFail($id);
+        return view('imagenes.show', compact('imagen'));
     }
 
-    // Mostrar el formulario para editar una imagen existente
+    // Editar imagen
     public function editImagen($id)
     {
-        $imagen = Imagen::findOrFail($id); // Obtener la imagen por ID
-        return view('imagenes.edit', compact('imagen')); // Retornar la vista del formulario de edición
+        $imagen = Imagen::findOrFail($id);
+        return view('imagenes.edit', compact('imagen'));
     }
 
-    // Actualizar una imagen existente
+    // Actualizar imagen
     public function updateImagen(Request $request, $id)
     {
         $request->validate([
-            'nombre' => 'required|string|max:255',
+            'nombre'  => 'required|string|max:255',
             'seccion' => 'required|string|max:255',
-            'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'imagen'  => 'nullable|file|mimes:jpeg,png,jpg,gif,webp|max:5120',
         ]);
 
         $imagen = Imagen::findOrFail($id);
 
-        // Verificar reglas de secciones
-        if ($request->seccion !== 'nosotros' && $imagen->seccion !== $request->seccion) {
-            $existingImage = Imagen::where('seccion', $request->seccion)->first();
-            if ($existingImage) {
-                return redirect()->back()->withErrors(['seccion' => 'Ya existe una imagen en la sección ' . $request->seccion]);
-            }
-        } elseif ($request->seccion === 'nosotros' && $imagen->seccion !== 'nosotros') {
-            $existingImagesCount = Imagen::where('seccion', 'nosotros')->count();
-            if ($existingImagesCount >= 3) {
-                return redirect()->back()->withErrors(['seccion' => 'Ya se han subido 3 imágenes en la sección nosotros.']);
-            }
-        }
-
-        // Si se sube una nueva imagen, actualizarla
+        // Si suben nueva imagen
         if ($request->hasFile('imagen')) {
-            $newImagen = $request->file('imagen');
-            $nombreImagen = time() . '_' . $newImagen->getClientOriginalName(); // Evitar nombres duplicados
-            $rutaImagen = 'imagenes/' . $nombreImagen;
+            $newFile = $request->file('imagen');
+            $originalName = $newFile->getClientOriginalName();
+            $safeName = time() . '_' . preg_replace('/\s+/', '_', $originalName);
+            $rutaImagen = 'imagenes/' . $safeName;
 
-            // Mover la imagen a la carpeta pública
-            $newImagen->move(public_path('imagenes'), $nombreImagen);
+            $newFile->move(public_path('imagenes'), $safeName);
 
-            // Eliminar la imagen anterior si existe
+            // borrar archivo anterior
             if ($imagen->imagen_url && file_exists(public_path($imagen->imagen_url))) {
-                unlink(public_path($imagen->imagen_url));
+                @unlink(public_path($imagen->imagen_url));
             }
 
             $imagen->imagen_url = $rutaImagen;
         }
 
-        // Actualizar los otros campos
-        $imagen->nombre = $request->nombre;
+        $imagen->nombre  = $request->nombre;  // aquí NO forzamos unique (solo en create)
         $imagen->seccion = $request->seccion;
         $imagen->save();
 
         return redirect()->route('imagenes.index')->with('success', 'Imagen actualizada correctamente.');
     }
 
-
-    // Eliminar una imagen
+    // Eliminar imagen
     public function destroyImagen($id)
     {
-        $imagen = Imagen::findOrFail($id); // Obtener la imagen por ID
-        // Opcional: eliminar la imagen del disco
-        // if (file_exists(public_path($imagen->imagen_url))) {
-        //     unlink(public_path($imagen->imagen_url));
-        // }
+        $imagen = Imagen::findOrFail($id);
 
-        $imagen->delete(); // Eliminar la imagen de la base de datos
+        if ($imagen->imagen_url && file_exists(public_path($imagen->imagen_url))) {
+            @unlink(public_path($imagen->imagen_url));
+        }
+
+        $imagen->delete();
+
         return redirect()->route('imagenes.index')->with('success', 'Imagen eliminada correctamente.');
     }
+
+    // Logo (frontend)
     public function getLogoImage()
     {
-        return Imagen::where('seccion', 'logo')->first(); // Obtener la imagen del logo
+        return Imagen::where('seccion', 'logo')->orderBy('id', 'desc')->first();
     }
+
+    // Banner principal (frontend)
     public function mostrarBanner()
     {
-        $bannerImage = Imagen::where('seccion', 'banner')->get();
-        return view('index', compact('bannerImage'));
+        $bannerImages = Imagen::where('seccion', 'banner')->orderBy('id', 'desc')->get();
+        return view('index', compact('bannerImages'));
     }
+
+    // ✅ Nosotros Banner (frontend) - Carrusel abajo de “Bienvenidos”
     public function mostrarBannerN()
     {
-        $bannerNImage = Imagen::where('seccion', 'nosotros_banner')->first();
-        return view('nosotros', compact('bannerNImage'));
-    }
-    public function mostrarNosotros()
-{
-    $nosotrosImages = Imagen::where('seccion', 'nosotros')->get(); // Obtener todas las imágenes de la sección "nosotros"
-    return view('nosotros', compact('nosotrosImages')); // Retornar la vista con las imágenes
-}
+        $nosotrosBannerImages = Imagen::where('seccion', 'nosotros_banner')
+            ->orderBy('id', 'desc')
+            ->get();
 
+        return view('nosotros', compact('nosotrosBannerImages'));
+    }
 }

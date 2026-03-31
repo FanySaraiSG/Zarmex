@@ -3,59 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ asset('css/inicio.css') }}">
     <title>Inicio de Sesión - Empleados</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+    <link rel="stylesheet" href="{{ asset('css/inicio.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
-    <header>
-        <div class="nav-container">
-            <div class="nav-left">
-                <a href="../"><i class="fas fa-arrow-left"></i></a>
+    <header class="topbar">
+    <a href="{{ url('/') }}" class="topbar-logo">
+        <img src="{{ asset('imagenes/Captura de pantalla 2025-01-19 134751.png') }}" alt="Zarmex">
+    </a>
+</header>
+    <main class="login-page">
+        <section class="login-card">
+            <div class="login-avatar">
+                <svg class="user-icon" viewBox="0 0 24 24" fill="none">
+               <circle cx="12" cy="8" r="4" stroke="white" stroke-width="1.5"/>
+    <path d="M4 20c0-4 4-6 8-6s8 2 8 6" stroke="white" stroke-width="1.5"/>
+</svg>
             </div>
-            <div class="logo">
-                <a href="../">
-                    <img src="{{ asset('imagenes/Captura de pantalla 2025-01-19 134751.png') }}" alt="Zarmex">
-                </a>
-            </div>
-            <div class="nav-right"></div>
-        </div>
-    </header>
 
-    <div id="main-container" class="container">
-        <div class="panel left">
-            <h2>Inicio de Sesión - Empleados</h2>
-            
-            <!-- Mensajes de estado de sesión -->
-            @if (session('status'))
-                <p class="text-green-500 text-sm">{{ session('status') }}</p>
-            @endif
+            <h1>Inicio de Sesión - Empleados</h1>
 
-            <form method="POST" action="{{ route('employee.login') }}">
+            <form method="POST" action="{{ route('employee.login') }}" class="login-form">
                 @csrf
 
-                <!-- Email -->
-                <div>
-                    <label for="email">Correo Electrónico</label>
-                    <input type="email" name="email" id="email" placeholder="Tu correo" required value="{{ old('email') }}">
+                <div class="form-group">
+                    <label for="email"></label>
+                    <div class="input-wrap">
+                        <span class="input-icon">
+                            <i class="fa-solid fa-user"></i>
+                        </span>
+                        <input
+                            id="email"
+                            type="email"
+                            name="email"
+                            placeholder="Email"
+                            required
+                            autofocus
+                            value="{{ old('email') }}"
+                        >
+                    </div>
                     @error('email')
-                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                        <span class="error-text">{{ $message }}</span>
                     @enderror
                 </div>
 
-                <!-- Contraseña -->
-                <div class="mt-4">
-                    <label for="password">Contraseña</label>
-                    <input type="password" name="password" id="password" placeholder="Tu contraseña" required>
+                <div class="form-group">
+                    <label for="password"></label>
+                    <div class="input-wrap">
+                        <span class="input-icon">
+                            <i class="fa-solid fa-lock"></i>
+                        </span>
+
+                        <input
+                            id="password"
+                            type="password"
+                            name="password"
+                            placeholder="Password"
+                            required
+                        >
+
+                        
+                    </div>
                     @error('password')
-                        <span class="text-red-500 text-sm">{{ $message }}</span>
+                        <span class="error-text">{{ $message }}</span>
                     @enderror
                 </div>
 
-                <button type="submit">Ingresar</button>
+                <button type="submit" class="login-btn">Ingresar</button>
             </form>
-        </div>
-    </div>
+        </section>
+    </main>
+
+    <script>
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.getElementById('toggleIcon');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+    </script>
 
 </body>
 </html>

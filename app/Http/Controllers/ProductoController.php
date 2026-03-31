@@ -6,22 +6,27 @@ use Illuminate\Http\Request;
 use App\Models\Producto;
 use App\Models\Categoria;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use App\Models\Color;
 use App\Models\ImagenProducto;
-use App\Models\Medida;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
+
 class ProductoController extends Controller
 {
     public function index($categoria = null)
     {
-
         $categorias = Categoria::all();
 
         if ($categoria) {
-            $categoriaNombre = DB::table('categorias')->where('id_categoria', $categoria)->value('nombre');
-            $productos = Producto::where('categoria_id', $categoria)->paginate(6); // Aplicamos paginación
+            $categoriaNombre = DB::table('categorias')
+                ->where('id_categoria', $categoria)
+                ->value('nombre');
+
+            $productos = Producto::where('categoria_id', $categoria)->paginate(6);
         } else {
             $categoriaNombre = 'Todos los productos';
-            $productos = Producto::paginate(6); // Aplicamos paginación
+            $productos = Producto::paginate(6);
         }
 
         return view('productos.index', compact('categoriaNombre', 'productos', 'categorias'));
@@ -35,58 +40,55 @@ class ProductoController extends Controller
 
     public function store(Request $request)
     {
-        // Validación de datos
         $request->validate([
             'id' => 'required|unique:productos,id',
-            'nombre' => 'required|string|max:255',
             'descripcion' => 'nullable|string',
             'precio' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'categoria_id' => 'required|exists:categorias,id_categoria',
-            'imagen_url' => 'nullable|image|max:2048', // Máximo 2MB
-            'largo' => 'required|numeric|min:0',
-            'ancho' => 'required|numeric|min:0',
-            'altura' => 'required|numeric|min:0',
+            'imagen_url' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+
+            'doc1' => 'nullable|file|max:10240|mimes:pdf,doc,docx,xls,xlsx',
+            'doc2' => 'nullable|file|max:10240|mimes:pdf,doc,docx,xls,xlsx',
+            'doc3' => 'nullable|file|max:10240|mimes:pdf,doc,docx,xls,xlsx',
         ]);
 
-        // Obtener el ID del producto
         $idProducto = $request->input('id');
 
-        // Verificar que el ID no esté vacío
         if (empty($idProducto)) {
-            return redirect()->back()->withErrors(['id' => 'El ID del producto no puede estar vacío.'])->withInput();
+            return redirect()->back()
+                ->withErrors(['id' => 'El ID del producto no puede estar vacío.'])
+                ->withInput();
         }
 
-        // Ruta de la carpeta donde se guardarán las imágenes
+        $nombreAuto = 'Producto ' . $idProducto;
+
         $rutaProducto = public_path("images/productos/{$idProducto}");
-
-        // Crear la carpeta del producto si no existe
         if (!file_exists($rutaProducto)) {
-            mkdir($rutaProducto, 0755, true); // Crea la carpeta del producto con permisos 755
+            mkdir($rutaProducto, 0755, true);
         }
 
-        // Manejo de la imagen
-        $imagenPath = null;
-        if ($request->hasFile('imagen_url') && $request->file('imagen_url')->isValid()) {
-            // Obtener la extensión de la imagen
-            $extension = $request->file('imagen_url')->getClientOriginalExtension();
+        $nombreImagen = 'principal.jpg';
+        $rutaImagenFisica = $rutaProducto . '/' . $nombreImagen;
+        $imagenPath = "images/productos/{$idProducto}/{$nombreImagen}";
 
-            // Definir el nombre de la imagen como "principal" con la extensión correspondiente
-            $nombreImagen = "principal.{$extension}";
+        if ($request->hasFile('imagen_url')) {
+            foreach (glob($rutaProducto . "/principal.*") as $archivo) {
+                @unlink($archivo);
+            }
 
-            // Mover la imagen a la carpeta correspondiente
-            $request->file('imagen_url')->move($rutaProducto, $nombreImagen);
+            $manager = new ImageManager(new Driver());
 
-            // Guardar la ruta relativa para la base de datos
-            $imagenPath = "images/productos/{$idProducto}/{$nombreImagen}";
-        } else {
-            return redirect()->back()->withErrors(['imagen_url' => 'La imagen no es válida.'])->withInput();
+            $imagenProcesada = $manager->read($request->file('imagen_url'))
+                ->cover(1200, 1200)
+                ->toJpeg(85);
+
+            file_put_contents($rutaImagenFisica, (string) $imagenProcesada);
         }
 
-        // Crear el producto
         $producto = Producto::create([
             'id' => $idProducto,
-            'nombre' => $request->nombre,
+            'nombre' => $nombreAuto,
             'descripcion' => $request->descripcion,
             'precio' => $request->precio,
             'stock' => $request->stock,
@@ -94,13 +96,27 @@ class ProductoController extends Controller
             'imagen_url' => $imagenPath,
         ]);
 
-        // Crear la medida vinculada
-        Medida::create([
-            'producto_id' => $producto->id,
-            'largo' => $request->largo,
-            'ancho' => $request->ancho,
-            'altura' => $request->altura,
-        ]);
+        foreach (['doc1', 'doc2', 'doc3'] as $campo) {
+            if ($request->hasFile($campo)) {
+                $columna = $campo . '_url';
+
+                $archivo = $request->file($campo);
+                $ext = strtolower($archivo->getClientOriginalExtension());
+                $nombreBase = Str::slug(pathinfo($archivo->getClientOriginalName(), PATHINFO_FILENAME));
+                $nombreFinal = $nombreBase . '_' . time() . '.' . $ext;
+
+                $destino = public_path("docs/productos/{$producto->id}");
+                if (!file_exists($destino)) {
+                    mkdir($destino, 0755, true);
+                }
+
+                $archivo->move($destino, $nombreFinal);
+
+                $producto->$columna = "docs/productos/{$producto->id}/{$nombreFinal}";
+            }
+        }
+
+        $producto->save();
 
         return redirect()->route('productos.index')->with('success', 'Producto creado correctamente.');
     }
@@ -120,173 +136,262 @@ class ProductoController extends Controller
         }
 
         $categorias = Categoria::all();
-        return view('productos.edit', compact('producto', 'categorias'));
+
+        $imagenesExtra = ImagenProducto::where('producto_id', $producto->id)
+            ->orderBy('orden')
+            ->get();
+
+        return view('productos.edit', compact('producto', 'categorias', 'imagenesExtra'));
     }
+
     public function update(Request $request, $id)
     {
         $request->validate([
             'id' => 'required|unique:productos,id,' . $id,
-            'nombre' => 'required|string|max:255',
             'descripcion' => 'nullable|string',
             'precio' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'categoria_id' => 'nullable|exists:categorias,id_categoria',
-            'imagen_url' => 'nullable|image|mimes:jpg,png,jpeg,gif|max:2048',
-            'largo' => 'required|numeric|min:0',
-            'ancho' => 'required|numeric|min:0',
-            'altura' => 'required|numeric|min:0',
+
+            'imagen_url' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+
+            'imagenes'   => 'nullable|array',
+            'imagenes.*' => 'image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+
+            'doc1' => 'nullable|file|max:10240|mimes:pdf,doc,docx,xls,xlsx',
+            'doc2' => 'nullable|file|max:10240|mimes:pdf,doc,docx,xls,xlsx',
+            'doc3' => 'nullable|file|max:10240|mimes:pdf,doc,docx,xls,xlsx',
         ]);
 
         $producto = Producto::findOrFail($id);
-        $nuevo_id = $request->input('id'); // Nuevo ID ingresado en el formulario
+        $idAnterior = $producto->id;
+        $nuevoId = $request->input('id');
 
-        // Verificar si el ID cambió
-        if ($producto->id !== $nuevo_id) {
+        if ($idAnterior !== $nuevoId) {
             DB::beginTransaction();
+
             try {
-                // Deshabilitar verificación de claves foráneas para evitar errores
                 DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
-                // Actualizar todas las imágenes del producto con el nuevo ID
-                ImagenProducto::where('producto_id', $producto->id)->update(['producto_id' => $nuevo_id]);
+                ImagenProducto::where('producto_id', $idAnterior)->update(['producto_id' => $nuevoId]);
+                DB::table('productos')->where('id', $idAnterior)->update(['id' => $nuevoId]);
 
-                // Actualizar el ID del producto en `productos`
-                DB::table('productos')->where('id', $producto->id)->update(['id' => $nuevo_id]);
-
-                // Habilitar verificación de claves foráneas después de la actualización
                 DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-
                 DB::commit();
             } catch (\Exception $e) {
                 DB::rollBack();
-                return back()->withErrors(['error' => 'Error al actualizar el producto: ' . $e->getMessage()]);
+                DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+
+                return back()->withErrors([
+                    'error' => 'Error al actualizar el producto: ' . $e->getMessage()
+                ]);
             }
+
+            $rutaVieja = public_path("images/productos/{$idAnterior}");
+            $rutaNueva = public_path("images/productos/{$nuevoId}");
+
+            if (file_exists($rutaVieja) && !file_exists($rutaNueva)) {
+                @rename($rutaVieja, $rutaNueva);
+            }
+
+            $docsViejos = public_path("docs/productos/{$idAnterior}");
+            $docsNuevos = public_path("docs/productos/{$nuevoId}");
+
+            if (file_exists($docsViejos) && !file_exists($docsNuevos)) {
+                @rename($docsViejos, $docsNuevos);
+            }
+
+            DB::table('productos')
+                ->where('id', $nuevoId)
+                ->update([
+                    'imagen_url' => DB::raw("REPLACE(imagen_url, 'images/productos/{$idAnterior}/', 'images/productos/{$nuevoId}/')"),
+                    'doc1_url'   => DB::raw("REPLACE(doc1_url, 'docs/productos/{$idAnterior}/', 'docs/productos/{$nuevoId}/')"),
+                    'doc2_url'   => DB::raw("REPLACE(doc2_url, 'docs/productos/{$idAnterior}/', 'docs/productos/{$nuevoId}/')"),
+                    'doc3_url'   => DB::raw("REPLACE(doc3_url, 'docs/productos/{$idAnterior}/', 'docs/productos/{$nuevoId}/')")
+                ]);
+
+            DB::table('imagen_productos')
+                ->where('producto_id', $nuevoId)
+                ->update([
+                    'ruta' => DB::raw("REPLACE(ruta, 'images/productos/{$idAnterior}/', 'images/productos/{$nuevoId}/')")
+                ]);
+
+            $producto = Producto::findOrFail($nuevoId);
         }
 
-        // Actualizar otros datos del producto
-        $datos = $request->except(['imagen_url', 'id']);
+        $datos = $request->except([
+            'imagen_url', 'imagenes', 'id', 'nombre',
+            'doc1', 'doc2', 'doc3'
+        ]);
+
         $producto->update($datos);
 
-        // Manejo de imagen
+        $rutaProducto = public_path("images/productos/{$producto->id}");
+        if (!file_exists($rutaProducto)) {
+            mkdir($rutaProducto, 0755, true);
+        }
+
         if ($request->hasFile('imagen_url')) {
-            $rutaImagenAnterior = public_path($producto->imagen_url);
-            if (file_exists($rutaImagenAnterior)) {
-                unlink($rutaImagenAnterior);
+            foreach (glob($rutaProducto . "/principal.*") as $archivo) {
+                @unlink($archivo);
             }
 
-            // Guardar imagen con el nombre 'principal'
-            $extension = $request->file('imagen_url')->getClientOriginalExtension();
-            $nombreImagen = 'principal.' . $extension; // Fijo el nombre a 'principal'
-            $rutaProducto = public_path("images/productos/{$producto->id}");
+            $nombreImagen = 'principal.jpg';
+            $rutaImagenFisica = $rutaProducto . '/' . $nombreImagen;
 
-            // Crear la carpeta si no existe
-            if (!file_exists($rutaProducto)) {
-                mkdir($rutaProducto, 0755, true);
+            $manager = new ImageManager(new Driver());
+
+            $imagenProcesada = $manager->read($request->file('imagen_url'))
+                ->cover(1200, 1200)
+                ->toJpeg(85);
+
+            file_put_contents($rutaImagenFisica, (string) $imagenProcesada);
+
+            $producto->imagen_url = "images/productos/{$producto->id}/{$nombreImagen}";
+        }
+
+        if ($request->hasFile('imagenes')) {
+            $ultimoOrden = (int) ImagenProducto::where('producto_id', $producto->id)->max('orden');
+            $orden = $ultimoOrden + 1;
+
+            foreach ($request->file('imagenes') as $img) {
+                $nombre = "extra_" . time() . "_" . uniqid() . ".jpg";
+                $rutaExtraFisica = $rutaProducto . '/' . $nombre;
+
+                $manager = new ImageManager(new Driver());
+
+                $imagenExtraProcesada = $manager->read($img)
+                    ->cover(1200, 1200)
+                    ->toJpeg(85);
+
+                file_put_contents($rutaExtraFisica, (string) $imagenExtraProcesada);
+
+                ImagenProducto::create([
+                    'producto_id' => $producto->id,
+                    'ruta'        => "images/productos/{$producto->id}/{$nombre}",
+                    'orden'       => $orden,
+                ]);
+
+                $orden++;
             }
+        }
+        //  ELIMINAR DOCUMENTOS SI SE MARCA EL CHECKBOX
+foreach (['doc1', 'doc2', 'doc3'] as $campo) {
+    $checkboxEliminar = 'eliminar_' . $campo;
+    $columna = $campo . '_url';
 
-            // Mover la imagen a la carpeta correspondiente
-            $request->file('imagen_url')->move($rutaProducto, $nombreImagen);
-            $producto->update(['imagen_url' => "images/productos/{$producto->id}/{$nombreImagen}"]);
+    if ($request->has($checkboxEliminar) && !empty($producto->$columna)) {
+        $rutaAnterior = public_path($producto->$columna);
+
+        if (file_exists($rutaAnterior)) {
+            @unlink($rutaAnterior);
         }
 
-        // Actualizar medidas
-        $medidas = Medida::where('producto_id', $producto->id)->first();
-        if ($medidas) {
-            $medidas->update([
-                'largo' => $request->largo,
-                'ancho' => $request->ancho,
-                'altura' => $request->altura,
-            ]);
-        } else {
-            // Si no existe la medida, crear una nueva
-            Medida::create([
-                'producto_id' => $producto->id,
-                'largo' => $request->largo,
-                'ancho' => $request->ancho,
-                'altura' => $request->altura,
-            ]);
-        }
-
-        return redirect()->route('productos.index')->with('success', 'Producto actualizado correctamente.');
+        $producto->$columna = null;
     }
+}
 
+        foreach (['doc1', 'doc2', 'doc3'] as $campo) {
+            if ($request->hasFile($campo)) {
+                $columna = $campo . '_url';
+
+                if (!empty($producto->$columna)) {
+                    $rutaAnterior = public_path($producto->$columna);
+                    if (file_exists($rutaAnterior)) {
+                        @unlink($rutaAnterior);
+                    }
+                }
+
+                $archivo = $request->file($campo);
+                $ext = strtolower($archivo->getClientOriginalExtension());
+                $nombreBase = Str::slug(pathinfo($archivo->getClientOriginalName(), PATHINFO_FILENAME));
+                $nombreFinal = $nombreBase . '_' . time() . '.' . $ext;
+
+                $destino = public_path("docs/productos/{$producto->id}");
+                if (!file_exists($destino)) {
+                    mkdir($destino, 0755, true);
+                }
+
+                $archivo->move($destino, $nombreFinal);
+
+                $producto->$columna = "docs/productos/{$producto->id}/{$nombreFinal}";
+            }
+        }
+
+        $producto->save();
+
+        return redirect()->route('productos.index')
+    ->with('success', 'Producto actualizado correctamente.');
+    }
 
     public function mostrarProductosPorCategoria($id_categoria)
     {
-        $productos = Producto::where('categoria_id', $id_categoria)->paginate(8); // Usar paginate correctamente
+        $productos = Producto::where('categoria_id', $id_categoria)->paginate(8);
         $categorias = Categoria::all();
-        $categoriaNombre = DB::table('categorias')->where('id_categoria', $id_categoria)->value('nombre');
+        $categoriaNombre = DB::table('categorias')
+            ->where('id_categoria', $id_categoria)
+            ->value('nombre');
 
         return view('catalogo', compact('productos', 'categorias', 'categoriaNombre'));
     }
+
     public function verMas($id)
     {
-        $producto = Producto::with('medida')->find($id); // Buscar el producto por ID y cargar medidas
+        $producto = Producto::findOrFail($id);
 
-        if (!$producto) {
-            abort(404); // Si no se encuentra el producto, lanzar un error 404
-        }
-
-        // Obtener el nombre de la categoría del producto
         $nombreCategoria = DB::table('categorias')
             ->where('id_categoria', $producto->categoria_id)
             ->value('nombre');
 
-        // Obtener todas las imágenes asociadas al producto
-        $imagenes = $producto->imagenes; // Asumiendo que tienes la relación definida en el modelo Producto
-
-        $colors = Color::all(); // Obtener todos los colores (si es necesario)
-
-        // Pasar las medidas a la vista
-        $medidas = $producto->medida; // Obtener medidas del producto
-
-        return view('vermas', compact('producto', 'nombreCategoria', 'imagenes', 'colors', 'medidas'));
-    }
-
-
-    public function imagenes()
-    {
-        return $this->hasMany(ImagenProducto::class, 'producto_id');
-    }
-    public function buscar(Request $request)
-    {
-        $query = $request->input('query');  // Obtener el término de búsqueda
-
-        // Buscar productos por ID o nombre
-        $productos = Producto::where('id', 'like', "%{$query}%")
-            ->orWhere('nombre', 'like', "%{$query}%")
+        $imagenes = ImagenProducto::where('producto_id', $producto->id)
+            ->orderBy('orden')
             ->get();
 
-        // Devolver los resultados como JSON
+        $colors = Color::all();
+
+        return view('vermas', compact('producto', 'nombreCategoria', 'imagenes', 'colors'));
+    }
+
+    public function buscar(Request $request)
+    {
+        $query = $request->input('query');
+
+        $productos = Producto::where('id', 'like', "%{$query}%")
+            ->orWhere('descripcion', 'like', "%{$query}%")
+            ->get();
+
         return response()->json($productos);
     }
+
     public function destroy($id)
     {
-        // Encuentra el producto por ID
         $producto = Producto::findOrFail($id);
 
-        // Eliminar las imágenes asociadas en la tabla ImagenProducto
         $imagenes = ImagenProducto::where('producto_id', $producto->id)->get();
-
         foreach ($imagenes as $imagen) {
-            // Aquí asumimos que tienes un campo 'ruta' en la tabla ImagenProducto
-            $rutaImagen = public_path($imagen->ruta); // Ajusta 'ruta' según el nombre del campo
+            $rutaImagen = public_path($imagen->ruta);
             if (file_exists($rutaImagen)) {
-                unlink($rutaImagen); // Eliminar archivo físico
+                @unlink($rutaImagen);
             }
-            $imagen->delete(); // Eliminar registro de la base de datos
+            $imagen->delete();
         }
 
-        // Eliminar las medidas asociadas
-        Medida::where('producto_id', $producto->id)->delete();
-
-        // Eliminar la imagen principal del producto
-        $rutaPrincipal = public_path($producto->imagen_url);
-        if (file_exists($rutaPrincipal)) {
-            unlink($rutaPrincipal); // Eliminar archivo físico
+        if ($producto->imagen_url) {
+            $rutaPrincipal = public_path($producto->imagen_url);
+            if (file_exists($rutaPrincipal)) {
+                @unlink($rutaPrincipal);
+            }
         }
 
-        // Eliminar el producto
+        foreach (['doc1_url', 'doc2_url', 'doc3_url'] as $col) {
+            if (!empty($producto->$col)) {
+                $ruta = public_path($producto->$col);
+                if (file_exists($ruta)) {
+                    @unlink($ruta);
+                }
+            }
+        }
+
         $producto->delete();
 
         return redirect()->route('productos.index')->with('success', 'Producto eliminado correctamente.');
@@ -297,14 +402,13 @@ class ProductoController extends Controller
         $query = $request->input('query');
 
         if ($query) {
-            $resultados = Producto::where('nombre', 'like', '%' . $query . '%')
-                                ->orWhere('descripcion', 'like', '%' . $query . '%')
-                                ->get();
+            $resultados = Producto::where('id', 'like', '%' . $query . '%')
+                ->orWhere('descripcion', 'like', '%' . $query . '%')
+                ->get();
         } else {
-            $resultados = collect(); // Si no hay consulta, devuelve una colección vacía
+            $resultados = collect();
         }
 
         return view('busqueda', ['resultados' => $resultados, 'query' => $query]);
     }
-
 }

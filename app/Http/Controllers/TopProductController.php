@@ -14,17 +14,22 @@ class TopProductController extends Controller
         return view('top_products.index', compact('topProducts', 'products'));
     }
 
-    public function update(Request $request, TopProduct $topProduct)
-    {
-        $request->validate([
-            'product_id' => 'nullable|string|exists:productos,id',
-        ]);
+    public function update(Request $request, $id)
+{
+    $request->validate([
+        'product_id' => 'nullable|exists:productos,id',
+    ]);
 
-        $topProduct->update(['product_id' => $request->product_id]);
+    $topProduct = TopProduct::findOrFail($id);
+    $topProduct->product_id = $request->product_id ?: null;
+    $topProduct->save();
 
-        return redirect()->route('top-products.index')->with('success', 'Producto actualizado.');
-    }
-
+    return response()->json([
+        'success' => true,
+        'message' => 'Producto actualizado correctamente',
+        'data' => $topProduct
+    ]);
+}
     public function showTopProducts()
     {
         // Obtener los 5 productos más vendidos

@@ -11,7 +11,7 @@ class Producto extends Model
 
     protected $table = 'productos';
     protected $primaryKey = 'id';
-    public $incrementing = false; // Importante para usar un ID personalizado
+    public $incrementing = false; // ID tipo ZAR-CQP-001
     protected $keyType = 'string';
 
     protected $fillable = [
@@ -25,19 +25,22 @@ class Producto extends Model
         'fecha_creacion'
     ];
 
-    public $timestamps = false; // Laravel no manejará automáticamente created_at y updated_at
+    public $timestamps = false;
 
     public function categoria()
     {
         return $this->belongsTo(Categoria::class, 'categoria_id', 'id_categoria');
     }
+
+    // ✅ Imágenes extra del carrusel (tabla imagenes_productos)
     public function imagenes()
     {
-        return $this->hasMany(ImagenProducto::class, 'producto_id', 'id');
+        return $this->hasMany(\App\Models\ImagenProducto::class, 'producto_id', 'id')
+            ->orderBy('orden', 'asc');
     }
+
     public function medida()
     {
         return $this->hasOne(Medida::class, 'producto_id', 'id');
     }
-
 }
