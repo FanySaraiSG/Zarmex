@@ -23,10 +23,10 @@ class ProductoController extends Controller
                 ->where('id_categoria', $categoria)
                 ->value('nombre');
 
-            $productos = Producto::where('categoria_id', $categoria)->paginate(6);
+            $productos = Producto::where('categoria_id', $categoria)->get();
         } else {
             $categoriaNombre = 'Todos los productos';
-            $productos = Producto::paginate(6);
+            $productos = Producto::get();
         }
 
         return view('productos.index', compact('categoriaNombre', 'productos', 'categorias'));

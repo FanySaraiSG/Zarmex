@@ -27,7 +27,7 @@ class ImagenProductoController extends Controller
         $imagen = $request->file('imagen');
 
         // Contar cuántas imágenes tiene el producto y calcular el próximo número
-        $numImagenes = ImagenProducto::where('producto_id', $producto_id)->count();
+        $numImagenes = ImagenProducto::where('producto_id', '=', $producto_id)->count();
         $nuevoNumero = $numImagenes + 1; // Empieza en 1 si no hay imágenes previas
 
         // Generar el ID de la imagen basado en producto_id + número

@@ -35,8 +35,7 @@
                 <tbody>
                     @foreach ($productos as $producto)
                     <tr>
-                        <td>{{ ($productos->currentPage() - 1) * $productos->perPage() + $loop->iteration }}</td>
-
+                        <td>{{ $loop->iteration }}</td>
                         <td>{{ $producto->id }}</td>
 
                         <td style="max-width: 220px;">
@@ -125,10 +124,6 @@
                     @endforeach
                 </tbody>
             </table>
-        </div>
-
-        <div class="d-flex justify-content-center mt-3">
-            {{ $productos->links() }}
         </div>
 
     </div>

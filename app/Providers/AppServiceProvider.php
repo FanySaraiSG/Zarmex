@@ -25,7 +25,7 @@ class AppServiceProvider extends ServiceProvider
     {
         if (Schema::hasTable('imagenes')) {
             $logoImage = Imagen::where('seccion', 'logo')->first();
-            View::share('logoImage', $logoImage);
+            view()->share('logoImage', $logoImage);
         }
         Paginator::useBootstrap();
     }
