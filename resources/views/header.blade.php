@@ -266,7 +266,7 @@ ul{ list-style:none; }
     width: 96%;
     max-width: 1600px;
     margin: auto;
-    padding: 14px 0;
+    padding: 4px 0;
     display:flex;
     align-items:center;
     gap:18px;
@@ -297,7 +297,7 @@ ul{ list-style:none; }
     justify-content:center;
     align-items:center;
 }
-.zx-brand img{ height:70px; }
+.zx-brand img{ height:35px; }
 
 /* ===== buscador ===== */
 .zx-search-wrap{

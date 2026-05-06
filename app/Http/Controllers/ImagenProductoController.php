@@ -27,31 +27,32 @@ class ImagenProductoController extends Controller
         $imagen = $request->file('imagen');
 
         // Contar cuántas imágenes tiene el producto y calcular el próximo número
-        $numImagenes = ImagenProducto::where('producto_id', '=', $producto_id)->count();
-        $nuevoNumero = $numImagenes + 1; // Empieza en 1 si no hay imágenes previas
+        $numImagenes = ImagenProducto::where('producto_id', $producto_id)->count();
+        $nuevoNumero = $numImagenes + 1;
 
         // Generar el ID de la imagen basado en producto_id + número
         $idImagen = "{$producto_id}_{$nuevoNumero}";
 
-        // Usar el nombre original del archivo
-        $nombreImagen = $imagen->getClientOriginalName();
+        // MODIFICACIÓN: Usar un nombre único con timestamp para evitar colisiones de archivos
+        $nombreImagen = time() . '_' . $imagen->getClientOriginalName();
 
         // Ruta donde se guardará la imagen
-        $rutaImagen = public_path("images/productos/$producto_id");
+        $rutaRelativa = "images/productos/$producto_id";
+        $rutaAbsoluta = public_path($rutaRelativa);
 
         // Crear el directorio si no existe
-        if (!file_exists($rutaImagen)) {
-            mkdir($rutaImagen, 0755, true); // Crear la carpeta si no existe
+        if (!file_exists($rutaAbsoluta)) {
+            mkdir($rutaAbsoluta, 0755, true);
         }
 
         // Mover la imagen a la carpeta
-        $imagen->move($rutaImagen, $nombreImagen);
+        $imagen->move($rutaAbsoluta, $nombreImagen);
 
         // Guardar en la base de datos
         ImagenProducto::create([
-            'id' => $idImagen, // ID personalizado
+            'id' => $idImagen, 
             'producto_id' => $producto_id,
-            'ruta' => "images/productos/$producto_id/$nombreImagen"
+            'ruta' => "$rutaRelativa/$nombreImagen"
         ]);
 
         // Redirigir a la vista de índice de imágenes del producto
@@ -73,33 +74,30 @@ class ImagenProductoController extends Controller
         ]);
 
         $imagenProducto = ImagenProducto::findOrFail($id); // Buscar la imagen por ID
-        $producto_id = $imagenProducto->producto_id; // Obtener el ID del producto al que pertenece
+        $producto_id = $imagenProducto->producto_id;
 
-        // Obtener la nueva imagen
         $nuevaImagen = $request->file('imagen');
 
-        // Ruta donde se almacenará la imagen
-        $rutaImagen = public_path("images/productos/$producto_id");
+        // MODIFICACIÓN: Nuevo nombre para la actualización
+        $nombreImagen = time() . '_' . $nuevaImagen->getClientOriginalName();
+        $rutaRelativa = "images/productos/$producto_id";
+        $rutaAbsoluta = public_path($rutaRelativa);
 
-        // Crear el directorio si no existe
-        if (!file_exists($rutaImagen)) {
-            mkdir($rutaImagen, 0755, true); // Crear la carpeta si no existe
+        if (!file_exists($rutaAbsoluta)) {
+            mkdir($rutaAbsoluta, 0755, true);
         }
 
-        // Eliminar la imagen anterior si existe
+        // Eliminar la imagen anterior físicamente si existe para no dejar basura en el servidor
         if (file_exists(public_path($imagenProducto->ruta))) {
-            unlink(public_path($imagenProducto->ruta)); // Eliminar la imagen anterior
+            unlink(public_path($imagenProducto->ruta));
         }
 
-        // Usar el mismo nombre de archivo que la imagen anterior
-        $nombreImagen = basename($imagenProducto->ruta); // Obtener el nombre de la imagen anterior
+        // Mover la nueva imagen
+        $nuevaImagen->move($rutaAbsoluta, $nombreImagen);
 
-        // Mover la nueva imagen a la carpeta con el nombre anterior
-        $nuevaImagen->move($rutaImagen, $nombreImagen);
-
-        // Actualizar la ruta de la imagen en la base de datos
-        $imagenProducto->ruta = "images/productos/$producto_id/$nombreImagen"; // Actualizar la ruta
-        $imagenProducto->save(); // Guardar los cambios
+        // Actualizar la ruta en la base de datos
+        $imagenProducto->ruta = "$rutaRelativa/$nombreImagen";
+        $imagenProducto->save();
 
         return redirect()->route('productos.imagenes.show', $producto_id)->with('success', 'Imagen actualizada correctamente.');
     }
@@ -107,12 +105,12 @@ class ImagenProductoController extends Controller
     // Método para eliminar una imagen existente
     public function destroy($id)
     {
-        $imagenProducto = ImagenProducto::findOrFail($id); // Buscar la imagen por ID
+        $imagenProducto = ImagenProducto::findOrFail($id); 
         $rutaImagen = public_path($imagenProducto->ruta);
 
         // Eliminar el archivo de la carpeta
         if (file_exists($rutaImagen)) {
-            unlink($rutaImagen); // Eliminar el archivo
+            unlink($rutaImagen);
         }
 
         // Eliminar el registro de la base de datos
@@ -124,12 +122,8 @@ class ImagenProductoController extends Controller
     // Método para mostrar las imágenes de un producto en la vista de índice
     public function show($id)
     {
-        // Buscar el producto por su ID
         $producto = Producto::findOrFail($id);
-
-        // Obtener las imágenes relacionadas
-        $imagenes = $producto->imagenes; // Asegúrate de tener esta relación en tu modelo Producto
-        // Retornar una vista con el producto y las imágenes
+        $imagenes = $producto->imagenes; 
         return view('productos.imagen.index', compact('producto', 'imagenes'));
     }
 }
