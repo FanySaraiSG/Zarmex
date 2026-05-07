@@ -50,7 +50,7 @@
             height: 270px;
             object-fit: contain;
             padding: 20px;
-            background: #def7ed;
+            background: #46ad84;
         }
 
         .modal-content {
@@ -92,12 +92,12 @@
         .btn-document-inline {
             display: inline-flex;
             align-items: center;
-            padding: 6px 12px;
+            padding: 12px 12px;
             background: #f8f9fa;
             border: 1px solid #eee;
             border-radius: 8px;
             text-decoration: none;
-            color: #444;
+            color: #012e0d;
             font-size: 0.75rem;
             transition: 0.2s;
         }

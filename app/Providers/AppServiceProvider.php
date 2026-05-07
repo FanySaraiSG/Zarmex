@@ -5,7 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider; // Importa la clase correcta
 use App\Models\Imagen;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\View; 
 use Illuminate\Pagination\Paginator;
 
 class AppServiceProvider extends ServiceProvider
