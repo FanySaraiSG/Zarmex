@@ -123,6 +123,10 @@ Route::prefix('employees')->group(function () {
         Route::put('/reportes/{reporte}', [ReporteController::class, 'update'])->name('reportes.update');
         Route::delete('/reportes/{reporte}', [ReporteController::class, 'destroy'])->name('reportes.destroy');
 
+        // Video del producto
+        Route::put('productos/{id}/video', [ProductoController::class, 'updateVideo'])->name('productos.video.update');
+        Route::delete('productos/{id}/video', [ProductoController::class, 'destroyVideo'])->name('productos.video.destroy');
+
         /* =========================
         |  ADMIN: REVIEWS / RESEÑAS
         |========================= */

@@ -397,7 +397,7 @@ foreach (['doc1', 'doc2', 'doc3'] as $campo) {
         return redirect()->route('productos.index')->with('success', 'Producto eliminado correctamente.');
     }
 
-    public function mostrarResultadosBusqueda(Request $request)
+   public function mostrarResultadosBusqueda(Request $request)
     {
         $query = $request->input('query');
 
@@ -411,4 +411,42 @@ foreach (['doc1', 'doc2', 'doc3'] as $campo) {
 
         return view('busqueda', ['resultados' => $resultados, 'query' => $query]);
     }
+
+    public function updateVideo(Request $request, $id)
+    {
+        $request->validate([
+            'video' => 'required|file|mimes:mp4|max:51200',
+        ]);
+
+        $producto = Producto::findOrFail($id);
+        $rutaProducto = public_path("images/productos/{$producto->id}");
+
+        if (!file_exists($rutaProducto)) mkdir($rutaProducto, 0755, true);
+
+        if (!empty($producto->video_url) && file_exists(public_path($producto->video_url))) {
+            @unlink(public_path($producto->video_url));
+        }
+
+        $nombre = 'video_' . time() . '.mp4';
+        $request->file('video')->move($rutaProducto, $nombre);
+        $producto->video_url = "images/productos/{$producto->id}/{$nombre}";
+        $producto->save();
+
+        return redirect()->back()->with('success', 'Video actualizado correctamente.');
+    }
+
+    public function destroyVideo($id)
+    {
+        $producto = Producto::findOrFail($id);
+
+        if (!empty($producto->video_url) && file_exists(public_path($producto->video_url))) {
+            @unlink(public_path($producto->video_url));
+        }
+
+        $producto->video_url = null;
+        $producto->save();
+
+        return response()->json(['success' => true]);
+    }
+
 }

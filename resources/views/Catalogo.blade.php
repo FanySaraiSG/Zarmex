@@ -32,7 +32,8 @@
             background: #fff;
             border-radius: 20px;
             border: 1px solid #eee;
-            box-shadow: 0 6px 15px rgba(0,0,0,0.05);
+            /* AJUSTE: Sombreado más intenso en estado normal */
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
             transition: all 0.3s ease;
             display: flex;
             flex-direction: column;
@@ -42,7 +43,8 @@
 
         .card2:hover { 
             transform: translateY(-8px);
-            box-shadow: 0 12px 25px rgba(0,0,0,0.1);
+            /* AJUSTE: Sombreado mucho más marcado al pasar el mouse */
+            box-shadow: 0 20px 40px rgba(0,0,0,0.25);
         }
 
         .card2 img {
@@ -50,13 +52,13 @@
             height: 270px;
             object-fit: contain;
             padding: 20px;
-            background: #46ad84;
+            background: #c4e6d8;
         }
 
         .modal-content {
             border-radius: 25px !important;
             border: none;
-            max-height: 85vh; /* Ajustado para mejor scroll en dispositivos */
+            max-height: 85vh;
             display: flex;
             flex-direction: column;
         }
@@ -88,7 +90,6 @@
         }
         .color-circle:hover { transform: scale(1.2); }
 
-        /* Estilo para documentos uno delante de otro */
         .btn-document-inline {
             display: inline-flex;
             align-items: center;
