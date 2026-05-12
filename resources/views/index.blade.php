@@ -7,7 +7,6 @@
 
     <title>{{ config('app.name', 'Zarmex') }}</title>
 
-    <!-- Fonts -->
     <link rel="stylesheet" href="{{ asset('css/main.css') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,15 +20,13 @@
     <script src="{{ asset('js/whatsapp-drag.js') }}"></script>
 
     <style>
-        /* Hace que el video del banner se vea como imagen (full width, sin deformarse) */
         .banner-media {
             width: 100%;
-            height: 436px;      /* mismo alto que tu banner */
-            object-fit: cover;  /* recorta bonito */
+            height: 436px;
+            object-fit: cover;
             display: block;
         }
 
-        /* WHATSAPP FLOAT (AGREGADO) */
         .whatsapp-float {
             position: fixed;
             bottom: 25px;
@@ -45,7 +42,7 @@
             justify-content: center;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
-            z-index: 999999; /* importante para que no lo tape nada */
+            z-index: 999999;
             text-decoration: none;
         }
 
@@ -60,7 +57,6 @@
 <body class="antialiased">
     @include('header')
 
-    </div>
     <section>
         @php
             $bannerImages = \App\Models\Imagen::where('seccion', 'banner')->get();
@@ -73,244 +69,421 @@
                  data-bs-interval="5000">
 
                 <div class="carousel-inner">
-
                     @foreach($bannerImages as $index => $image)
                         @php
                             $extension = strtolower(pathinfo($image->imagen_url, PATHINFO_EXTENSION));
                         @endphp
 
                         <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
-
-                            {{-- SI ES VIDEO --}}
                             @if(in_array($extension, ['mp4','webm','ogg']))
-                                <video class="d-block w-100"
-                                       autoplay
-                                       muted
-                                       loop
-                                       playsinline
-                                       style="height:436px; object-fit:cover;">
+                                {{-- Se agregó la clase 'banner-video' para que el JS lo reconozca --}}
+                                <video class="banner-video d-block w-100" autoplay muted loop playsinline style="height:436px; object-fit:cover;">
                                     <source src="{{ asset($image->imagen_url) }}" type="video/{{ $extension }}">
                                     Tu navegador no soporta video HTML5
                                 </video>
-
-                            {{-- SI ES IMAGEN --}}
                             @else
-                                <img src="{{ asset($image->imagen_url) }}"
-                                     class="d-block w-100"
-                                     alt="Banner"
-                                     style="height:436px; object-fit:cover;">
+                                <img src="{{ asset($image->imagen_url) }}" class="d-block w-100" alt="Banner" style="height:650px; object-fit:cover;">
                             @endif
-
                         </div>
                     @endforeach
-
                 </div>
 
-                <button class="carousel-control-prev"
-                        type="button"
-                        data-bs-target="#carouselBanner"
-                        data-bs-slide="prev">
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselBanner" data-bs-slide="prev">
                     <span class="carousel-control-prev-icon"></span>
                 </button>
-
-                <button class="carousel-control-next"
-                        type="button"
-                        data-bs-target="#carouselBanner"
-                        data-bs-slide="next">
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselBanner" data-bs-slide="next">
                     <span class="carousel-control-next-icon"></span>
                 </button>
             </div>
 
         @else
             <div class="content-area">
-                <img src="{{ asset('imagenes/banner.jpeg') }}"
-                     alt="Banner Predeterminado"
-                     style="height:436px; object-fit:cover;">
+                <img src="{{ asset('imagenes/banner.jpeg') }}" alt="Banner Predeterminado" style="height:436px; object-fit:cover;">
             </div>
         @endif
 
-        {{-- ===================== LOS MÁS VENDIDOS (CARRUSEL) ===================== --}}
+        {{-- ===================== PRODUCTOS DESTACADOS ===================== --}}
         <section class="products">
             <style>
-                /* Contenedor general */
-                .best-sellers-wrap{
-                    max-width: 1200px;
-                    margin: 0 auto;
-                    padding: 0 15px;
-                }
+                .best-sellers-wrap { max-width: 1200px; margin: 0 auto; padding: 0 15px; }
+                .zx-title-playfair { font-family: "Playfair Display", serif !important; font-weight: 700; letter-spacing: .5px; }
 
-                /* Card estilo (tu mismo look, pero mejor acomodado) */
-                .best-card{
+                /* ── Cards ── */
+                .best-card {
                     border: 1px solid #ddd;
-                    border-radius: 12px;
+                    border-radius: 16px;
                     overflow: hidden;
-                    text-align: center;
-                    background-color: #fff;
-                    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.12);
-                    padding: 16px;
+                    background: #fff;
+                    box-shadow: 0 4px 12px rgba(0,0,0,.10);
+                    transition: transform .25s ease, box-shadow .25s ease;
+                    cursor: pointer;
                     height: 100%;
                 }
-
-                .best-card img{
-                    width: 100%;
-                    height: 220px;
-                    object-fit: contain;
-                    border-radius: 10px;
-                    background: #f7f7f7;
-                    padding: 8px;
+                .best-card:hover { transform: translateY(-8px); box-shadow: 0 16px 32px rgba(40,102,110,.18); }
+                .best-card img { width: 100%; height: 220px; object-fit: contain; background: #FFF; padding: 8px; }
+                .best-card h3 { font-size: 1.1em; margin: 12px 0 8px; color: #28666e; font-weight: 700; text-align: center; }
+                .best-card p { font-size: 0.88em; color: #555; margin: 0 0 12px; line-height: 1.4; text-align: justify; padding: 0 8px; }
+                .best-btn {
+                    display: block; text-align: center; background: #28666e; color: #fedc97;
+                    padding: 10px 16px; border-radius: 8px; font-weight: 700; border: none;
+                    width: calc(100% - 32px); margin: 0 16px 16px; cursor: pointer;
+                    transition: background .25s ease, transform .2s ease;
                 }
+                .best-btn:hover { background: #1a4a50; transform: translateY(-1px); color: #fff; }
 
-                .best-card h3{
-                    font-size: 1.15em;
-                    margin: 12px 0 8px;
-                    color: #28666e;
-                    font-weight: 700;
-                }
-
-                .best-card p{
-                    font-size: 0.95em;
-                    color: #555;
-                    margin: 0 0 12px;
-                    line-height: 1.4;
-                }
-
-                .best-btn{
-                    display: inline-block;
-                    text-decoration: none;
-                    background-color: #28666e;
-                    color: #fedc97;
-                    padding: 10px 16px;
-                    border-radius: 8px;
-                    font-weight: 700;
-                    transition: background-color .25s ease, transform .2s ease;
-                }
-                .best-btn:hover{
-                    background-color: #7c9885;
-                    transform: translateY(-1px);
-                    color: #ffffff;
-                }
-
-                /* Flechas del carrusel (más visibles) */
+                /* Carrusel flechas */
                 .best-carousel .carousel-control-prev-icon,
-                .best-carousel .carousel-control-next-icon{
-                    filter: invert(1);
-                }
-
-                /* Un poquito de espacio para que las flechas no tapen cards */
+                .best-carousel .carousel-control-next-icon { filter: invert(1); }
                 .best-carousel .carousel-control-prev,
-                .best-carousel .carousel-control-next{
-                    width: 6%;
-                }
-                .zx-title-playfair{
-                  font-family: "Playfair Display", serif !important;
-                  font-weight: 700;
-                   letter-spacing: .5px;
-             }
+                .best-carousel .carousel-control-next { width: 6%; }
 
+                /* OVERLAY */
+                .prod-overlay {
+                    position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+                    z-index: 99999; display: none; align-items: center;
+                    justify-content: center; padding: 16px;
+                }
+                .prod-overlay.open { display: flex; }
+
+                /* MODAL */
+                .prod-modal {
+                    background: #fff; border-radius: 16px; width: 100%; max-width: 740px;
+                    max-height: 90vh; overflow-y: auto; border: 1px solid #ddd;
+                    animation: prodPopIn .25s cubic-bezier(.23,1,.32,1);
+                }
+                @keyframes prodPopIn { from { opacity:0; transform:scale(.94); } to { opacity:1; transform:scale(1); } }
+
+                .prod-modal-header {
+                    display: flex; align-items: center; justify-content: space-between;
+                    padding: 16px 20px 14px; border-bottom: 1px solid #eee;
+                }
+                .prod-modal-header h3 { font-size: 1.1em; font-weight: 700; color: #28666e; margin: 0; }
+
+                .prod-modal-body { display: grid; grid-template-columns: 1fr 1fr; }
+
+                /* Carrusel del modal */
+                .prod-carousel-wrap { padding: 18px 18px 16px 20px; border-right: 1px solid #eee; }
+                .prod-carousel-stage {
+                    position: relative; width: 100%; height: 300px; background: #f7f7f7;
+                    border-radius: 12px; overflow: hidden; margin-bottom: 10px;
+                }
+                .prod-carousel-track { display: flex; height: 100%; transition: transform .35s cubic-bezier(.23,1,.32,1); }
+                .prod-carousel-slide { min-width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+                .prod-carousel-slide img { width: 100%; height: 100%; object-fit: contain; padding: 12px; }
+                .prod-carousel-slide video { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; }
+                .prod-slide-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; color: #aaa; font-size: 12px; }
+                .prod-slide-empty span:first-child { font-size: 36px; }
+
+                .prod-carr-btn {
+                    position: absolute; top: 50%; transform: translateY(-50%);
+                    background: rgba(40,102,110,0.85); border: none; border-radius: 50%;
+                    width: 28px; height: 28px; color: #fedc97; font-size: 16px; cursor: pointer;
+                    display: flex; align-items: center; justify-content: center; z-index: 2;
+                    transition: background .2s;
+                }
+                .prod-carr-btn:hover { background: #28666e; }
+                .prod-carr-btn.prev { left: 8px; }
+                .prod-carr-btn.next { right: 8px; }
+
+                .prod-dots { display: flex; justify-content: center; gap: 5px; margin-bottom: 10px; }
+                .prod-dot { width: 6px; height: 6px; border-radius: 50%; background: #ccc; cursor: pointer; transition: background .2s, transform .15s; }
+                .prod-dot.active { background: #28666e; transform: scale(1.3); }
+
+                /* Info derecha */
+                .prod-modal-right { padding: 18px 20px 18px 18px; }
+                .prod-info-label { font-size: 11px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: .8px; margin-bottom: 6px; margin-top: 14px; }
+                .prod-info-label:first-child { margin-top: 0; }
+                .prod-desc-full { font-size: 13px; color: #333; line-height: 1.6; }
+                .prod-colors-wrap { display: flex; flex-wrap: wrap; gap: 7px; }
+                .prod-color-swatch {
+                    width: 26px; height: 26px; border-radius: 50%; border: 2px solid transparent;
+                    cursor: pointer; transition: transform .15s, border-color .15s; position: relative;
+                }
+                .prod-color-swatch:hover { transform: scale(1.15); }
+                .prod-color-swatch.selected { border-color: #28666e; }
+                .prod-color-swatch.selected::after { content: ''; position: absolute; inset: -4px; border-radius: 50%; border: 1.5px solid #28666e; }
+                .prod-sel-color { font-size: 12px; color: #888; margin-top: 7px; }
+
+                /* Footer del modal */
+                .prod-modal-footer {
+                    padding: 12px 20px 16px;
+                    border-top: 1px solid #eee;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                }
+                .prod-btn-whatsapp {
+                    background: #25D366;
+                    color: #fff;
+                    border: none;
+                    border-radius: 10px;
+                    padding: 12px 32px;
+                    font-size: 15px;
+                    font-weight: 700;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    transition: background .2s, transform .15s;
+                }
+                .prod-btn-whatsapp:hover { background: #1ebe5d; transform: translateY(-1px); }
+
+                @media (max-width: 768px) {
+                    .prod-modal-body { grid-template-columns: 1fr; }
+                    .prod-carousel-wrap { border-right: none; border-bottom: 1px solid #eee; }
+                }
             </style>
 
-            <h2 class="text-center zx-title-playfair" style="color:#28666e; font-size:2em; margin: 20px 0;"> LOS MÁS VENDIDOS</h2>
+            <h2 class="text-center zx-title-playfair" style="color:#28666e; font-size:2em; margin: 20px 0;">PRODUCTOS DESTACADOS</h2>
+
             <div class="best-sellers-wrap">
                 <div id="topProductsCarousel" class="carousel slide best-carousel" data-bs-ride="carousel" data-bs-interval="4500">
                     <div class="carousel-inner">
-
                         @foreach($topProducts->chunk(3) as $chunk)
                             <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
-                                <div class="row g-4">
+                                <div class="row g-4 justify-content-center">
                                     @foreach($chunk as $topProduct)
                                         <div class="col-12 col-md-6 col-lg-4">
                                             <div class="best-card">
                                                 <img src="{{ $topProduct->product->imagen_url ?? asset('Imagenes/84493-4540581.jpg') }}"
-                                                     alt="{{ $topProduct->product->name ?? 'Producto' }}">
-
-                                                <h3>{{ $topProduct->product->id }}</h3>
-
-                                                <p style="text-align: justify;">
-                                                    {{ \Illuminate\Support\Str::limit($topProduct->product->descripcion ?? '', 120) }}
-                                                </p>
-
-                                                <a href="{{ route('productos.vermas', ['id' => $topProduct->product->id]) }}"
-                                                   class="best-btn">
+                                                     alt="{{ $topProduct->product->nombre ?? 'Producto' }}">
+                                                
+                                                {{-- Limpieza de nombre en la tarjeta --}}
+                                                <h3>{{ Str::afterLast($topProduct->product->nombre, ' ') }}</h3>
+                                                
+                                                <button class="best-btn"
+                                                    data-nombre="{{ $topProduct->product->nombre ?? 'Producto' }}"
+                                                    data-desc="{{ $topProduct->product->descripcion ?? '' }}"
+                                                    data-img="{{ $topProduct->product->imagen_url ?? asset('Imagenes/84493-4540581.jpg') }}"
+                                                    data-colores="{{ json_encode(optional($topProduct->product->colores)->pluck('nombre', 'hex') ?? []) }}"
+                                                    onclick="abrirProdModalDesdeBtn(this)">
                                                     Ver más
-                                                </a>
+                                                </button>
                                             </div>
                                         </div>
                                     @endforeach
                                 </div>
                             </div>
                         @endforeach
-
                     </div>
 
                     <button class="carousel-control-prev" type="button" data-bs-target="#topProductsCarousel" data-bs-slide="prev">
                         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                         <span class="visually-hidden">Anterior</span>
                     </button>
-
                     <button class="carousel-control-next" type="button" data-bs-target="#topProductsCarousel" data-bs-slide="next">
                         <span class="carousel-control-next-icon" aria-hidden="true"></span>
                         <span class="visually-hidden">Siguiente</span>
                     </button>
                 </div>
             </div>
+
+            {{-- ── MODAL ── --}}
+            <div class="prod-overlay" id="prodOverlay" onclick="if(event.target===this) cerrarProdModal()">
+                <div class="prod-modal">
+                    <div class="prod-modal-header">
+                        <h3 id="pm-nombre"></h3>
+                    </div>
+                    <div class="prod-modal-body">
+                        {{-- Carrusel del Modal --}}
+                        <div class="prod-carousel-wrap">
+                            <div class="prod-carousel-stage">
+                                <div class="prod-carousel-track" id="pm-track"></div>
+                                <button class="prod-carr-btn prev" onclick="pmMover(-1)">‹</button>
+                                <button class="prod-carr-btn next" onclick="pmMover(1)">›</button>
+                            </div>
+                            <div class="prod-dots" id="pm-dots"></div>
+                        </div>
+                        {{-- Info --}}
+                        <div class="prod-modal-right">
+                            <p class="prod-info-label">Descripción</p>
+                            <p class="prod-desc-full" id="pm-desc"></p>
+                            <p class="prod-info-label">Colores disponibles</p>
+                            <div class="prod-colors-wrap" id="pm-colors"></div>
+                            <p class="prod-sel-color" id="pm-color-name">Selecciona un color</p>
+                        </div>
+                    </div>
+                    <div class="prod-modal-footer">
+                        <button class="prod-btn-whatsapp" onclick="abrirWhatsapp()">
+                            <i class="fab fa-whatsapp"></i> WhatsApp
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                let pmSlides = [], pmCur = 0, pmNombreActual = '';
+
+                function abrirProdModalDesdeBtn(btn) {
+                    const nombre  = btn.getAttribute('data-nombre');
+                    const desc    = btn.getAttribute('data-desc');
+                    const img     = btn.getAttribute('data-img');
+                    const colores = JSON.parse(btn.getAttribute('data-colores') || '{}');
+                    abrirProdModal(nombre, desc, img, colores);
+                }
+
+                function abrirProdModal(nombre, desc, imgPrincipal, colores) {
+                    // Limpieza del nombre para mostrar solo el ID (Última palabra)
+                    const partes = nombre.split(' ');
+                    const soloCodigo = partes[partes.length - 1];
+                    
+                    pmNombreActual = soloCodigo; // Guardamos el ID para WhatsApp
+
+                    document.getElementById('pm-nombre').textContent = soloCodigo;
+                    document.getElementById('pm-desc').textContent = desc;
+
+                    // Colores
+                    const cw = document.getElementById('pm-colors');
+                    cw.innerHTML = '';
+                    document.getElementById('pm-color-name').textContent = 'Selecciona un color';
+                    if (colores && typeof colores === 'object') {
+                        Object.entries(colores).forEach(([hex, nombre_color]) => {
+                            const sw = document.createElement('div');
+                            sw.className = 'prod-color-swatch';
+                            sw.style.background = hex;
+                            sw.title = nombre_color;
+                            sw.onclick = () => {
+                                document.querySelectorAll('.prod-color-swatch').forEach(s => s.classList.remove('selected'));
+                                sw.classList.add('selected');
+                                document.getElementById('pm-color-name').textContent = nombre_color;
+                            };
+                            cw.appendChild(sw);
+                        });
+                    }
+
+                    // Slides
+                    pmSlides = [{ type: 'img', src: imgPrincipal, label: 'Imagen 1' }];
+                    pmCur = 0;
+                    pmRenderTrack();
+                    pmRenderDots();
+
+                    document.getElementById('prodOverlay').classList.add('open');
+                }
+
+                function cerrarProdModal() {
+                    document.getElementById('prodOverlay').classList.remove('open');
+                }
+
+                function abrirWhatsapp() {
+                    const mensaje = encodeURIComponent(
+                        `Hola, estoy interesado en el producto: ${pmNombreActual}. ¿Me podrían dar más información?`
+                    );
+                    window.open(`https://wa.me/+525581366555?text=${mensaje}`, '_blank');
+                }
+
+                function pmRenderTrack() {
+                    const track = document.getElementById('pm-track');
+                    track.innerHTML = '';
+                    pmSlides.forEach(s => {
+                        const slide = document.createElement('div');
+                        slide.className = 'prod-carousel-slide';
+                        if (s.src) {
+                            slide.innerHTML = s.type === 'vid'
+                                ? `<video src="${s.src}" controls style="width:100%;height:100%;object-fit:cover;border-radius:12px"></video>`
+                                : `<img src="${s.src}">`;
+                        } else {
+                            slide.innerHTML = `<div class="prod-slide-empty"><span>${s.type === 'vid' ? '🎬' : '🖼'}</span><span>${s.label}</span></div>`;
+                        }
+                        track.appendChild(slide);
+                    });
+                    track.style.transform = `translateX(-${pmCur * 100}%)`;
+                }
+
+                function pmRenderDots() {
+                    const dots = document.getElementById('pm-dots');
+                    dots.innerHTML = '';
+                    pmSlides.forEach((_, i) => {
+                        const d = document.createElement('div');
+                        d.className = 'prod-dot' + (i === pmCur ? ' active' : '');
+                        d.onclick = () => pmGoTo(i);
+                        dots.appendChild(d);
+                    });
+                }
+
+                function pmGoTo(i) {
+                    pmCur = i;
+                    document.getElementById('pm-track').style.transform = `translateX(-${pmCur * 100}%)`;
+                    document.querySelectorAll('.prod-dot').forEach((d, idx) => d.classList.toggle('active', idx === pmCur));
+                }
+
+                function pmMover(dir) {
+                    pmCur = (pmCur + dir + pmSlides.length) % pmSlides.length;
+                    pmGoTo(pmCur);
+                }
+            </script>
         </section>
-        {{-- ===================== FIN LOS MÁS VENDIDOS (CARRUSEL) ===================== --}}
+        {{-- ===================== FIN PRODUCTOS DESTACADOS ===================== --}}
 
         <section class="testimonials py-5">
             <div class="container">
-                <h2 class="text-center mb-5 zx-title-playfair">Reseñas Destacadas</h2>
+                <h2 class="text-center mb-4 zx-title-playfair">Reseñas Destacadas</h2>
+                <style>
+                    .resenas-nav { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-bottom: 32px; }
+                    .resenas-nav-btn {
+                        padding: 8px 22px; border-radius: 999px; border: 2px solid #28666e;
+                        background: transparent; color: #28666e; font-weight: 700;
+                        font-size: 0.88em; cursor: pointer; transition: background .25s, color .25s, transform .2s;
+                    }
+                    .resenas-nav-btn:hover, .resenas-nav-btn.active { background: #28666e; color: #fedc97; transform: translateY(-2px); }
+                    .resenas-grid { display: none; grid-template-columns: repeat(3, 1fr); gap: 24px; max-width: 1100px; margin: 0 auto; }
+                    .resenas-grid.active { display: grid; }
+                    .resena-prod-card { background: #fff; border: 1px solid #ddd; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,.10); transition: transform .25s ease; }
+                    .resena-prod-card img { width: 100%; height: 200px; object-fit: contain; background: #f7f7f7; padding: 16px; }
+                </style>
 
-                <div id="reseñasCarousel" class="carousel slide" data-bs-ride="carousel">
-                    <div class="carousel-inner">
-                        @foreach($reseñas->chunk(4) as $chunk)
-                            <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
-                                <div class="row">
-                                    @foreach($chunk as $review)
-                                        <div class="col-md-3 mb-4">
-                                            <div class="card h-100">
-                                                <div class="card-body">
-                                                    <div class="stars mb-2">
-                                                        @for($i = 1; $i <= 5; $i++)
-                                                            <i class="fas fa-star {{ $i <= $review->calificacion ? 'text-warning' : 'text-muted' }}"></i>
-                                                        @endfor
-                                                    </div>
-                                                    <p class="card-text">{{ $review->descripcion }}</p>
-                                                    <h5 class="card-title mt-3">
-                                                        {{ $review->guest_nombre ? $review->guest_nombre : 'Usuario desconocido' }}
-                                                    </h5>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @endforeach
+                @php
+                    $resenasPorCategoria = $reseñas->groupBy(fn($r) => $r->product->categoria ?? 'General');
+                    $categorias = $resenasPorCategoria->keys();
+                @endphp
+
+                <div class="resenas-nav">
+                    @foreach($categorias as $i => $cat)
+                        <button class="resenas-nav-btn {{ $i === 0 ? 'active' : '' }}" onclick="switchResenas('{{ Str::slug($cat) }}', this)">
+                            {{ $cat }}
+                        </button>
+                    @endforeach
+                </div>
+
+                @foreach($resenasPorCategoria as $cat => $resenas)
+                    <div class="resenas-grid {{ $loop->first ? 'active' : '' }}" id="resenas-{{ Str::slug($cat) }}">
+                        @foreach($resenas->take(3) as $review)
+                            <div class="resena-prod-card">
+                                <img src="{{ $review->product->imagen_url ?? asset('Imagenes/84493-4540581.jpg') }}" alt="Producto">
+                                <div class="card-body">
+                                    <h4>{{ $review->product->nombre ?? 'Producto' }}</h4>
+                                    <div class="stars">
+                                        @for($i = 1; $i <= 5; $i++)
+                                            <i class="fas fa-star {{ $i <= $review->calificacion ? 'text-warning' : 'text-muted' }}"></i>
+                                        @endfor
+                                    </div>
+                                    <p>{{ $review->descripcion }}</p>
+                                    <p class="reviewer">— {{ $review->guest_nombre ?? 'Usuario desconocido' }}</p>
                                 </div>
                             </div>
                         @endforeach
                     </div>
-
-                    <button class="carousel-control-prev" type="button" data-bs-target="#reseñasCarousel" data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Anterior</span>
-                    </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#reseñasCarousel" data-bs-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Siguiente</span>
-                    </button>
-                </div>
+                @endforeach
             </div>
+            <script>
+                function switchResenas(slug, btn) {
+                    document.querySelectorAll('.resenas-grid').forEach(g => g.classList.remove('active'));
+                    document.querySelectorAll('.resenas-nav-btn').forEach(b => b.classList.remove('active'));
+                    document.getElementById('resenas-' + slug).classList.add('active');
+                    btn.classList.add('active');
+                }
+            </script>
         </section>
+    </section>
 
-        </main>
-        @include('footer')
+    @include('footer')
 
-        {{-- BOTÓN WHATSAPP --}}
-        <a href="https://wa.me/+525581366555?text=Hola,%20estoy%20interesado%20en%20los%20productos%20de%20Zarmex"
-           target="_blank"
-           class="whatsapp-float"
-           title="Contáctanos por WhatsApp">
-            <i class="fab fa-whatsapp"></i>
-        </a>
+    {{-- BOTÓN WHATSAPP FLOTANTE --}}
+    <a href="https://wa.me/+525581366555?text=Hola,%20estoy%20interesado%20en%20los%20productos%20de%20Zarmex"
+       target="_blank" class="whatsapp-float">
+        <i class="fab fa-whatsapp"></i>
+    </a>
 
-    {{-- ===== JS para controlar video en carrusel ===== --}}
+    {{-- Script de Control de Banner (Video/Imagen) --}}
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const banner = document.getElementById('carouselBanner');
@@ -332,7 +505,6 @@
                 if (!active) return;
 
                 const video = active.querySelector('video.banner-video');
-
                 if (video) {
                     bsCarousel.pause();
                     video.play().catch(() => {});
@@ -344,10 +516,8 @@
 
             banner.addEventListener('slide.bs.carousel', () => pauseAllVideos());
             banner.addEventListener('slid.bs.carousel', () => handleActiveSlide());
-
             handleActiveSlide();
         });
     </script>
 </body>
-
 </html>

@@ -51,19 +51,7 @@
     margin-bottom: 20px; /* Espacio debajo de la descripción */
     margin-top: 0; /* Sin margen superior para acercarlo al título */
 }
-
-/* Botón de agregar al carrito */
-.card2 button {
-    background-color: #28666e;
-    color: #fedc97;
-    border: none;
-    border-radius: 5px;
-    padding: 12px 20px;
-    cursor: pointer;
-    font-size: 1.2em; /* Aumentado */
-    transition: background-color 0.3s ease;
-    align-self: flex-start; /* Alinea el botón hacia la izquierda */
-}
+    
 
 /* Cambio de color al pasar el mouse por encima */
 .card2 button:hover {
