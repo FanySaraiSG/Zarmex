@@ -30,9 +30,10 @@
         <div class="zx-menu" id="zxMenu">
             <ul class="zx-menu-root">
                 <li class="zx-item zx-has-sub">
-                    <a href="#" class="zx-item-link">
+                    <a href="#" class="zx-item-link" style="display:flex; align-items:center; gap:10px;">
+                        <img src="{{ asset('iconos/productos.png') }}" alt="Productos" style="width:18px; height:12px; object-fit:contain; background:transparent; border:none; box-shadow:none;">
                         Productos
-                        <i class="fa-solid fa-chevron-down zx-chevron"></i>
+                        <i class="fa-solid zx-chevron"></i>
                     </a>
                     <ul class="zx-sub">
                         @foreach(App\Models\Categoria::all() as $categoria)
@@ -42,9 +43,10 @@
                 </li>
 
                 <li class="zx-item zx-has-sub">
-                    <a href="#" class="zx-item-link">
+                    <a href="#" class="zx-item-link" style="display:flex; align-items:center; gap:10px;">
+                        <img src="{{ asset('iconos/medico.png') }}" alt="Servicios" style="width: 18px; height:22px; object-fit:contain; background:transparent; border:none; box-shadow:none;">
                         Servicios
-                        <i class="fa-solid fa-chevron-down zx-chevron"></i>
+                        <i class="fa-solid zx-chevron"></i>
                     </a>
                     <ul class="zx-sub">
                         <li><a href="{{ url('mantenimiento') }}">Mantenimiento</a></li>
@@ -52,9 +54,13 @@
                     </ul>
                 </li>
 
-                <li class="zx-item">
-                    <a href="{{ url('/nosotros') }}" class="zx-item-link">Nosotros</a>
-                </li>
+                <li class="zx-item zx-has-sub">
+                    <a href="#" class="zx-item-link" style="display:flex; align-items:center; gap:10px;">
+                        <img src="{{ asset('iconos/nosotros.png') }}" alt="Nosotros" style="width:18px; height:22px; object-fit:contain; background:transparent; border:none; box-shadow:none;">
+                        Nosotros
+                        <i class="fa-solid zx-chevron"></i>
+                    </a>
+                    <ul class="zx-sub">
             </ul>
         </div>
 
@@ -97,7 +103,7 @@
             @else
                 <a class="zx-user-profile" href="{{ route('employee.login') }}" title="Ingresar">
                     <div class="zx-avatar-icon">
-                        <i class="ri-user-settings-line"></i>
+                        <img src="{{ asset('iconos/admin.png') }}" alt="Administrador" style="width:30px; height:30px; object-fit:contain;">
                     </div>
                 </a>
             @endif
