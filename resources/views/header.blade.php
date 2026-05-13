@@ -32,7 +32,7 @@
                 <li class="zx-item zx-has-sub">
                     <a href="#" class="zx-item-link">
                         Productos
-                        <i class="fa-solid fa-chevron-down zx-chevron"></i>
+                        <i class="fa-solid fa-chevron-down zx-chevron zx-chevron--productos"></i>
                     </a>
                     <ul class="zx-sub">
                         @foreach(App\Models\Categoria::all() as $categoria)
@@ -242,8 +242,15 @@
 
 .zx-chevron {
     font-size: 0.8em;
-    margin-left: 4px;
+    margin-left: 8px;
+    transition: transform 0.2s ease;
 }
+
+/* icono cambia al abrir (mobile) */
+.zx-has-sub.is-open > .zx-item-link .zx-chevron {
+    transform: rotate(180deg);
+}
+
 
 /* BUSCADOR */
 .zx-search-wrap {
@@ -379,6 +386,18 @@
     background: linear-gradient(90deg, var(--gold), #2b494b);
     color: white;
 }
+
+.zx-menu-icon{
+    color: var(--gold);
+    margin-right: 8px;
+    font-size: 0.95em;
+}
+
+.zx-item-link{
+    display:flex;
+    align-items:center;
+}
+
 
 .zx-has-sub:hover .zx-sub { display: block; }
 

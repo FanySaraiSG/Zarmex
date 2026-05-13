@@ -6,6 +6,47 @@
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/formularios.css') }}">
+
+    <style>
+.edit-container{
+            display:flex;
+            justify-content:center;
+            padding: 20px;
+            width
+        }
+
+.edit-card{
+            .edit-card {
+    width: 95%; /* Cambiado de un ancho fijo a un porcentaje para ocupar casi toda la pantalla */
+    max-width: 1400px; /* Un límite opcional para que no se estire infinito en monitores 4K */
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 12px 30px rgba(0,0,0,.18);
+    
+    /* ELIMINADOS: max-height y overflow para que crezca con la página */
+    padding: 30px; /* Un poco más de aire para el diseño ancho */
+}
+
+.field {
+    margin-bottom: 20px;
+}
+.edit-container{
+            display:flex;
+            justify-content:center;
+            padding:20px;
+        }
+        .edit.card{
+            width: min(1000px, 200vw);
+            background:#fff;
+            border-radius:14px;
+            box-shadow:0 12px 30px rgba(0,0,0,.18);
+
+            /* “cuadro” */
+            max-height:80vh;
+            overflow:auto; /* scroll interno en vez de que crezca la página */
+            padding:18px;
+        }
+    </style>
 </head>
 <body>
 
@@ -33,16 +74,6 @@
             <div class="field">
                 <label>Descripción:</label>
                 <textarea name="descripcion" class="form-control">{{ $producto->descripcion }}</textarea>
-            </div>
-
-            <div class="field">
-                <label>Precio:</label>
-                <input type="number" step="0.01" name="precio" class="form-control" value="{{ $producto->precio }}">
-            </div>
-
-            <div class="field">
-                <label>Stock:</label>
-                <input type="number" name="stock" class="form-control" value="{{ $producto->stock }}">
             </div>
 
             <div class="field">
@@ -77,6 +108,11 @@
                 <label>Imagen Extra:</label>
                 <input type="file" name="imagenes[]" class="form-control" multiple accept="image/*">
                 <small style="opacity:.7;">Esta imágen se agregan al carrusel del producto.</small>
+            </div>
+            {{-- Para subir un video --}}
+            <div class="field">
+                <label>Video archivo:</label>
+                <input type="file" name="video_url" class="form-control" accept="video/*">
             </div>
 
             {{-- (Opcional) mostrar extras ya guardadas --}}
