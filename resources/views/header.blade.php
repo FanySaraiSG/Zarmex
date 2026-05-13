@@ -23,7 +23,10 @@
             <span class="zx-brand-name">ZARMEX</span>
         </a>
 
-        {{-- 2. MENÚ HORIZONTAL --}}
+        {{-- 2. MENÚ (DESKTOP) --}}
+        <button class="zx-ham" id="zxHam" type="button" aria-label="Abrir menú">
+            <span></span><span></span><span></span>
+        </button>
         <div class="zx-menu" id="zxMenu">
             <ul class="zx-menu-root">
                 <li class="zx-item zx-has-sub">
@@ -107,32 +110,37 @@
 :root {
     --bg: #145555;
     --bg-dark: #58776f;
-    --gold: #c9a84c;
-    --text-menu: #e8e8e8;
+    --gold: #b8a120;
+    --text-menu: #ffffff;
 }
 
 .zx-header {
-    background: var(--bg);
+    background: rgba(6, 43, 33, 0.9);
     position: sticky;
     top: 0;
     z-index: 9999;
-    width: 100%;
+    width: 90%;
+    margin: auto;
     display: flex;
     align-items: center;
     border-top: 3px solid var(--gold);
     border-bottom: 3px solid var(--gold);
     box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    border-radius: 50px;
+    backdrop-filter: blur(10px);
 }
 
 .zx-bar {
     width: clamp(95%, 1200px, 98%);
     margin: auto;
-    display: grid;
-    grid-template-columns: auto 1fr auto;
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
     align-items: center;
     gap: clamp(12px, 3vw, 32px);
     height: clamp(65px, 10vw, 80px);
     padding: 0 clamp(8px, 2vw, 16px);
+    padding-right: clamp(8px, 2vw, 24px);
 }
 
 /* LOGO - LAPTOP */
@@ -143,7 +151,8 @@
     text-decoration: none;
     flex-shrink: 0;
     padding-right: clamp(8px, 2vw, 24px);
-    border-right: 1px solid rgba(201,168,76,0.4);
+    border-right: 1px dotted rgba(201,168,76,0.4);
+    padding-right: clamp(8px, 2vw, 24px);
 }
 
 .zx-logo-circle {
@@ -181,6 +190,25 @@
     justify-content: center;
 }
 
+/* hamburguesa (mobile) */
+.zx-ham {
+    display: none;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    padding: 8px;
+    flex-shrink: 0;
+}
+
+.zx-ham span {
+    width: 26px;
+    height: 3px;
+    background: var(--gold);
+    border-radius: 3px;
+    display: block;
+    margin: 4px 0;
+}
+
 .zx-menu-root {
     display: flex;
     gap: clamp(2px, 1vw, 8px);
@@ -188,6 +216,7 @@
     padding: 0;
     list-style: none;
     flex-wrap: wrap;
+    border left: 1px dotted rgba(201,168,76,0.4);
 }
 
 .zx-item-link {
@@ -199,6 +228,11 @@
     white-space: nowrap;
     border-radius: 6px;
     transition: all 0.3s ease;
+    border: none;
+}
+
+.zx-item:not(:last-child) {
+    border-right: 1px dotted rgba(201, 168, 76, 0.4);
 }
 
 .zx-item-link:hover {
@@ -223,9 +257,10 @@
 }
 
 .zx-search {
-    background: rgba(255,255,255,0.95);
-    border-radius: 25px;
-    height: clamp(36px, 6vw, 44px);
+    
+    background: rgba(65, 99, 99, 0.9);
+    border-radius: 50px;
+    height: clamp(40px, 6vw, 50px);
     width: 100%;
     display: flex;
     align-items: center;
@@ -233,7 +268,11 @@
     border: 2px solid rgba(201,168,76,0.3);
     padding: 0 clamp(12px, 3vw, 20px);
     transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
 }
+  ::placeholder {
+        color: #999;
+    }
 
 .zx-search:hover {
     border-color: var(--gold);
@@ -254,6 +293,7 @@
     color: #333;
     background: transparent;
     height: 100%;
+    color: white;
 }
 
 .zx-search input::placeholder {
@@ -285,7 +325,7 @@
     width: clamp(38px, 6vw, 46px);
     height: clamp(38px, 6vw, 46px);
     background: var(--bg-dark);
-    color: #fff;
+    color: #ffffff;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -336,7 +376,7 @@
 }
 
 .zx-sub li a:hover { 
-    background: linear-gradient(90deg, var(--gold), #d4b567);
+    background: linear-gradient(90deg, var(--gold), #2b494b);
     color: white;
 }
 
@@ -447,6 +487,10 @@
         height: 60px;
         padding: 0 12px;
     }
+
+    /* queremos que el panel hamburguesa siempre pueda abrirse */
+    .zx-menu.is-open { display: flex; }
+
     
     .zx-brand-name {
         display: block;
@@ -461,8 +505,76 @@
         text-align: center;
     }
     
+    /* En mobile mostramos hamburguesa y el menú en panel */
+    .zx-ham {
+        display: block;
+        margin-left: 6px;
+    }
+    
     .zx-menu {
+        position: absolute;
+        top: 100%;
+        right: 12px;
+        left: 12px;
+        width: auto;
+        justify-content: flex-start;
+        background: rgba(6, 43, 33, 0.98);
+        border-radius: 16px;
+        border: 1px solid rgba(184, 161, 32, 0.35);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+        padding: 10px 8px;
         display: none;
+        z-index: 10002;
+    }
+    
+    .zx-menu.is-open {
+        display: flex;
+    }
+    
+    .zx-menu-root {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+        gap: 0;
+    }
+    
+    .zx-item:not(:last-child) {
+        border-right: none;
+    }
+    
+    .zx-item {
+        width: 100%;
+    }
+    
+    .zx-item-link {
+        width: 100%;
+        padding: 10px 12px;
+        justify-content: space-between;
+    }
+    
+.zx-sub {
+        position: static;
+        transform: none;
+        left: auto;
+        top: auto;
+        margin-top: 0;
+        width: 100%;
+        min-width: 0;
+        box-shadow: none;
+        border-radius: 12px;
+        border-top: none;
+        margin-top: 6px;
+        display: none;
+        padding: 6px 0;
+    }
+    
+    .zx-has-sub:hover .zx-sub {
+        display: none;
+    }
+    
+    .zx-has-sub.is-open .zx-sub {
+        display: block;
     }
     
     .zx-search-wrap {
@@ -507,3 +619,44 @@
     }
 }
 </style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const ham = document.getElementById('zxHam');
+    const menu = document.getElementById('zxMenu');
+    if (!ham || !menu) return;
+
+    ham.addEventListener('click', (e) => {
+      e.stopPropagation();
+      menu.classList.toggle('is-open');
+    });
+
+    // acordeón para Productos/Servicios en mobile
+    const items = menu.querySelectorAll('.zx-item.zx-has-sub');
+    items.forEach(item => {
+      const link = item.querySelector('.zx-item-link');
+      if (!link) return;
+
+      link.addEventListener('click', (e) => {
+        // evita que el # haga scroll arriba
+        e.preventDefault();
+        e.stopPropagation();
+
+        const alreadyOpen = item.classList.contains('is-open');
+        items.forEach(i => i.classList.remove('is-open'));
+        if (!alreadyOpen) item.classList.add('is-open');
+      });
+    });
+
+    document.addEventListener('click', (e) => {
+      // Cerrar si se hace click fuera del menú o del botón
+      if (!menu.contains(e.target) && !ham.contains(e.target)) {
+        menu.classList.remove('is-open');
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') menu.classList.remove('is-open');
+    });
+  });
+</script>
