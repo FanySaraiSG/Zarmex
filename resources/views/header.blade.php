@@ -66,10 +66,10 @@
 
         {{-- 3. BUSCADOR --}}
         <div class="zx-search-wrap" id="zxSearchWrap">
-           <form class="zx-search">
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input id="zxSearchInput" type="text" name="q" placeholder="¿Qué estás buscando hoy?">
-           </form>
+            <form class="zx-search" action="{{ route('buscar.resultados') }}" method="GET" autocomplete="off">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input id="zxSearchInput" type="text" name="q" placeholder="¿Qué estás buscando hoy?" value="{{ request('q','') }}">
+            </form>
 
             <div class="zx-results" id="zxResults" hidden>
                 <div class="zx-results-title">Resultados de búsqueda</div>
@@ -630,39 +630,195 @@
   document.addEventListener('DOMContentLoaded', () => {
     const ham = document.getElementById('zxHam');
     const menu = document.getElementById('zxMenu');
-    if (!ham || !menu) return;
 
-    ham.addEventListener('click', (e) => {
-      e.stopPropagation();
-      menu.classList.toggle('is-open');
-    });
-
-    // acordeón para Productos/Servicios en mobile
-    const items = menu.querySelectorAll('.zx-item.zx-has-sub');
-    items.forEach(item => {
-      const link = item.querySelector('.zx-item-link');
-      if (!link) return;
-
-      link.addEventListener('click', (e) => {
-        // evita que el # haga scroll arriba
-        e.preventDefault();
+    // =====================
+    // MENÚ (mobile)
+    // =====================
+    if (ham && menu) {
+      ham.addEventListener('click', (e) => {
         e.stopPropagation();
-
-        const alreadyOpen = item.classList.contains('is-open');
-        items.forEach(i => i.classList.remove('is-open'));
-        if (!alreadyOpen) item.classList.add('is-open');
+        menu.classList.toggle('is-open');
       });
+
+      // acordeón para Productos/Servicios en mobile
+      const items = menu.querySelectorAll('.zx-item.zx-has-sub');
+      items.forEach(item => {
+        const link = item.querySelector('.zx-item-link');
+        if (!link) return;
+
+        link.addEventListener('click', (e) => {
+          // evita que el # haga scroll arriba
+          e.preventDefault();
+          e.stopPropagation();
+
+          const alreadyOpen = item.classList.contains('is-open');
+          items.forEach(i => i.classList.remove('is-open'));
+          if (!alreadyOpen) item.classList.add('is-open');
+        });
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!menu.contains(e.target) && !ham.contains(e.target)) {
+          menu.classList.remove('is-open');
+        }
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') menu.classList.remove('is-open');
+      });
+    }
+
+    // =====================
+    // BUSCADOR + AUTOCOMPLETE
+    // =====================
+    const input = document.getElementById('zxSearchInput');
+    const resultsWrap = document.getElementById('zxResults');
+    const resultsList = document.getElementById('zxResultsList');
+
+    if (!input || !resultsWrap || !resultsList) return;
+
+    const debounce = (fn, ms = 250) => {
+      let t;
+      return (...args) => {
+        clearTimeout(t);
+        t = setTimeout(() => fn(...args), ms);
+      };
+    };
+
+    const renderItems = (items) => {
+      resultsList.innerHTML = '';
+
+      if (!items || items.length === 0) {
+        resultsList.innerHTML = '<div style="padding: 10px; color:#666;">Sin resultados</div>';
+        resultsWrap.hidden = false;
+        return;
+      }
+
+      const frag = document.createDocumentFragment();
+
+      items.forEach((it) => {
+        const a = document.createElement('a');
+        a.href = it.url || '#';
+        a.className = 'zx-search-item';
+        a.setAttribute('data-url', it.url || '');
+        a.innerHTML = `
+          <div style="font-weight:700; color:#234d50;">${it.titulo || ''}</div>
+          <div style="font-size: 12px; color:#666; margin-top:2px;">${it.descripcion || ''}</div>
+        `;
+
+        a.addEventListener('click', (e) => {
+          if (!it.url) e.preventDefault();
+        });
+
+        frag.appendChild(a);
+      });
+
+      resultsList.appendChild(frag);
+      resultsWrap.hidden = false;
+    };
+
+    const hideResults = () => {
+      resultsWrap.hidden = true;
+      resultsList.innerHTML = '';
+    };
+
+    const buscarSugerencias = async (q) => {
+      const query = (q || '').trim();
+      if (query.length < 2) {
+        hideResults();
+        return;
+      }
+
+      try {
+        const res = await fetch(`/buscar-sugerencias?q=${encodeURIComponent(query)}`, {
+          headers: { 'Accept': 'application/json' }
+        });
+        const data = await res.json();
+        renderItems(data.items || []);
+      } catch (err) {
+        hideResults();
+      }
+    };
+
+    const onInput = debounce((e) => {
+      // Mantener la experiencia tipo "autocomplete": mientras escribe, se consultan sugerencias.
+      buscarSugerencias(e.target.value);
+    }, 150);
+
+    // Mostrar sugerencias al enfocarse (si ya hay texto en el input)
+    input.addEventListener('focus', () => {
+      buscarSugerencias(input.value);
     });
 
-    document.addEventListener('click', (e) => {
-      // Cerrar si se hace click fuera del menú o del botón
-      if (!menu.contains(e.target) && !ham.contains(e.target)) {
-        menu.classList.remove('is-open');
+    // Navegación con teclado (↑ ↓ + Enter)
+    let activeIndex = -1;
+
+    const getItems = () => Array.from(resultsList.querySelectorAll('.zx-search-item'));
+
+    const setActive = (idx) => {
+      const items = getItems();
+      items.forEach((el) => el.style.background = '');
+      if (idx >= 0 && idx < items.length) {
+        items[idx].style.background = 'rgba(184,161,32,0.18)';
+        activeIndex = idx;
+      }
+    };
+
+    input.addEventListener('keydown', (e) => {
+      const items = getItems();
+      if (!items.length) return;
+
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setActive(Math.min(activeIndex + 1, items.length - 1));
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setActive(Math.max(activeIndex - 1, 0));
+      } else if (e.key === 'Enter') {
+        // Si hay sugerencias activas, navegar al item.
+        if (activeIndex >= 0 && activeIndex < items.length) {
+          e.preventDefault();
+          items[activeIndex].click();
+        }
+        // Si no hay item activo, el formulario hará GET /buscar.
+        hideResults();
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        hideResults();
       }
     });
 
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') menu.classList.remove('is-open');
+
+    input.addEventListener('input', onInput);
+
+    // Cerrar cuando se hace click fuera
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('#zxSearchWrap')) hideResults();
+    });
+
+    // Enter: enviar el form (buscar completo) en vez de usar autocomplete
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        // el form ya hará GET /buscar
+        hideResults();
+      }
     });
   });
 </script>
+
+<style>
+  /* estilos mínimos para items del autocomplete (sin tocar tu CSS global) */
+  .zx-results-list .zx-search-item{
+    display:block;
+    padding: 10px 14px;
+    text-decoration:none;
+    border-radius: 10px;
+    margin: 6px;
+    border: 1px solid rgba(0,0,0,0.06);
+    background: rgba(255,255,255,0.9);
+  }
+  .zx-results-list .zx-search-item:hover{
+    border-color: rgba(184,161,32,0.6);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+  }
+</style>

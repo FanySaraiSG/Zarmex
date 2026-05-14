@@ -1,9 +1,9 @@
 <style>
     .zx-footer {
-        background-color: #639075;
+        background-color: #387751;
         padding: 10px 0 10px 0;
         font-family: 'Figtree', sans-serif;
-        color: #555;
+        color: #000000;
         clear: both; /* Evita que elementos flotantes lo empujen hacia arriba */
         position: relative; /* Asegura que no sea absolute ni fixed */
         width: 100%;
@@ -73,11 +73,11 @@
         font-size: 13px;
         margin-bottom: 10px;
         text-decoration: none;
-        color: #555;
+        color: #000000;
     }
 
     .zx-list-item i {
-        color: #715528;
+        color: #000000;
         width: 25px;
         font-size: 16px;
     }

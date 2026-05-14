@@ -212,6 +212,7 @@
                     justify-content: center;
                     align-items: center;
                 }
+
                 .prod-btn-whatsapp {
                     background: #25D366;
                     color: #fff;
@@ -226,7 +227,34 @@
                     gap: 8px;
                     transition: background .2s, transform .15s;
                 }
+
                 .prod-btn-whatsapp:hover { background: #1ebe5d; transform: translateY(-1px); }
+
+                /* Botón cerrar (círculo con tache) */
+                .prod-modal-close {
+                    position: absolute;
+                    top: 14px;
+                    right: 14px;
+                    width: 34px;
+                    height: 34px;
+                    border-radius: 50%;
+                    border: 2px solid rgba(184,161,32,0.55);
+                    background: rgba(0,0,0,0.04);
+                    color: #28666e;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    z-index: 3;
+                    transition: transform .15s ease, background .2s ease, color .2s ease;
+                }
+
+                .prod-modal-close:hover {
+                    transform: scale(1.05);
+                    background: rgba(184,161,32,0.15);
+                    color: #1a4a50;
+                }
+
 
                 @media (max-width: 768px) {
                     .prod-modal-body { grid-template-columns: 1fr; }
@@ -278,12 +306,22 @@
                 </div>
             </div>
 
-            {{-- ── MODAL ── --}}
+            {{-- ── MODAL (simple: info antigua + WhatsApp) ── --}}
             <div class="prod-overlay" id="prodOverlay" onclick="if(event.target===this) cerrarProdModal()">
                 <div class="prod-modal">
+                    {{-- Botón cerrar arriba derecha (círculo con tache) --}}
+                    <button
+                        type="button"
+                        class="prod-modal-close"
+                        onclick="cerrarProdModal()"
+                        aria-label="Cerrar">
+                        <i class="fas fa-times"></i>
+                    </button>
+
                     <div class="prod-modal-header">
                         <h3 id="pm-nombre"></h3>
                     </div>
+
                     <div class="prod-modal-body">
                         {{-- Carrusel del Modal --}}
                         <div class="prod-carousel-wrap">
@@ -294,15 +332,19 @@
                             </div>
                             <div class="prod-dots" id="pm-dots"></div>
                         </div>
-                        {{-- Info --}}
+
+                        {{-- Info (SIN precios / SIN carrito). Se deja solo descripción y colores si ya existían. --}}
                         <div class="prod-modal-right">
                             <p class="prod-info-label">Descripción</p>
                             <p class="prod-desc-full" id="pm-desc"></p>
+
                             <p class="prod-info-label">Colores disponibles</p>
                             <div class="prod-colors-wrap" id="pm-colors"></div>
                             <p class="prod-sel-color" id="pm-color-name">Selecciona un color</p>
                         </div>
                     </div>
+
+                    {{-- WhatsApp centrado --}}
                     <div class="prod-modal-footer">
                         <button class="prod-btn-whatsapp" onclick="abrirWhatsapp()">
                             <i class="fab fa-whatsapp"></i> WhatsApp
@@ -310,6 +352,7 @@
                     </div>
                 </div>
             </div>
+
 
             <script>
                 let pmSlides = [], pmCur = 0, pmNombreActual = '';
