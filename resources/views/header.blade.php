@@ -33,13 +33,9 @@
                     <a href="#" class="zx-item-link" style="display:flex; align-items:center; gap:10px;">
                         <img src="{{ asset('iconos/productos.png') }}" alt="Productos" style="width:18px; height:12px; object-fit:contain; background:transparent; border:none; box-shadow:none;">
                         Productos
-<<<<<<< HEAD
-                        <i class="fa-solid fa-chevron-down zx-chevron zx-chevron--productos"></i>
-=======
                         <i class="fa-solid zx-chevron"></i>
->>>>>>> a4591e581d29f63ab8c73340921e05afd7818d6b
                     </a>
-                    <ul class="zx-sub">
+            <ul class="zx-sub">
                         @foreach(App\Models\Categoria::all() as $categoria)
                             <li><a href="{{ route('categoria.productos', $categoria->id_categoria) }}">{{ $categoria->nombre }}</a></li>
                         @endforeach
@@ -127,12 +123,13 @@
 .zx-header {
     background: rgba(6, 43, 33, 0.9);
     position: sticky;
-    top: 0;
+    top: 14px;
     z-index: 9999;
-    width: 90%;
-    margin: auto;
+    width: 92%;
+    margin: 14px auto 0;
     display: flex;
     align-items: center;
+    justify-content: center;
     border-top: 3px solid var(--gold);
     border-bottom: 3px solid var(--gold);
     box-shadow: 0 4px 10px rgba(0,0,0,0.15);
@@ -225,8 +222,9 @@
     margin: 0;
     padding: 0;
     list-style: none;
-    flex-wrap: wrap;
-    border left: 1px dotted rgba(201,168,76,0.4);
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: center;
 }
 
 .zx-item-link {
@@ -252,15 +250,8 @@
 
 .zx-chevron {
     font-size: 0.8em;
-    margin-left: 8px;
-    transition: transform 0.2s ease;
+    margin-left: 4px;
 }
-
-/* icono cambia al abrir (mobile) */
-.zx-has-sub.is-open > .zx-item-link .zx-chevron {
-    transform: rotate(180deg);
-}
-
 
 /* BUSCADOR */
 .zx-search-wrap {
@@ -301,6 +292,17 @@
     font-size: clamp(14px, 2.5vw, 18px);
     flex-shrink: 0;
 }
+
+/* Evitar “recuadro blanco” al seleccionar opciones del buscador */
+.zx-search input:focus,
+.zx-search input:active,
+.zx-search input:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+    border-color: transparent !important;
+}
+
+
 
 .zx-search input {
     border: none;
@@ -395,17 +397,15 @@
 .zx-sub li a:hover { 
     background: linear-gradient(90deg, var(--gold), #2b494b);
     color: white;
+    outline: none;
 }
 
-.zx-menu-icon{
-    color: var(--gold);
-    margin-right: 8px;
-    font-size: 0.95em;
-}
-
-.zx-item-link{
-    display:flex;
-    align-items:center;
+/* quitar recuadros de foco en links del menú (incluye “Nosotros”) */
+.zx-sub li a:focus,
+.zx-sub li a:active,
+.zx-sub li a:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
 }
 
 
