@@ -2,186 +2,227 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Editar Producto</title>
-
+    <title>Edición de Producto - Panel Zarmex</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/formularios.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
+    <style>
+        :root {
+            --primary-green: #1a7431;
+            --medium-green: #2d6a4f;
+            --light-green: #d8f3dc;
+            --accent-green: #74c69d;
+            --bg-gray: #f0f4f2;
+        }
+
+        body { background-color: var(--bg-gray); font-family: 'Segoe UI', sans-serif; }
+        
+        .edit-card {
+            width: 100%; max-width: 1000px; background: #fff;
+            border-radius: 20px; border-top: 10px solid var(--primary-green);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1); padding: 40px;
+            margin: 40px auto;
+        }
+
+        /* Tabs Verdes */
+        .nav-pills-custom { background-color: var(--light-green); border-radius: 15px; padding: 6px; }
+        .nav-pills-custom .nav-link { color: var(--medium-green); font-weight: 600; border-radius: 12px; border: none; }
+        .nav-pills-custom .nav-link.active {
+            background-color: var(--primary-green) !important; color: white !important;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        /* Galería de Imágenes */
+        .gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .img-slot {
+            aspect-ratio: 1; border: 2px dashed var(--accent-green);
+            border-radius: 12px; position: relative; overflow: hidden;
+            background: #fafafa; display: flex; align-items: center; justify-content: center;
+        }
+        .img-slot img { width: 100%; height: 100%; object-fit: cover; }
+        .preview-label { cursor: pointer; text-align: center; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+
+        /* Video Preview */
+        #video-preview-container video { width: 100%; border-radius: 12px; background: #000; margin-top: 10px; }
+
+        /* Documentos */
+        .doc-box { border: 1px solid #e0e0e0; border-radius: 12px; padding: 15px; margin-bottom: 15px; transition: 0.3s; }
+        .doc-box:hover { border-color: var(--primary-green); background: var(--bg-gray); }
+
+        .btn-save { background-color: var(--primary-green); color: white; border: none; padding: 12px 30px; border-radius: 12px; font-weight: bold; }
+        .btn-back { background-color: #6c757d; color: white; border: none; padding: 12px 25px; border-radius: 12px; text-decoration: none; display: inline-flex; align-items: center; }
+        .btn-back:hover { background-color: #5a6268; color: white; }
+    </style>
 </head>
 <body>
 
-@auth('employee')
-@if(auth('employee')->user()->rol === 'admin')
-
-<div class="edit-container">
-
+<div class="container">
     <div class="edit-card">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold" style="color: var(--primary-green);">Panel de Edición</h2>
+            <a href="{{ route('productos.index') }}" class="btn-back"><i class="bi bi-arrow-left me-2"></i> Regresar</a>
+        </div>
 
-        <h2 class="edit-title">EDITAR PRODUCTO</h2>
-
-        <form action="{{ route('productos.update', $producto->id) }}"
-              method="POST"
-              enctype="multipart/form-data">
-
+        <form action="{{ route('productos.update', $producto->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
 
-            <div class="field">
-                <label>ID:</label>
-                <input type="text" name="id" class="form-control" value="{{ $producto->id }}">
-            </div>
+            <ul class="nav nav-pills nav-justified nav-pills-custom mb-4" role="tablist">
+                <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-info" type="button">1. Información</button></li>
+                <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-media" type="button">2. Multimedia</button></li>
+                <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-docs" type="button">3. Documentos</button></li>
+            </ul>
 
-            <div class="field">
-                <label>Descripción:</label>
-                <textarea name="descripcion" class="form-control">{{ $producto->descripcion }}</textarea>
-            </div>
-
-            <div class="field">
-                <label>Precio:</label>
-                <input type="number" step="0.01" name="precio" class="form-control" value="{{ $producto->precio }}">
-            </div>
-
-            <div class="field">
-                <label>Stock:</label>
-                <input type="number" name="stock" class="form-control" value="{{ $producto->stock }}">
-            </div>
-
-            <div class="field">
-                <label>Categoría:</label>
-                <select name="categoria_id" class="form-select">
-                    @foreach($categorias as $categoria)
-                        <option value="{{ $categoria->id_categoria }}"
-                            {{ $producto->categoria_id == $categoria->id_categoria ? 'selected' : '' }}>
-                            {{ $categoria->nombre }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div class="field">
-                <label>Imagen Principal Actual:</label>
-                @if($producto->imagen_url)
-                    <div class="current-img">
-                        <img src="{{ asset($producto->imagen_url) }}?v={{ time() }}" style="max-width:140px;border-radius:12px;">
-                    </div>
-                @endif
-            </div>
-
-            {{-- (Opcional) cambiar imagen principal --}}
-            <div class="field">
-                <label>Cambiar imagen principal (opcional):</label>
-                <input type="file" name="imagen_url" class="form-control" accept="image/*">
-            </div>
-
-            {{--  SUBIR MUCHAS IMÁGENES EXTRA --}}
-            <div class="field">
-                <label>Imagen Extra:</label>
-                <input type="file" name="imagenes[]" class="form-control" multiple accept="image/*">
-                <small style="opacity:.7;">Esta imágen se agregan al carrusel del producto.</small>
-            </div>
-
-            {{-- (Opcional) mostrar extras ya guardadas --}}
-            @if(isset($imagenesExtra) && $imagenesExtra->count())
-                <div class="field">
-                    <label>Imágenes extra guardadas:</label>
-                    <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                        @foreach($imagenesExtra as $img)
-                            <img src="{{ asset($img->ruta) }}?v={{ time() }}"
-                                 style="width:80px;height:80px;object-fit:cover;border-radius:10px;border:1px solid #ddd;">
-                        @endforeach
+            <div class="tab-content">
+                
+                <div class="tab-pane fade show active" id="tab-info">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-bold text-muted small">ID DEL PRODUCTO</label>
+                            <input type="text" class="form-control bg-light" value="{{ $producto->id }}" readonly>
+                        </div>
+                        <div class="col-md-8 mb-3">
+                            <label class="form-label fw-bold text-muted small">CATEGORÍA</label>
+                            <select name="categoria_id" class="form-select">
+                                @foreach($categorias as $cat)
+                                    <option value="{{ $cat->id_categoria }}" {{ $producto->categoria_id == $cat->id_categoria ? 'selected' : '' }}>
+                                        {{ $cat->nombre }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold text-muted small">NUEVA DESCRIPCIÓN DEL ADMINISTRADOR</label>
+                            <textarea name="descripcion" class="form-control" rows="8" placeholder="Escriba aquí la descripción detallada..."></textarea>
+                        </div>
                     </div>
                 </div>
-            @endif
 
-            <!-- DOCUMENTOS -->
-            <!-- DOCUMENTOS -->
-<div class="docs-box">
-    <h6>Documentos del producto</h6>
+                <div class="tab-pane fade" id="tab-media">
+                    <label class="form-label fw-bold mb-3">GALERÍA DE IMÁGENES (Arrastra para ordenar)</label>
+                    <div class="gallery-grid mb-4" id="sortable-gallery">
+                        @for($i = 0; $i < 6; $i++)
+                        <div class="img-slot">
+                            <label class="preview-label" id="label-img-{{$i}}">
+                                <input type="file" name="imagenes[]" class="d-none" accept="image/*" onchange="previewImage(this, 'img-view-{{$i}}')">
+                                <img id="img-view-{{$i}}" src="{{ isset($imagenesExtra[$i]) ? asset($imagenesExtra[$i]->ruta) : '' }}" 
+                                     style="{{ isset($imagenesExtra[$i]) ? '' : 'display:none;' }}">
+                                @if(!isset($imagenesExtra[$i]))
+                                    <i class="bi bi-camera text-muted fs-2"></i>
+                                    <span class="small text-muted">Agregar</span>
+                                @endif
+                            </label>
+                        </div>
+                        @endfor
+                    </div>
 
-    <div class="mb-3">
-        <label>Garantía</label>
+                    <label class="form-label fw-bold">VIDEO PROMOCIONAL</label>
+                    <input type="file" name="video_url" class="form-control" accept="video/*" onchange="previewVideo(this)">
+                    <div id="video-preview-container" class="mt-2" style="{{ $producto->video_url ? '' : 'display:none;' }}">
+                        <p class="small text-muted mb-1">Vista previa del video:</p>
+                        <video id="video-tag" controls>
+                            <source src="{{ $producto->video_url ? asset($producto->video_url) : '' }}" id="video-source">
+                        </video>
+                    </div>
+                </div>
 
-        @if($producto->doc1_url)
-            <div class="mb-2">
-                <a href="{{ asset($producto->doc1_url) }}" target="_blank">Ver documento actual</a>
+                <div class="tab-pane fade" id="tab-docs">
+                    @php 
+                        $fields = [
+                            'doc1' => ['label' => 'Garantía', 'icon' => 'bi-shield-check', 'path' => $producto->doc1_url],
+                            'doc2' => ['label' => 'Manual de Usuario', 'icon' => 'bi-book', 'path' => $producto->doc2_url],
+                            'doc3' => ['label' => 'Ficha Técnica', 'icon' => 'bi-file-earmark-pdf', 'path' => $producto->doc3_url]
+                        ];
+                    @endphp
+
+                    @foreach($fields as $key => $data)
+                    <div class="doc-box">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center">
+                                <i class="bi {{$data['icon']}} fs-3 me-3" style="color: var(--primary-green);"></i>
+                                <div>
+                                    <h6 class="mb-0 fw-bold">{{$data['label']}}</h6>
+                                    @if($data['path'])
+                                        <a href="{{ asset($data['path']) }}" target="_blank" class="small text-success">
+                                            <i class="bi bi-eye"></i> Ver archivo anterior
+                                        </a>
+                                    @endif
+                                    <div id="new-{{$key}}" class="small text-primary fw-bold mt-1" style="display:none;"></div>
+                                </div>
+                            </div>
+                            <label class="btn btn-sm btn-outline-success">
+                                <input type="file" name="{{$key}}" class="d-none" onchange="previewDoc(this, 'new-{{$key}}')">
+                                <i class="bi bi-upload"></i> Nuevo Archivo
+                            </label>
+                        </div>
+                    </div>
+                    @endforeach
+                </div>
             </div>
 
-            <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" name="eliminar_doc1" value="1" id="eliminar_doc1">
-                <label class="form-check-label" for="eliminar_doc1">
-                    Eliminar garantía actual
-                </label>
+            <div class="d-flex justify-content-between align-items-center mt-5 border-top pt-4">
+                <span class="text-muted fw-bold" id="tabIndicator">Pestaña 1 de 3</span>
+                <button type="submit" class="btn btn-save">Guardar Cambios</button>
             </div>
-        @endif
-
-        <input type="file" name="doc1" class="form-control">
-    </div>
-
-    <div class="mb-3">
-        <label>Manual</label>
-
-        @if($producto->doc2_url)
-            <div class="mb-2">
-                <a href="{{ asset($producto->doc2_url) }}" target="_blank">Ver documento actual</a>
-            </div>
-
-            <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" name="eliminar_doc2" value="1" id="eliminar_doc2">
-                <label class="form-check-label" for="eliminar_doc2">
-                    Eliminar manual actual
-                </label>
-            </div>
-        @endif
-
-        <input type="file" name="doc2" class="form-control">
-    </div>
-
-    <div class="mb-3">
-        <label>Ficha Técnica</label>
-
-        @if($producto->doc3_url)
-            <div class="mb-2">
-                <a href="{{ asset($producto->doc3_url) }}" target="_blank">Ver documento actual</a>
-            </div>
-
-            <div class="form-check mb-2">
-                <input class="form-check-input" type="checkbox" name="eliminar_doc3" value="1" id="eliminar_doc3">
-                <label class="form-check-label" for="eliminar_doc3">
-                    Eliminar ficha técnica actual
-                </label>
-            </div>
-        @endif
-
-        <input type="file" name="doc3" class="form-control">
-    </div>
-</div>
-
-            <!-- BOTONES -->
-            <div class="button-group">
-
-                <a href="{{ route('productos.imagenes.show', $producto->id) }}"
-                   class="btn btn-main btn-small">
-                    Mostrar Imágenes
-                </a>
-
-                <button type="submit" class="btn btn-main btn-small">
-                    Actualizar Producto
-                </button>
-
-                <a href="{{ route('productos.index') }}"
-                   class="btn btn-grey btn-small">
-                    Regresar
-                </a>
-
-            </div>
-
         </form>
-
     </div>
-
 </div>
 
-@endif
-@endauth
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // 1. Previsualización de Imágenes
+    function previewImage(input, imgId) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.getElementById(imgId);
+                img.src = e.target.result;
+                img.style.display = 'block';
+                // Ocultar icono de 'plus' si existe
+                input.parentElement.querySelector('i')?.remove();
+                input.parentElement.querySelector('span')?.remove();
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    // 2. Previsualización de Video
+    function previewVideo(input) {
+        const container = document.getElementById('video-preview-container');
+        const video = document.getElementById('video-tag');
+        const source = document.getElementById('video-source');
+
+        if (input.files && input.files[0]) {
+            const fileURL = URL.createObjectURL(input.files[0]);
+            source.src = fileURL;
+            video.load();
+            container.style.display = 'block';
+        }
+    }
+
+    // 3. Previsualización de Documentos
+    function previewDoc(input, displayId) {
+        const display = document.getElementById(displayId);
+        if (input.files && input.files[0]) {
+            display.innerText = "📄 Nuevo: " + input.files[0].name;
+            display.style.display = 'block';
+        }
+    }
+
+    // 4. SortableJS (Arrastrar)
+    Sortable.create(document.getElementById('sortable-gallery'), {
+        animation: 150,
+        ghostClass: 'bg-light'
+    });
+
+    // 5. Indicador de pasos
+    document.querySelectorAll('button[data-bs-toggle="tab"]').forEach((btn, idx) => {
+        btn.addEventListener('shown.bs.tab', () => {
+            document.getElementById('tabIndicator').innerText = `Pestaña ${idx + 1} de 3`;
+        });
+    });
+</script>
 
 </body>
 </html>
