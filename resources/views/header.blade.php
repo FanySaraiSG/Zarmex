@@ -55,11 +55,12 @@
                 </li>
 
                 <li class="zx-item zx-has-sub">
-                    <a href="#" class="zx-item-link" style="display:flex; align-items:center; gap:10px;">
+                    <a href="{{ route('nosotros') }}" class="zx-item-link" style="display:flex; align-items:center; gap:10px;">
                         <img src="{{ asset('iconos/nosotros.png') }}" alt="Nosotros" style="width:18px; height:22px; object-fit:contain; background:transparent; border:none; box-shadow:none;">
                         Nosotros
                         <i class="fa-solid zx-chevron"></i>
                     </a>
+
                     <ul class="zx-sub">
             </ul>
         </div>
@@ -408,6 +409,14 @@
     box-shadow: none !important;
 }
 
+/* quitar el “cuadro” al pasar el mouse en el item de “Nosotros” (y cualquier sublink) */
+.zx-sub li a:hover,
+.zx-sub li a:focus:hover {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+
 
 .zx-has-sub:hover .zx-sub { display: block; }
 
@@ -670,7 +679,18 @@
         if (!link) return;
 
         link.addEventListener('click', (e) => {
-          // evita que el # haga scroll arriba
+          // Solo usamos el comportamiento "acordeón" en los items que tienen submenú real.
+          // Si es "Nosotros" (navegación directa), NO bloqueamos el click.
+          const href = (link.getAttribute('href') || '').trim();
+          const isNosotros = href.includes('/nosotros') || href.includes("route('nosotros')") || href.includes('nosotros');
+          const hasSubmenu = item.querySelector('.zx-sub');
+
+          if (isNosotros) {
+            // deja navegar
+            menu.classList.remove('is-open');
+            return;
+          }
+
           e.preventDefault();
           e.stopPropagation();
 
