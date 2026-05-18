@@ -105,7 +105,16 @@ Route::prefix('employees')->group(function () {
             Route::get('edit/{id}', [ImagenProductoController::class, 'edit'])->name('productos.imagenes.edit');
             Route::put('{id}', [ImagenProductoController::class, 'update'])->name('productos.imagenes.update');
             Route::delete('{id}', [ImagenProductoController::class, 'destroy'])->name('productos.imagenes.destroy');
+
+            // ✅ Reordenar imágenes extra (slots 1..6)
+            Route::post('reordenar/{producto_id}', [ImagenProductoController::class, 'reordenar'])
+                ->name('productos.imagenes.reordenar');
+
+            // ✅ Guardar TODO (imágenes + video + orden) en una sola request
+            Route::post('guardarTodo/{producto_id}', [ImagenProductoController::class, 'guardarTodo'])
+                ->name('productos.imagenes.guardarTodo');
         });
+
 
         Route::get('imagenes', [ImagenController::class, 'indexImagen'])->name('imagenes.index');
         Route::get('imagenes/create', [ImagenController::class, 'createImagen'])->name('imagenes.create');
