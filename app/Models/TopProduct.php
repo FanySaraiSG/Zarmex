@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class TopProduct extends Model {
     use HasFactory;
 
-    protected $fillable = ['product_id'];
+    protected $fillable = ['product_id', 'section'];
+
 
     public function product() {
         return $this->belongsTo(Producto::class, 'product_id', 'id');

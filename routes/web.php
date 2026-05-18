@@ -86,7 +86,7 @@ Route::prefix('employees')->group(function () {
         Route::resource('employees', EmployeesController::class);
         Route::resource('categorias', CategoriaController::class);
         Route::resource('colors', ColorController::class);
-        Route::resource('top-products', TopProductController::class)->only(['index', 'update']);
+        Route::resource('top-products', TopProductController::class)->only(['index', 'store', 'update', 'destroy']);
 
         Route::get('/productos', [ProductoController::class, 'index'])->name('productos.index');
         Route::get('/productos/create', [ProductoController::class, 'create'])->name('productos.create');

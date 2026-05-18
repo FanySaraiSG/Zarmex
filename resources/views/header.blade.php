@@ -54,7 +54,7 @@
                     </ul>
                 </li>
 
-                <li class="zx-item zx-has-sub">
+                <li class="zx-item">
                     <a href="{{ route('nosotros') }}" class="zx-item-link" style="display:flex; align-items:center; gap:10px;">
                         <img src="{{ asset('iconos/nosotros.png') }}" alt="Nosotros" style="width:18px; height:22px; object-fit:contain; background:transparent; border:none; box-shadow:none;">
                         Nosotros

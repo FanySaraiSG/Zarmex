@@ -137,6 +137,45 @@
                 .best-carousel .carousel-control-prev,
                 .best-carousel .carousel-control-next { width: 6%; }
 
+                /* ===== Botones secciones (encima del carrusel) ===== */
+                .best-section-actions{
+                    display:flex;
+                    justify-content:center;
+                    gap:12px;
+                    margin: 0 0 18px;
+                    position: relative;
+                    z-index: 3;
+                }
+                .best-section-action-btn{
+                    background: rgba(40,102,110,0.92);
+                    color: #fedc97;
+                    border: 1px solid rgba(184,161,32,0.35);
+                    padding: 10px 18px;
+                    border-radius: 999px;
+                    font-weight: 800;
+                    cursor:pointer;
+                    transition: transform .2s ease, background .2s ease, color .2s ease;
+                }
+                .best-section-action-btn:hover{
+                    transform: translateY(-2px);
+                    background: #28666e;
+                    color: #fff;
+                }
+                .best-section-action-btn.active{
+                    background: #1a4a50;
+                    color: #fedc97;
+                    box-shadow: 0 8px 20px rgba(20,85,85,0.25);
+                }
+
+                /* Filtro visual por sección */
+                .best-card{ transition: opacity .2s ease, transform .2s ease; }
+                .best-sec-todos{ opacity: 1; }
+                .best-sec-novedades,
+                .best-sec-populares{ opacity: 1; }
+
+                .best-hide-section{ opacity: 0; pointer-events: none; transform: scale(0.98); }
+
+
                 /* OVERLAY */
                 .prod-overlay {
                     position: fixed; inset: 0; background: rgba(0,0,0,0.6);
@@ -246,7 +285,7 @@
                     justify-content: center;
                     cursor: pointer;
                     z-index: 3;
-                    transition: transform .15s ease, background .2s ease, color .2s ease;
+                    transition: transform 15s ease, background 2s ease, color 2s ease;
                 }
 
                 .prod-modal-close:hover {
@@ -264,47 +303,157 @@
 
             <h2 class="text-center zx-title-playfair" style="color:#28666e; font-size:2em; margin: 20px 0;">PRODUCTOS DESTACADOS</h2>
 
-            <div class="best-sellers-wrap">
-                <div id="topProductsCarousel" class="carousel slide best-carousel" data-bs-ride="carousel" data-bs-interval="4500">
-                    <div class="carousel-inner">
-                        @foreach($topProducts->chunk(3) as $chunk)
-                            <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
-                                <div class="row g-4 justify-content-center">
-                                    @foreach($chunk as $topProduct)
-                                        <div class="col-12 col-md-6 col-lg-4">
-                                            <div class="best-card">
-                                                <img src="{{ $topProduct->product->imagen_url ?? asset('Imagenes/84493-4540581.jpg') }}"
-                                                     alt="{{ $topProduct->product->nombre ?? 'Producto' }}">
-                                                
-                                                {{-- Limpieza de nombre en la tarjeta --}}
-                                                <h3>{{ Str::afterLast($topProduct->product->nombre, ' ') }}</h3>
-                                                
-                                                <button class="best-btn"
-                                                    data-nombre="{{ $topProduct->product->nombre ?? 'Producto' }}"
-                                                    data-desc="{{ $topProduct->product->descripcion ?? '' }}"
-                                                    data-img="{{ $topProduct->product->imagen_url ?? asset('Imagenes/84493-4540581.jpg') }}"
-                                                    data-colores="{{ json_encode(optional($topProduct->product->colores)->pluck('nombre', 'hex') ?? []) }}"
-                                                    onclick="abrirProdModalDesdeBtn(this)">
-                                                    Ver más
-                                                </button>
-                                            </div>
-                                        </div>
-                                    @endforeach
+                <div class="best-sellers-wrap">
+                <div class="best-section-actions" aria-label="Secciones de productos destacados">
+                    <button type="button" class="best-section-action-btn" onclick="showBestSection('todos')">Todos</button>
+                    <button type="button" class="best-section-action-btn" onclick="showBestSection('novedades')">Novedades</button>
+                    <button type="button" class="best-section-action-btn" onclick="showBestSection('populares')">Populares</button>
+                </div>
+
+                @php
+                    $novedades = ($topProducts ?? collect())->where('section','novedades')->values();
+                    $populares = ($topProducts ?? collect())->where('section','populares')->values();
+                @endphp
+
+                @if(($topProducts ?? collect())->count() === 0)
+
+                    <div style="text-align:center; color:#666; padding: 24px;">No hay productos destacados disponibles.</div>
+                @else
+                <div id="topProductsTodosCarousel" class="carousel slide best-carousel" data-bs-ride="carousel" data-bs-interval="4500">
+                        <div class="carousel-inner">
+                            @foreach($topProducts->chunk(3) as $chunk)
+                                <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
+                                    <div class="row g-4 justify-content-center">
+                                        @foreach($chunk as $topProduct)
+                                            @php
+                                                $section = $topProduct->section ?? 'todos';
+                                                $bestSectionClass = match($section) {
+                                                    'novedades' => 'best-sec-novedades',
+                                                    'populares' => 'best-sec-populares',
+                                                    default => 'best-sec-todos'
+                                                };
+                                            @endphp
+
+                                            @if($topProduct->product)
+                                                <div class="col-12 col-md-6 col-lg-4">
+                                                    <div class="best-card {{ $bestSectionClass }}" data-best-section="{{ $section }}">
+                                                        <img src="{{ $topProduct->product->imagen_url ?? asset('Imagenes/84493-4540581.jpg') }}"
+                                                             alt="{{ $topProduct->product->nombre ?? 'Producto' }}">
+
+                                                        <h3>{{ Str::afterLast($topProduct->product->nombre, ' ') }}</h3>
+
+                                                        <button class="best-btn"
+                                                            data-nombre="{{ $topProduct->product->nombre ?? 'Producto' }}"
+                                                            data-desc="{{ $topProduct->product->descripcion ?? '' }}"
+                                                            data-img="{{ $topProduct->product->imagen_url ?? asset('Imagenes/84493-4540581.jpg') }}"
+                                                            data-colores="{{ json_encode(optional($topProduct->product->colores)->pluck('nombre', 'hex') ?? []) }}"
+                                                            onclick="abrirProdModalDesdeBtn(this)">
+                                                            Ver más
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        @endforeach
+                                    </div>
                                 </div>
-                            </div>
-                        @endforeach
+                            @endforeach
+                        </div>
+
+                        <button class="carousel-control-prev" type="button" data-bs-target="#topProductsTodosCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Anterior</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#topProductsTodosCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Siguiente</span>
+                        </button>
                     </div>
 
-                    <button class="carousel-control-prev" type="button" data-bs-target="#topProductsCarousel" data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Anterior</span>
-                    </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#topProductsCarousel" data-bs-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="visually-hidden">Siguiente</span>
-                    </button>
-                </div>
+                    @php
+                        $novedades = $topProducts->where('section','novedades')->values();
+                        $populares = $topProducts->where('section','populares')->values();
+                    @endphp
+
+                    <div id="topProductsNovedadesCarousel" class="carousel slide best-carousel d-none" data-bs-ride="carousel" data-bs-interval="4500">
+                        <div class="carousel-inner">
+                            @foreach($novedades->chunk(3) as $chunk)
+                                <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
+                                    <div class="row g-4 justify-content-center">
+                                        @foreach($chunk as $topProduct)
+                                            @if($topProduct->product)
+                                                <div class="col-12 col-md-6 col-lg-4">
+                                                    <div class="best-card best-sec-novedades" data-best-section="novedades">
+                                                        <img src="{{ $topProduct->product->imagen_url ?? asset('Imagenes/84493-4540581.jpg') }}"
+                                                             alt="{{ $topProduct->product->nombre ?? 'Producto' }}">
+                                                        <h3>{{ Str::afterLast($topProduct->product->nombre, ' ') }}</h3>
+                                                        <button class="best-btn"
+                                                            data-nombre="{{ $topProduct->product->nombre ?? 'Producto' }}"
+                                                            data-desc="{{ $topProduct->product->descripcion ?? '' }}"
+                                                            data-img="{{ $topProduct->product->imagen_url ?? asset('Imagenes/84493-4540581.jpg') }}"
+                                                            data-colores="{{ json_encode(optional($topProduct->product->colores)->pluck('nombre', 'hex') ?? []) }}"
+                                                            onclick="abrirProdModalDesdeBtn(this)">
+                                                            Ver más
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        <button class="carousel-control-prev" type="button" data-bs-target="#topProductsNovedadesCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Anterior</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#topProductsNovedadesCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Siguiente</span>
+                        </button>
+                    </div>
+
+                    <div id="topProductsPopularesCarousel" class="carousel slide best-carousel d-none" data-bs-ride="carousel" data-bs-interval="4500">
+                        <div class="carousel-inner">
+                            @foreach($populares->chunk(3) as $chunk)
+                                <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
+                                    <div class="row g-4 justify-content-center">
+                                        @foreach($chunk as $topProduct)
+                                            @if($topProduct->product)
+                                                <div class="col-12 col-md-6 col-lg-4">
+                                                    <div class="best-card best-sec-populares" data-best-section="populares">
+                                                        <img src="{{ $topProduct->product->imagen_url ?? asset('Imagenes/84493-4540581.jpg') }}"
+                                                             alt="{{ $topProduct->product->nombre ?? 'Producto' }}">
+                                                        <h3>{{ Str::afterLast($topProduct->product->nombre, ' ') }}</h3>
+                                                        <button class="best-btn"
+                                                            data-nombre="{{ $topProduct->product->nombre ?? 'Producto' }}"
+                                                            data-desc="{{ $topProduct->product->descripcion ?? '' }}"
+                                                            data-img="{{ $topProduct->product->imagen_url ?? asset('Imagenes/84493-4540581.jpg') }}"
+                                                            data-colores="{{ json_encode(optional($topProduct->product->colores)->pluck('nombre', 'hex') ?? []) }}"
+                                                            onclick="abrirProdModalDesdeBtn(this)">
+                                                            Ver más
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        <button class="carousel-control-prev" type="button" data-bs-target="#topProductsPopularesCarousel" data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Anterior</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#topProductsPopularesCarousel" data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Siguiente</span>
+                        </button>
+                    </div>
+                @endif
             </div>
+
 
             {{-- ── MODAL (simple: info antigua + WhatsApp) ── --}}
             <div class="prod-overlay" id="prodOverlay" onclick="if(event.target===this) cerrarProdModal()">
@@ -453,6 +602,42 @@
                     pmCur = (pmCur + dir + pmSlides.length) % pmSlides.length;
                     pmGoTo(pmCur);
                 }
+
+                // =====================
+                // Secciones botones (encima de carrusel)
+                // =====================
+                function showBestSection(section) {
+                    const btns = document.querySelectorAll('.best-section-action-btn');
+                    btns.forEach(b => {
+                        const isActive = (b.getAttribute('onclick') || '').includes(`showBestSection('${section}')`);
+                        b.classList.toggle('active', isActive);
+                    });
+
+                    const ids = {
+                        todos: 'topProductsTodosCarousel',
+                        novedades: 'topProductsNovedadesCarousel',
+                        populares: 'topProductsPopularesCarousel'
+                    };
+
+                    Object.entries(ids).forEach(([key, id]) => {
+                        const el = document.getElementById(id);
+                        if (!el) return;
+                        el.classList.toggle('d-none', key !== section);
+
+                        // Si hay carruseles ya inicializados por Bootstrap, forzamos a recalcular tamaño.
+                        try {
+                            if (!el.classList.contains('d-none')) {
+                                const inst = bootstrap.Carousel.getOrCreateInstance(el, { interval: 4500, ride: true });
+                                inst.to(0);
+                            }
+                        } catch (e) {}
+                    });
+                }
+
+                // Inicializa en "todos"
+                document.addEventListener('DOMContentLoaded', () => {
+                    try { showBestSection('todos'); } catch(e) {}
+                });
             </script>
         </section>
         {{-- ===================== FIN PRODUCTOS DESTACADOS ===================== --}}

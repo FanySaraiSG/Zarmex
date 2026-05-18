@@ -10,10 +10,16 @@ class HomeController extends Controller
     public function index()
     {
         // Obtener las reseñas activas
-        $reseñas = Review::where('estatus', 'activo')->get();
+        $reseñas = Review::query()->where('estatus', 'activo')->get();
 
-        // Obtener los 5 productos más vendidos
-        $topProducts = TopProduct::with('product')->take(5)->get();
+        // Obtener productos destacados (ahora ya existen secciones: todos/novedades/populares)
+        $topProducts = TopProduct::query()
+            ->with('product')
+            ->orderBy('section')
+            ->get()
+            ->filter(fn ($tp) => !empty($tp->product));
+
+
 
         // Pasar las variables a la vista
         return view('index', compact('reseñas', 'topProducts'));

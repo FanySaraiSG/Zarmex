@@ -101,13 +101,24 @@ header, footer, .whatsapp, #whatsapp{
     <div class="crud-box">
 
         <!-- HEADER -->
-        <div class="d-flex justify-content-between align-items-center mb-3">
+        <div class="d-flex justify-content-between align-items-center mb-3 gap-2 flex-wrap">
             <a class="btn btn-back" href="{{ route('admin.dashboard') }}">
                 ← Regresar
             </a>
+
+            <div class="d-flex align-items-center gap-2">
+                <select class="select-product" id="newBestSection" style="min-width: 180px;">
+                    <option value="todos">Todos</option>
+                    <option value="novedades">Novedades</option>
+                    <option value="populares">Populares</option>
+                </select>
+
+                <button type="button" class="btn btn-back" id="btnAddTopProduct" style="background:#1b5a61;">+ Agregar</button>
+            </div>
         </div>
 
-        <h2 class="crud-title">Top 5 Productos Más Vendidos</h2>
+        <h2 class="crud-title">Top Productos Destacados</h2>
+
 
         @if (session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
@@ -121,12 +132,16 @@ header, footer, .whatsapp, #whatsapp{
                     <tr>
                         <th>#</th>
                         <th>Producto</th>
+                        <th>Sección</th>
+                        <th>Acciones</th>
                     </tr>
+
                 </thead>
 
-                <tbody>
+
+                <tbody id="topProductsTbody">
                     @foreach ($topProducts as $topProduct)
-                    <tr>
+                    <tr data-top-product-id="{{ $topProduct->id }}">
                         <td>{{ $loop->iteration }}</td>
 
                         <td>
@@ -144,9 +159,28 @@ header, footer, .whatsapp, #whatsapp{
 
                             </select>
                         </td>
+
+                        <td>
+                            <select class="select-product auto-submit auto-submit-section"
+                                data-id="{{ $topProduct->id }}"
+                                data-section-current="{{ $topProduct->section ?? 'todos' }}">
+
+                                <option value="todos" {{ ($topProduct->section ?? 'todos') === 'todos' ? 'selected' : '' }}>Todos</option>
+                                <option value="novedades" {{ ($topProduct->section ?? 'todos') === 'novedades' ? 'selected' : '' }}>Novedades</option>
+                                <option value="populares" {{ ($topProduct->section ?? 'todos') === 'populares' ? 'selected' : '' }}>Populares</option>
+
+                            </select>
+                        </td>
+
+                        <td>
+                            <button type="button" class="btn btn-back btn-delete" style="background:#7a2b2b; padding: 10px 14px;" title="Eliminar">
+                                Eliminar
+                            </button>
+                        </td>
                     </tr>
                     @endforeach
                 </tbody>
+
 
             </table>
         </div>
@@ -156,10 +190,9 @@ header, footer, .whatsapp, #whatsapp{
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
+    // Actualizar (PUT) al cambiar selects
     document.querySelectorAll('.auto-submit').forEach(select => {
-
         select.addEventListener('change', function() {
-
             let productId = this.value;
             let topProductId = this.dataset.id;
 
@@ -171,7 +204,8 @@ document.addEventListener("DOMContentLoaded", function() {
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
                 body: JSON.stringify({
-                    product_id: productId
+                    product_id: productId,
+                    section: select.closest('tr').querySelector('.auto-submit-section')?.value || 'todos'
                 })
             })
             .then(res => res.json())
@@ -182,12 +216,68 @@ document.addEventListener("DOMContentLoaded", function() {
                 console.error(err);
                 alert('Error al actualizar');
             });
-
         });
+    });
 
+    // Eliminar
+    document.querySelectorAll('.btn-delete').forEach(btn => {
+        btn.addEventListener('click', async function() {
+            const tr = btn.closest('tr');
+            const topProductId = tr?.dataset.topProductId;
+            if (!topProductId) return;
+
+            if (!confirm('¿Eliminar este registro de TopProduct?')) return;
+
+            try {
+                const res = await fetch(`/employees/top-products/${topProductId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                });
+                const data = await res.json().catch(() => ({}));
+
+                tr?.remove();
+            } catch (e) {
+                console.error(e);
+                alert('Error al eliminar');
+            }
+        });
+    });
+
+    // Agregar (CREATE)
+    const btnAdd = document.getElementById('btnAddTopProduct');
+    const newSection = document.getElementById('newBestSection');
+
+    btnAdd?.addEventListener('click', async function() {
+        const section = newSection?.value || 'todos';
+
+        try {
+            const res = await fetch(`/employees/top-products`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    product_id: null,
+                    section
+                })
+            });
+            const data = await res.json();
+
+            // Recargar para evitar lógica de pintar fila
+            window.location.reload();
+        } catch (e) {
+            console.error(e);
+            alert('Error al agregar');
+        }
     });
 });
 </script>
+
 
 </body>
 </html>
