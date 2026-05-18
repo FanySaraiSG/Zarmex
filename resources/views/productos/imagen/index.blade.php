@@ -33,9 +33,6 @@
         .upload-section { background: #f8f9fa; border-radius: 14px; padding: 20px; border: 1px solid #eee; }
         .upload-section h5 { color: #234d50; font-weight: 700; margin-bottom: 4px; }
         .upload-section p { font-size: 0.82rem; color: #888; margin-bottom: 12px; }
-        .counter { font-size: 0.85rem; font-weight: 600; }
-        .counter.ok { color: #28666e; }
-        .counter.full { color: #e63946; }
 
         /* VIDEO SECTION */
         .video-section { background: #f0f7f8; border-radius: 14px; padding: 20px; border: 1px solid #c4e0e2; margin-top: 16px; }
@@ -46,6 +43,12 @@
         .btn-zx { background: #28666e; color: #fff; border: none; border-radius: 10px; padding: 10px 24px; font-weight: 700; }
         .btn-zx:hover { background: #1d4f55; color: #fff; }
         .btn-back { background: #eee; color: #333; border: none; border-radius: 10px; padding: 8px 18px; font-weight: 600; }
+
+        .counter { font-size: 0.85rem; font-weight: 600; }
+        .counter.ok { color: #28666e; }
+        .counter.full { color: #e63946; }
+
+        .form-actions { display:flex; justify-content:flex-end; margin-top: 18px; }
     </style>
 
     <div class="img-page">
@@ -91,108 +94,134 @@
                 </div>
             </div>
 
-            {{-- GRID DE SLOTS --}}
-            <h6 class="fw-bold text-muted mb-2" style="font-size:0.8rem; letter-spacing:1px; text-transform:uppercase;">Imágenes Extra (máx. 6)</h6>
-            <div class="slots-grid">
-                @for($i = 1; $i <= 6; $i++)
-                    @php $img = $imagenes->get($i - 1); @endphp
-                    <div class="slot-card {{ $img ? 'ocupado' : '' }}">
-                        <span class="slot-num">{{ $i }}</span>
+            {{-- FORM ÚNICO (imágenes + video + reorden) --}}
+            <form id="galeria-form" action="{{ route('productos.imagenes.guardarTodo', $producto->id) }}" method="POST" enctype="multipart/form-data">
+                @csrf
 
-                        @if($img)
-                            <img src="{{ asset($img->ruta) }}?v={{ time() }}" alt="Imagen {{ $i }}">
-                            <div class="slot-actions">
-                                <a href="{{ route('productos.imagenes.edit', $img->img_id) }}" class="btn btn-warning btn-sm">
-                                    <i class="fa-solid fa-pen"></i> Editar
-                                </a>
-                                <form action="{{ route('productos.imagenes.destroy', $img->img_id) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Eliminar esta imagen?')">
-                                    @csrf @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm">
-                                        <i class="fa-solid fa-trash"></i> Borrar
-                                    </button>
-                                </form>
-                            </div>
-                        @else
-                            <div class="slot-empty-icon"><i class="fa-regular fa-image"></i></div>
-                            <div class="slot-empty-text">Vacío</div>
-                        @endif
-                    </div>
-                @endfor
-            </div>
+                {{-- GRID DE SLOTS --}}
+                <h6 class="fw-bold text-muted mb-2" style="font-size:0.8rem; letter-spacing:1px; text-transform:uppercase;">Imágenes Extra (máx. 6)</h6>
 
-            {{-- SUBIR NUEVAS IMÁGENES --}}
-            @if($imagenes->count() < 6)
-            <div class="upload-section">
-                <h5><i class="fa-solid fa-cloud-arrow-up me-2"></i>Subir Imágenes</h5>
-                <p>Puedes subir hasta {{ 6 - $imagenes->count() }} imagen(es) más. Formatos: JPG, PNG, WEBP. Máx. 2MB c/u.</p>
+                <div class="slots-grid">
+                    @for($i = 1; $i <= 6; $i++)
+                        @php $img = $imagenes->firstWhere('orden', $i); @endphp
+                        <div class="slot-card {{ $img ? 'ocupado' : '' }}"
+                             draggable="{{ $img ? 'true' : 'false' }}"
+                             ondragstart="dragStart({{ $img ? $img->img_id : 'null' }})"
+                             ondragover="dragOver(event)"
+                             ondrop="dropOnSlot(event, {{ $i }})"
+                             data-slot="{{ $i }}">
 
-                <form action="{{ route('productos.imagenes.store', $producto->id) }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <div class="mb-3">
-                        <input type="file" name="imagenes[]" class="form-control" multiple accept="image/jpeg,image/png,image/webp,image/gif"
-                               onchange="previewImages(this)">
-                        <div class="form-text">Selecciona hasta {{ 6 - $imagenes->count() }} archivo(s) a la vez.</div>
-                    </div>
-                    <div id="preview-container" class="d-flex flex-wrap gap-2 mb-3"></div>
-                    <button type="submit" class="btn-zx">
-                        <i class="fa-solid fa-upload me-2"></i>Guardar Imágenes
-                    </button>
-                </form>
-            </div>
-            @else
-            <div class="alert alert-warning mt-2">
-                <i class="fa-solid fa-triangle-exclamation me-2"></i>
-                Ya tienes 6 imágenes. Elimina alguna para subir una nueva.
-            </div>
-            @endif
+                            <input type="hidden" name="ordenes[{{ $i }}]" id="orden_slot_{{ $i }}" value="{{ $img ? $img->img_id : '' }}">
 
-            {{-- VIDEO --}}
-            <div class="video-section">
-                <h5><i class="fa-solid fa-video me-2"></i>Video del Producto</h5>
-                <p>Sube un video en formato MP4. Máx. 50MB. Aparecerá como último slide en el carrusel.</p>
+                            <span class="slot-num">{{ $i }}</span>
 
-                @if(!empty($producto->video_url))
-                <div class="mb-3">
-                    <div class="fw-bold mb-1" style="font-size:0.8rem; color:#234d50;">Video actual:</div>
-                    <video class="video-preview" controls>
-                        <source src="{{ asset($producto->video_url) }}" type="video/mp4">
-                    </video>
+                            @if($img)
+                                <img src="{{ asset($img->ruta) }}?v={{ time() }}" alt="Imagen {{ $i }}">
+                                {{-- Nota: no mostramos Editar/Borrar para cumplir "un solo botón al final" --}}
+                            @else
+                                <div class="slot-empty-icon"><i class="fa-regular fa-image"></i></div>
+                                <div class="slot-empty-text">Vacío</div>
+                            @endif
+                        </div>
+                    @endfor
                 </div>
+
+                {{-- SUBIR NUEVAS IMÁGENES --}}
+                @if($imagenes->count() < 6)
+                    <div class="upload-section">
+                        <h5><i class="fa-solid fa-cloud-arrow-up me-2"></i>Subir Imágenes</h5>
+                        <p>Puedes subir hasta {{ 6 - $imagenes->count() }} imagen(es) más. Formatos: JPG, PNG, WEBP, GIF. Máx. 2MB c/u.</p>
+
+                        <div class="mb-3">
+                            <input type="file" name="imagenes[]" class="form-control" multiple accept="image/jpeg,image/png,image/webp,image/gif" onchange="previewImages(this)">
+                            <div class="form-text">Selecciona hasta {{ 6 - $imagenes->count() }} archivo(s) a la vez.</div>
+                        </div>
+
+                        <div id="preview-container" class="d-flex flex-wrap gap-2 mb-3"></div>
+                    </div>
+                @else
+                    <div class="alert alert-warning mt-2">
+                        <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                        Ya tienes 6 imágenes. Elimina alguna para subir una nueva.
+                    </div>
                 @endif
 
-                <form action="{{ route('productos.video.update', $producto->id) }}" method="POST" enctype="multipart/form-data">
-                    @csrf @method('PUT')
-                    <div class="mb-3">
-                        <input type="file" name="video" class="form-control" accept="video/mp4">
-                    </div>
-                    <button type="submit" class="btn-zx">
-                        <i class="fa-solid fa-cloud-arrow-up me-2"></i>
-                        {{ empty($producto->video_url) ? 'Subir Video' : 'Reemplazar Video' }}
-                    </button>
+                {{-- VIDEO --}}
+                <div class="video-section">
+                    <h5><i class="fa-solid fa-video me-2"></i>Video del Producto</h5>
+                    <p>Sube un video en formato MP4. Máx. 50MB. Se guardará como video del producto.</p>
 
                     @if(!empty($producto->video_url))
-                    <button type="button" class="btn btn-outline-danger ms-2" onclick="eliminarVideo({{ $producto->id }})">
-                        <i class="fa-solid fa-trash me-1"></i>Eliminar Video
-                    </button>
+                        <div class="mb-3">
+                            <div class="fw-bold mb-1" style="font-size:0.8rem; color:#234d50;">Video actual:</div>
+                            <video class="video-preview" controls>
+                                <source src="{{ asset($producto->video_url) }}" type="video/mp4">
+                            </video>
+                        </div>
                     @endif
-                </form>
-            </div>
+
+                    <div class="mb-3">
+                        <input type="file" name="video" class="form-control" accept="video/mp4">
+                        <div class="form-text">Si no seleccionas video, se conserva el actual.</div>
+                    </div>
+                </div>
+
+                {{-- ÚNICO BOTÓN FINAL --}}
+                <div class="form-actions">
+                    <button type="submit" class="btn-zx">
+                        <i class="fa-solid fa-floppy-disk me-2"></i>Guardar
+                    </button>
+                </div>
+            </form>
 
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <script>
+        let dragImgId = null;
+        function dragStart(imgId) { dragImgId = imgId; }
+        function dragOver(event) { event.preventDefault(); }
+
+        let dragFromSlot = null;
+
+        function dropOnSlot(event, slot) {
+            event.preventDefault();
+            if (!dragImgId) return;
+
+            const inputDestino = document.getElementById('orden_slot_' + slot);
+            if (!inputDestino) return;
+
+            // Swap entre slot origen y destino para que el orden quede correcto.
+            if (dragFromSlot && dragFromSlot !== slot) {
+                const inputOrigen = document.getElementById('orden_slot_' + dragFromSlot);
+                if (inputOrigen) {
+                    const temp = inputDestino.value;
+                    inputDestino.value = inputOrigen.value;
+                    inputOrigen.value = temp;
+                } else {
+                    inputDestino.value = dragImgId;
+                }
+            } else {
+                inputDestino.value = dragImgId;
+            }
+        }
+
         function previewImages(input) {
             const container = document.getElementById('preview-container');
+            if (!container) return;
+
             container.innerHTML = '';
-            const files = Array.from(input.files);
+            const files = Array.from(input.files || []);
             const max = {{ 6 - $imagenes->count() }};
+
             if (files.length > max) {
                 alert('Solo puedes subir ' + max + ' imagen(es) más.');
                 input.value = '';
                 return;
             }
+
             files.forEach(file => {
                 const reader = new FileReader();
                 reader.onload = e => {
@@ -204,21 +233,8 @@
                 reader.readAsDataURL(file);
             });
         }
-
-        function eliminarVideo(productoId) {
-            if (!confirm('¿Eliminar el video de este producto?')) return;
-            fetch(`/employees/productos/${productoId}/video`, {
-                method: 'DELETE',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                    'Content-Type': 'application/json'
-                }
-            }).then(r => r.json()).then(d => {
-                if (d.success) location.reload();
-                else alert('Error al eliminar el video.');
-            });
-        }
     </script>
 
     @endauth
 </x-app-layout>
+

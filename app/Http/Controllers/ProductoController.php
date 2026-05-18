@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Nota: Este controller puede generar falsos positivos en Intelephense por stubs/typing.
+ */
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -26,7 +30,7 @@ class ProductoController extends Controller
             $productos = Producto::where('categoria_id', $categoria)->get();
         } else {
             $categoriaNombre = 'Todos los productos';
-            $productos = Producto::get();
+            $productos = Producto::all();
         }
 
         return view('productos.index', compact('categoriaNombre', 'productos', 'categorias'));
@@ -121,8 +125,9 @@ class ProductoController extends Controller
         return redirect()->route('productos.index')->with('success', 'Producto creado correctamente.');
     }
 
-    public function show($id)
+public function show(int $id)
     {
+
         $producto = Producto::findOrFail($id);
         return view('productos.show', compact('producto'));
     }
@@ -144,8 +149,9 @@ class ProductoController extends Controller
         return view('productos.edit', compact('producto', 'categorias', 'imagenesExtra'));
     }
 
-    public function update(Request $request, $id)
+public function update(Request $request, $id)
     {
+
         $request->validate([
             'id' => 'required|unique:productos,id,' . $id,
             'descripcion' => 'nullable|string',
@@ -320,8 +326,8 @@ foreach (['doc1', 'doc2', 'doc3'] as $campo) {
 
         $producto->save();
 
-        return redirect()->route('productos.index')
-    ->with('success', 'Producto actualizado correctamente.');
+        return redirect()->route('productos.edit', $producto->id)
+            ->with('success_edit', 'Producto actualizado correctamente.');
     }
 
     public function mostrarProductosPorCategoria($id_categoria)

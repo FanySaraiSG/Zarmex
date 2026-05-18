@@ -33,58 +33,105 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
-        /* Galería de Imágenes */
-        .gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
-        .img-slot {
-            aspect-ratio: 1; border: 2px dashed var(--accent-green);
-            border-radius: 12px; position: relative; overflow: hidden;
-            background: #fafafa; display: flex; align-items: center; justify-content: center;
+        /* Zona de Carga Masiva Unificada */
+        .upload-area {
+            border: 2px dashed var(--accent-green); background: #fafafa;
+            border-radius: 15px; padding: 40px; text-align: center;
+            cursor: pointer; transition: 0.3s; margin-bottom: 25px;
         }
+        .upload-area:hover { background: var(--light-green); border-color: var(--primary-green); }
+
+        /* Contenedor de Previsualización Dinámica */
+        .gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .img-slot {
+            aspect-ratio: 1; border: 1px solid #e0e0e0;
+            border-radius: 12px; position: relative; overflow: hidden;
+            background: #fff; display: flex; align-items: center; justify-content: center;
+            cursor: grab; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .img-slot:active { cursor: grabbing; }
         .img-slot img { width: 100%; height: 100%; object-fit: cover; }
-        .preview-label { cursor: pointer; text-align: center; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        
+        /* Botón para remover imágenes individuales */
+        .remove-btn {
+            position: absolute; top: 8px; right: 8px;
+            background: rgba(220, 53, 69, 0.9); color: white;
+            border: none; border-radius: 50%; width: 28px; height: 28px;
+            font-size: 14px; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; z-index: 10;
+        }
 
         /* Video Preview */
         #video-preview-container video { width: 100%; border-radius: 12px; background: #000; margin-top: 10px; }
 
         /* Documentos */
-        .doc-box { border: 1px solid #e0e0e0; border-radius: 12px; padding: 15px; margin-bottom: 15px; transition: 0.3s; }
+        .doc-box { border: 1px solid #e0e0e0; border-radius: 12px; padding: 20px; margin-bottom: 20px; transition: 0.3s; }
         .doc-box:hover { border-color: var(--primary-green); background: var(--bg-gray); }
 
-        .btn-save { background-color: var(--primary-green); color: white; border: none; padding: 12px 30px; border-radius: 12px; font-weight: bold; }
+        .btn-save { background-color: var(--primary-green); color: white; border: none; padding: 15px 40px; border-radius: 12px; font-weight: bold; }
         .btn-back { background-color: #6c757d; color: white; border: none; padding: 12px 25px; border-radius: 12px; text-decoration: none; display: inline-flex; align-items: center; }
         .btn-back:hover { background-color: #5a6268; color: white; }
+        
+        .btn-next-tab { background-color: var(--medium-green); color: white; border-radius: 10px; font-weight: 600; }
+        .btn-next-tab:hover { background-color: var(--primary-green); color: white; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="edit-card">
+
+        <!-- ========================================== -->
+        <!-- MENSAJE DE ÉXITO O ERROR (ÚNICO AGREGADO) -->
+        <!-- ========================================== -->
+        @if(session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
+        @if($errors->any())
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+        <!-- ========================================== -->
+
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold" style="color: var(--primary-green);">Panel de Edición</h2>
+            <h2 class="fw-bold m-0" style="color: var(--primary-green);">Panel de Edición</h2>
             <a href="{{ route('productos.index') }}" class="btn-back"><i class="bi bi-arrow-left me-2"></i> Regresar</a>
         </div>
 
-        <form action="{{ route('productos.update', $producto->id) }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('productos.update', $producto->id) }}" method="POST" enctype="multipart/form-data" id="product-form">
             @csrf
             @method('PUT')
 
-            <ul class="nav nav-pills nav-justified nav-pills-custom mb-4" role="tablist">
-                <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-info" type="button">1. Información</button></li>
-                <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-media" type="button">2. Multimedia</button></li>
-                <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-docs" type="button">3. Documentos</button></li>
+            <!-- Inputs ocultos para enviar el orden y el registro de eliminaciones -->
+            <input type="hidden" name="orden_imagenes" id="orden_imagenes">
+            <input type="hidden" name="imagenes_eliminadas" id="imagenes_eliminadas" value="[]">
+
+            <!-- Navegación de Pestañas -->
+            <ul class="nav nav-pills nav-justified nav-pills-custom mb-4" id="productTabs" role="tablist">
+                <li class="nav-item"><button class="nav-link active" id="tab-info-btn" data-bs-toggle="tab" data-bs-target="#tab-info" type="button" role="tab">1. Información</button></li>
+                <li class="nav-item"><button class="nav-link" id="tab-media-btn" data-bs-toggle="tab" data-bs-target="#tab-media" type="button" role="tab">2. Multimedia</button></li>
+                <li class="nav-item"><button class="nav-link" id="tab-docs-btn" data-bs-toggle="tab" data-bs-target="#tab-docs" type="button" role="tab">3. Documentos</button></li>
             </ul>
 
             <div class="tab-content">
                 
-                <div class="tab-pane fade show active" id="tab-info">
+                <!-- SECCIÓN 1: INFORMACIÓN -->
+                <div class="tab-pane fade show active" id="tab-info" role="tabpanel">
                     <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label fw-bold text-muted small">ID DEL PRODUCTO</label>
-                            <input type="text" class="form-control bg-light" value="{{ $producto->id }}" readonly>
-                        </div>
+                        <!-- Selector de Categoría -->
                         <div class="col-md-8 mb-3">
-                            <label class="form-label fw-bold text-muted small">CATEGORÍA</label>
-                            <select name="categoria_id" class="form-select">
+                            <label for="categoria_id" class="form-label fw-bold">Categoría</label>
+                            <select class="form-select" id="categoria_id" name="categoria_id">
                                 @foreach($categorias as $cat)
                                     <option value="{{ $cat->id_categoria }}" {{ $producto->categoria_id == $cat->id_categoria ? 'selected' : '' }}>
                                         {{ $cat->nombre }}
@@ -92,42 +139,66 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-12">
-                            <label class="form-label fw-bold text-muted small">NUEVA DESCRIPCIÓN DEL ADMINISTRADOR</label>
-                            <textarea name="descripcion" class="form-control" rows="8" placeholder="Escriba aquí la descripción detallada..."></textarea>
+
+                        <!-- Campo de ID -->
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label fw-bold text-muted small">ID DEL PRODUCTO</label>
+                            <input type="text" class="form-control bg-light text-secondary fw-bold" 
+                                   id="id_producto_input" name="id" value="{{ $producto->id }}" readonly>
+                            <small class="text-muted d-block mt-1">Se actualizará según la categoría.</small>
                         </div>
+                    </div>
+
+                    <!-- Descripción -->
+                    <!-- Descripción -->
+                     <div class="mb-4">
+                      <label class="form-label fw-bold text-muted small">NUEVA DESCRIPCIÓN DEL ADMINISTRADOR</label>
+                     <textarea name="descripcion" class="form-control" rows="8" placeholder="Escriba aquí la descripción desde cero..."></textarea>
+                    </div>
+
+                    <div class="d-flex justify-content-end">
+                        <button type="button" class="btn btn-next-tab px-4 py-2" onclick="cambiarPestaña('#tab-media-btn')">Siguiente Pestaña <i class="bi bi-arrow-right ms-1"></i></button>
                     </div>
                 </div>
 
-                <div class="tab-pane fade" id="tab-media">
-                    <label class="form-label fw-bold mb-3">GALERÍA DE IMÁGENES (Arrastra para ordenar)</label>
-                    <div class="gallery-grid mb-4" id="sortable-gallery">
-                        @for($i = 0; $i < 6; $i++)
-                        <div class="img-slot">
-                            <label class="preview-label" id="label-img-{{$i}}">
-                                <input type="file" name="imagenes[]" class="d-none" accept="image/*" onchange="previewImage(this, 'img-view-{{$i}}')">
-                                <img id="img-view-{{$i}}" src="{{ isset($imagenesExtra[$i]) ? asset($imagenesExtra[$i]->ruta) : '' }}" 
-                                     style="{{ isset($imagenesExtra[$i]) ? '' : 'display:none;' }}">
-                                @if(!isset($imagenesExtra[$i]))
-                                    <i class="bi bi-camera text-muted fs-2"></i>
-                                    <span class="small text-muted">Agregar</span>
-                                @endif
-                            </label>
-                        </div>
-                        @endfor
+                <!-- SECCIÓN 2: MULTIMEDIA -->
+                <div class="tab-pane fade" id="tab-media" role="tabpanel">
+                    <label class="form-label fw-bold mb-2">GALERÍA DE IMÁGENES</label>
+                    
+                    <div class="upload-area" onclick="document.getElementById('mass-image-input').click()">
+                        <i class="bi bi-images fs-1 text-muted"></i>
+                        <p class="mb-0 fw-bold text-muted mt-2">Haz clic aquí para seleccionar o arrastrar tus imágenes (Máx. 6)</p>
+                        <input type="file" id="mass-image-input" name="imagenes[]" class="d-none" accept="image/*" multiple>
                     </div>
 
-                    <label class="form-label fw-bold">VIDEO PROMOCIONAL</label>
-                    <input type="file" name="video_url" class="form-control" accept="video/*" onchange="previewVideo(this)">
-                    <div id="video-preview-container" class="mt-2" style="{{ $producto->video_url ? '' : 'display:none;' }}">
-                        <p class="small text-muted mb-1">Vista previa del video:</p>
-                        <video id="video-tag" controls>
+                    <div class="gallery-grid mb-4" id="sortable-gallery">
+                        @foreach($imagenesExtra as $img)
+                            <div class="img-slot" data-id="existente-{{ $img->id }}">
+                                <button type="button" class="remove-btn" onclick="eliminarImagenSlot(this, '{{ $img->id }}')">✕</button>
+                                <img src="{{ asset($img->ruta) }}" alt="Producto">
+                            </div>
+                        @endforeach
+                    </div>
+
+                    <label class="form-label fw-bold">VIDEO PROMOCIONAL (Archivo Local)</label>
+                    <input type="file" name="video_file" id="video-input" class="form-control mb-4" accept="video/mp4,video/mkv,video/x-m4v,video/*" onchange="previewVideo(this)">
+    
+                    <div id="video-preview-container" class="mt-2 mb-4" style="{{ $producto->video_url ? '' : 'display:none;' }}">
+                        <p class="small text-muted mb-1">Vista previa del video seleccionado:</p>
+                        <video id="video-tag" controls style="width: 100%; border-radius: 12px; background: #000;">
                             <source src="{{ $producto->video_url ? asset($producto->video_url) : '' }}" id="video-source">
+                            Tu navegador no soporta carga de videos.
                         </video>
                     </div>
+
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-outline-secondary btn-next-tab bg-white text-secondary px-4 py-2" onclick="cambiarPestaña('#tab-info-btn')"><i class="bi bi-arrow-left me-1"></i> Anterior</button>
+                        <button type="button" class="btn btn-next-tab px-4 py-2" onclick="cambiarPestaña('#tab-docs-btn')">Siguiente Pestaña <i class="bi bi-arrow-right ms-1"></i></button>
+                    </div>
                 </div>
 
-                <div class="tab-pane fade" id="tab-docs">
+                <!-- SECCIÓN 3: DOCUMENTOS -->
+                <div class="tab-pane fade" id="tab-docs" role="tabpanel">
                     @php 
                         $fields = [
                             'doc1' => ['label' => 'Garantía', 'icon' => 'bi-shield-check', 'path' => $producto->doc1_url],
@@ -158,12 +229,20 @@
                         </div>
                     </div>
                     @endforeach
+
+                    <div class="d-flex justify-content-start mt-4">
+                        <button type="button" class="btn btn-outline-secondary btn-next-tab bg-white text-secondary px-4 py-2" onclick="cambiarPestaña('#tab-media-btn')"><i class="bi bi-arrow-left me-1"></i> Anterior</button>
+                    </div>
                 </div>
             </div>
 
+            <!-- PIE DE FORMULARIO -->
             <div class="d-flex justify-content-between align-items-center mt-5 border-top pt-4">
                 <span class="text-muted fw-bold" id="tabIndicator">Pestaña 1 de 3</span>
-                <button type="submit" class="btn btn-save">Guardar Cambios</button>
+                
+                <button type="submit" id="btn-global-submit" class="btn btn-save px-5 py-2 fs-5 shadow-sm d-none">
+                    <i class="bi bi-check-circle me-2"></i> Guardar Todos los Cambios
+                </button>
             </div>
         </form>
     </div>
@@ -171,23 +250,51 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // 1. Previsualización de Imágenes
-    function previewImage(input, imgId) {
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = document.getElementById(imgId);
-                img.src = e.target.result;
-                img.style.display = 'block';
-                // Ocultar icono de 'plus' si existe
-                input.parentElement.querySelector('i')?.remove();
-                input.parentElement.querySelector('span')?.remove();
-            }
-            reader.readAsDataURL(input.files[0]);
-        }
+    const massInput = document.getElementById('mass-image-input');
+    const galleryEl = document.getElementById('sortable-gallery');
+    const eliminadasInput = document.getElementById('imagenes_eliminadas');
+    const btnGlobalSubmit = document.getElementById('btn-global-submit');
+    let listaEliminadas = [];
+
+    function cambiarPestaña(tabButtonId) {
+        const triggerEl = document.querySelector(tabButtonId);
+        bootstrap.Tab.getOrCreateInstance(triggerEl).show();
     }
 
-    // 2. Previsualización de Video
+    massInput.addEventListener('change', function() {
+        if (this.files) {
+            const imagenesActuales = galleryEl.querySelectorAll('.img-slot').length;
+            const espaciosDisponibles = 6 - imagenesActuales;
+            const filesToProcess = Array.from(this.files).slice(0, espaciosDisponibles);
+
+            filesToProcess.forEach((file) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const slot = document.createElement('div');
+                    slot.classList.add('img-slot');
+                    slot.setAttribute('data-id', `nueva-${file.name}`);
+                    
+                    slot.innerHTML = `
+                        <button type="button" class="remove-btn" onclick="eliminarImagenSlot(this)">✕</button>
+                        <img src="${e.target.result}" alt="Previa">
+                    `;
+                    galleryEl.appendChild(slot);
+                    actualizarOrdenFormulario();
+                }
+                reader.readAsDataURL(file);
+            });
+        }
+    });
+
+    function eliminarImagenSlot(btn, idBaseDatos = null) {
+        if (idBaseDatos) {
+            listaEliminadas.push(idBaseDatos);
+            eliminadasInput.value = JSON.stringify(listaEliminadas);
+        }
+        btn.parentElement.remove();
+        actualizarOrdenFormulario();
+    }
+
     function previewVideo(input) {
         const container = document.getElementById('video-preview-container');
         const video = document.getElementById('video-tag');
@@ -201,7 +308,6 @@
         }
     }
 
-    // 3. Previsualización de Documentos
     function previewDoc(input, displayId) {
         const display = document.getElementById(displayId);
         if (input.files && input.files[0]) {
@@ -210,19 +316,39 @@
         }
     }
 
-    // 4. SortableJS (Arrastrar)
-    Sortable.create(document.getElementById('sortable-gallery'), {
+    Sortable.create(galleryEl, {
         animation: 150,
-        ghostClass: 'bg-light'
+        ghostClass: 'bg-light',
+        onEnd: function () {
+            actualizarOrdenFormulario();
+        }
     });
 
-    // 5. Indicador de pasos
+    function actualizarOrdenFormulario() {
+        const slots = galleryEl.querySelectorAll('.img-slot');
+        const mapeoIds = Array.from(slots).map(slot => slot.getAttribute('data-id'));
+        document.getElementById('orden_imagenes').value = JSON.stringify(mapeoIds);
+    }
+
+    document.addEventListener("DOMContentLoaded", actualizarOrdenFormulario);
+
     document.querySelectorAll('button[data-bs-toggle="tab"]').forEach((btn, idx) => {
         btn.addEventListener('shown.bs.tab', () => {
             document.getElementById('tabIndicator').innerText = `Pestaña ${idx + 1} de 3`;
+            
+            if (idx === 2) {
+                btnGlobalSubmit.classList.remove('d-none');
+            } else {
+                btnGlobalSubmit.classList.add('d-none');
+            }
         });
     });
-</script>
 
+    document.getElementById('categoria_id').addEventListener('change', function() {
+        const inputId = document.getElementById('id_producto_input');
+        inputId.value = "Autogenerado al guardar";
+        inputId.classList.add('text-success');
+    });
+</script>
 </body>
 </html>
