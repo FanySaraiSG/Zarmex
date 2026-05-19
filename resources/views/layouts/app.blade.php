@@ -20,10 +20,21 @@
 
   <!-- Vite (Tailwind / JS) -->
   @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+  <style>
+    /* Fondo global SIEMPRE por encima de CSS de páginas */
+    html, body { 
+      background: url('{{ asset('fondo.jpg') }}') !important;
+      background-size: cover !important;
+      background-position: center !important;
+      background-attachment: fixed !important;
+    }
+  </style>
 </head>
 
+
 <body class="font-sans antialiased">
-  <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
+  <div class="min-h-screen zx-bg-wrap" style="background-color: transparent !important;">
 
     {{-- HEADER --}}
    @if(!request()->is('employees/*'))
@@ -70,5 +81,24 @@
 @endif
   <!-- Bootstrap JS (bundle con Popper) -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <style>
+    html, body {
+      min-height: 100vh;
+      background-image: linear-gradient(
+          rgba(255, 255, 255, 0.15),
+          rgba(255, 255, 255, 0.15)
+        ),
+        url('{{ asset('fondo.jpg') }}') !important;
+      background-size: cover !important;
+      background-position: center !important;
+      background-attachment: fixed !important;
+      background-color: transparent !important;
+    }
+
+    .zx-bg-wrap{
+      min-height: 100vh;
+      background: transparent !important;
+    }
+  </style>
 </body>
 </html>

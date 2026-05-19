@@ -1,13 +1,9 @@
-# TODO - Barra de búsqueda con base de datos
+- [x] Cambiar fondo global del sitio en `resources/views/layouts/app.blade.php` para usar `fondo.jpg`
+- [x] Agregar estilos (cover/position) y un overlay para legibilidad
+- [ ] Verificar que aplique en páginas no-`employees/*`
 
-- [x] Editar `resources/views/header.blade.php`:
-  - [x] Cambiar el `<form>` para que apunte a la ruta `buscar.resultados`.
-  - [x] Actualizar el JS del buscador para llamar `GET /buscar-sugerencias?q=...`.
-  - [x] Renderizar el dropdown `#zxResultsList` con resultados del autocomplete.
-  - [x] Hacer que al enviar el formulario navegue a la página completa `/buscar`.
+- [ ] En el apartado de reseñas (index): mostrar top por likes + formulario para enviar reseña pendiente
+- [ ] Botón para abrir formulario de reseña y enviar a `reviews.store`
 
-- [ ] Verificar manualmente:
-  - [ ] Ingresar texto en la barra y confirmar que aparecen sugerencias.
-  - [ ] Confirmar que el click en una sugerencia abre el producto.
-  - [ ] Confirmar que el submit del formulario abre la página `/buscar` con resultados paginados.
+
 

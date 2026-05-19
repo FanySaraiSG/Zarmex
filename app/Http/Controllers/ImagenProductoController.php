@@ -10,14 +10,7 @@ use Illuminate\Support\Facades\Storage;
 
 class ImagenProductoController extends Controller
 {
-<<<<<<< HEAD
-    // --- NUEVO MÉTODO PARA VIDEOS (Ahora dentro de la clase) ---
-    public function storeVideo(Request $request)
-=======
-    /**
-     * Guardar TODO (imágenes nuevas + reorden + video) en una sola request
-     */
-    public function guardarTodo(Request $request, int $producto_id)
+    public function guardarTodo(Request $request,  $producto_id)
     {
         $request->validate([
             'imagenes' => 'nullable|array',
@@ -160,7 +153,6 @@ class ImagenProductoController extends Controller
 
     // Método para mostrar el formulario de creación de una nueva imagen
     public function create(int $producto_id)
->>>>>>> c7aa86235c65341742d053ae29e2d657c9d06ad4
     {
         $request->validate([
             'producto_id' => 'required|exists:productos,id',
@@ -187,44 +179,20 @@ class ImagenProductoController extends Controller
         return back()->with('success', '¡Video propio subido con éxito!');
     }
 
-    // --- MÉTODOS EXISTENTES ---
 
-    public function create(int $producto_id)
-    {
-        $producto = Producto::findOrFail($producto_id);
-        return view('productos.imagen.create', compact('producto'));
-    }
-
-<<<<<<< HEAD
-=======
+  
     // Método para almacenar una o varias imágenes (imagenes[]) de un producto
->>>>>>> c7aa86235c65341742d053ae29e2d657c9d06ad4
     public function store(Request $request)
     {
         $request->validate([
             'producto_id' => 'required|exists:productos,id',
-<<<<<<< HEAD
-            'imagen' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-=======
             'imagenes' => 'required|array',
             'imagenes.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:2048',
->>>>>>> c7aa86235c65341742d053ae29e2d657c9d06ad4
         ]);
 
         $producto_id = $request->input('producto_id');
         $archivos = $request->file('imagenes');
 
-<<<<<<< HEAD
-        $numImagenes = ImagenProducto::query()->where('producto_id', $producto_id)->count();
-        $nuevoNumero = $numImagenes + 1;
-
-        $idImagen = "{$producto_id}_{$nuevoNumero}";
-        $nombreImagen = time() . '_' . $imagen->getClientOriginalName();
-
-        $rutaRelativa = "images/productos/$producto_id";
-        $rutaAbsoluta = public_path($rutaRelativa);
-
-=======
         // Limitar a un máximo global de 6 imágenes extra
         $cantidadActual = ImagenProducto::where('producto_id', $producto_id)->count();
         $espaciosDisponibles = max(0, 6 - (int) $cantidadActual);
@@ -249,25 +217,10 @@ class ImagenProductoController extends Controller
 
         $rutaRelativa = "images/productos/$producto_id";
         $rutaAbsoluta = public_path($rutaRelativa);
->>>>>>> c7aa86235c65341742d053ae29e2d657c9d06ad4
         if (!file_exists($rutaAbsoluta)) {
             mkdir($rutaAbsoluta, 0755, true);
         }
 
-<<<<<<< HEAD
-        $imagen->move($rutaAbsoluta, $nombreImagen);
-
-        ImagenProducto::create([
-            'id' => $idImagen, 
-            'producto_id' => $producto_id,
-            'ruta' => "$rutaRelativa/$nombreImagen"
-        ]);
-
-        return redirect()->route('productos.imagenes.show', $producto_id)->with('success', 'Imagen subida correctamente.');
-    }
-
-    public function edit(int $id)
-=======
         foreach ($archivos as $archivo) {
             while (isset($slotsOcupadosSet[$siguienteSlot]) && $siguienteSlot <= 6) {
                 $siguienteSlot++;
@@ -299,18 +252,13 @@ class ImagenProductoController extends Controller
 
     // Método para mostrar el formulario de edición de una imagen
     public function edit(string $id)
->>>>>>> c7aa86235c65341742d053ae29e2d657c9d06ad4
     {
         $imagen = ImagenProducto::findOrFail($id);
         return view('productos.imagen.edit', compact('imagen'));
     }
 
-<<<<<<< HEAD
-    public function update(Request $request, int $id)
-=======
     // Método para actualizar una imagen existente
     public function update(Request $request, string $id)
->>>>>>> c7aa86235c65341742d053ae29e2d657c9d06ad4
     {
         $request->validate([
             'imagen' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',

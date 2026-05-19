@@ -642,9 +642,69 @@
         </section>
         {{-- ===================== FIN PRODUCTOS DESTACADOS ===================== --}}
 
-        <section class="testimonials py-5">
+        <section class="testimonials py-5" id="resenasDestacadasSection">
             <div class="container">
                 <h2 class="text-center mb-4 zx-title-playfair">Reseñas Destacadas</h2>
+
+                {{-- Botón para mostrar/ocultar la sección de agregar reseña (validación/pendiente en backend) --}}
+                <div class="text-center mb-4">
+                                <button type="button" class="btn btn-light" id="btnMostrarAgregarResena">
+                        Agregar reseña
+                    </button>
+                    <button type="button" class="btn btn-outline-light" id="btnRevisarResenas" style="margin-left: 10px; border-color: rgba(40,102,110,.35); color:#28666e;">
+                        Revisar reseñas
+                    </button>
+                </div>
+
+                <div id="agregarResenaWrap" class="mb-5" style="display:none;">
+                    <div class="review-section" style="max-width: 760px; margin: 0 auto;">
+                        <h3>DEJA TU COMENTARIO DEL PRODUCTO</h3>
+
+                        <form id="formAgregarResena" action="{{ url('/productos') }}/" method="POST">
+                            @csrf
+
+                            <div class="mb-3">
+                                <label class="form-label">Producto</label>
+                                <select name="producto_id" class="form-select" id="resenaProductoSelect" required>
+                                    @foreach(($topProducts ?? collect())->pluck('product')->filter() as $prod)
+                                        <option value="{{ $prod->id }}">{{ $prod->nombre }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            {{-- Guest --}}
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">Nombre</label>
+                                    <input type="text" name="guest_nombre" class="form-control" placeholder="Opcional" maxlength="60">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" name="guest_email" class="form-control" placeholder="Opcional" maxlength="120">
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mt-2">
+                                <div class="col-md-4">
+                                    <label class="form-label">Calificación</label>
+                                    <select name="calificacion" class="form-select" required>
+                                        @for($i=1;$i<=5;$i++)
+                                            <option value="{{ $i }}">{{ $i }}</option>
+                                        @endfor
+                                    </select>
+                                </div>
+                                <div class="col-md-8">
+                                    <label class="form-label">Descripción</label>
+                                    <textarea name="descripcion" class="form-control" rows="3" minlength="5" maxlength="1000" required placeholder="Escribe tu reseña..."></textarea>
+                                </div>
+                            </div>
+
+                            <div class="text-center mt-4">
+                                <button type="submit" class="btn btn-primary">Enviar reseña</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
                 <style>
                     .resenas-nav { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-bottom: 32px; }
                     .resenas-nav-btn {
@@ -660,9 +720,18 @@
                 </style>
 
                 @php
-                    $resenasPorCategoria = $reseñas->groupBy(fn($r) => $r->product->categoria ?? 'General');
+                    // Ordenadas por mayor cantidad de interacciones (likes)
+                    // Nota: se espera que exista una relación/campo de likes para cada review.
+                    // Si tu modelo aún no tiene esto, ajustar en backend.
+                    $reseñasOrdenadas = ($reseñas ?? collect())->sortByDesc(function($r) {
+                        // Ajusta el nombre del campo si tu BD usa otro.
+                        return $r->likes_count ?? $r->likes ?? 0;
+                    });
+
+                    $resenasPorCategoria = $reseñasOrdenadas->groupBy(fn($r) => optional($r->product)->categoria ?? 'General');
                     $categorias = $resenasPorCategoria->keys();
                 @endphp
+
 
                 <div class="resenas-nav">
                     @foreach($categorias as $i => $cat)
@@ -675,13 +744,16 @@
                 @foreach($resenasPorCategoria as $cat => $resenas)
                     <div class="resenas-grid {{ $loop->first ? 'active' : '' }}" id="resenas-{{ Str::slug($cat) }}">
                         @foreach($resenas->take(3) as $review)
+                            @php
+                                $cal = (int) ($review->calificacion ?? 0);
+                            @endphp
                             <div class="resena-prod-card">
                                 <img src="{{ $review->product->imagen_url ?? asset('Imagenes/84493-4540581.jpg') }}" alt="Producto">
                                 <div class="card-body">
                                     <h4>{{ $review->product->nombre ?? 'Producto' }}</h4>
                                     <div class="stars">
                                         @for($i = 1; $i <= 5; $i++)
-                                            <i class="fas fa-star {{ $i <= $review->calificacion ? 'text-warning' : 'text-muted' }}"></i>
+                                            <i class="fas fa-star {{ $i <= $cal ? 'text-warning' : 'text-muted' }}"></i>
                                         @endfor
                                     </div>
                                     <p>{{ $review->descripcion }}</p>
@@ -693,7 +765,40 @@
                 @endforeach
             </div>
             <script>
-                function switchResenas(slug, btn) {
+                // Mostrar/ocultar formulario de agregar reseña
+                document.addEventListener('DOMContentLoaded', () => {
+                    const btn = document.getElementById('btnMostrarAgregarResena');
+                    const revisarBtn = document.getElementById('btnRevisarResenas');
+                    const wrap = document.getElementById('agregarResenaWrap');
+                    const form = document.getElementById('formAgregarResena');
+                    const select = document.getElementById('resenaProductoSelect');
+
+                    if (btn && wrap) {
+                        btn.addEventListener('click', () => {
+                            wrap.style.display = (wrap.style.display === 'none' || !wrap.style.display) ? 'block' : 'none';
+                        });
+                    }
+
+                    if (revisarBtn) {
+                        revisarBtn.addEventListener('click', () => {
+                            const section = document.getElementById('resenasDestacadasSection');
+                            if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        });
+                    }
+
+
+                    // Ajustar action según producto seleccionado
+                    if (form && select) {
+                        const setAction = () => {
+                            const id = select.value;
+                            form.action = `{{ url('/productos') }}/${id}/reviews`;
+                        };
+                        select.addEventListener('change', setAction);
+                        setAction();
+                    }
+                });
+
+                function switchResenas(slug, btn) { 
                     document.querySelectorAll('.resenas-grid').forEach(g => g.classList.remove('active'));
                     document.querySelectorAll('.resenas-nav-btn').forEach(b => b.classList.remove('active'));
                     document.getElementById('resenas-' + slug).classList.add('active');
