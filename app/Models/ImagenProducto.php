@@ -11,14 +11,20 @@ class ImagenProducto extends Model
 
     protected $table = 'imagenes_productos';
 
-    protected $primaryKey = 'img_id';
-    public $incrementing = true;
-    protected $keyType = 'int';
+    // 💡 CORREGIDO: Ajustado a lo que muestra tu phpMyAdmin
+    protected $primaryKey = 'id'; 
+    public $incrementing = false; // Como es VARCHAR, desactivamos el autoincremento de Laravel
+    protected $keyType = 'string';
 
-    // TABLA SÍ TIENE TIMESTAMPS
     public $timestamps = true;
 
+    protected $casts = [
+        'id'          => 'string',
+        'producto_id' => 'string',
+    ];
+
     protected $fillable = [
+        'id', // Permitimos llenarlo manualmente
         'producto_id',
         'ruta',
         'orden',

@@ -37,7 +37,8 @@ class AdminLogoController extends Controller
 
     public function reset()
     {
-        $setting = Setting::where('key', 'site_logo_path')->first();
+        // Use query() to avoid any custom static where signature on the model
+        $setting = Setting::query()->where('key', 'site_logo_path')->first();
 
         if ($setting) {
             // Borramos el archivo físico antes de eliminar el registro
