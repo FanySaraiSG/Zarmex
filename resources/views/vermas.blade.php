@@ -481,8 +481,13 @@
 <main class="zx-wrap">
 
 @php
+    // 💡 SOLUCIÓN: Extraemos limpiamente las cadenas de texto del array/objeto de imágenes extras
+    $rutasExtras = collect($imagenes)->map(function($img) {
+        return is_object($img) ? ($img->ruta ?? '') : ($img['ruta'] ?? '');
+    })->filter()->toArray();
+
     $thumbs = collect([$producto->imagen_url])
-        ->merge(collect($imagenes)->pluck('ruta'))
+        ->merge($rutasExtras)
         ->values();
 
     $descCorta = \Illuminate\Support\Str::limit(strip_tags($producto->descripcion), 180);
@@ -513,9 +518,13 @@
                         <img src="{{ asset($producto->imagen_url) }}" class="zx-main-img" alt="principal">
                     </div>
 
+                    {{-- 💡 CORREGIDO: Lectura segura tanto si llega como objeto o como array --}}
                     @foreach($imagenes as $imagen)
+                        @php
+                            $rutaExtra = is_object($imagen) ? $imagen->ruta : $imagen['ruta'];
+                        @endphp
                         <div class="carousel-item h-100">
-                            <img src="{{ asset($imagen->ruta) }}" class="zx-main-img" alt="extra">
+                            <img src="{{ asset($rutaExtra) }}" class="zx-main-img" alt="extra">
                         </div>
                     @endforeach
 

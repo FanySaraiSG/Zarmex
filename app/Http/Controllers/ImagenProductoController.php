@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-// 1. IMPORTACIONES (Solo una vez cada una)
+// 1. IMPORTACIONES
 use App\Models\ImagenProducto;
 use App\Models\Producto;
 use Illuminate\Http\Request;
@@ -10,7 +10,11 @@ use Illuminate\Support\Facades\Storage;
 
 class ImagenProductoController extends Controller
 {
+<<<<<<< HEAD
     public function guardarTodo(Request $request,  $producto_id)
+=======
+    public function guardarTodo(Request $request, int $producto_id)
+>>>>>>> 496c4848636d55715c84cb91450b9eceb28a87f3
     {
         $request->validate([
             'imagenes' => 'nullable|array',
@@ -21,10 +25,9 @@ class ImagenProductoController extends Controller
         ]);
 
         $ordenes = $request->input('ordenes', []);
-
         $producto = Producto::findOrFail($producto_id);
 
-        // 1) Reordenar imágenes existentes con base en ordenes[slot] => img_id
+        // 1) Reordenar imágenes existentes
         if (is_array($ordenes) && !empty($ordenes)) {
             foreach ($ordenes as $slot => $imgId) {
                 $slot = (int) $slot;
@@ -32,7 +35,7 @@ class ImagenProductoController extends Controller
                 if (empty($imgId)) continue;
 
                 $imagen = ImagenProducto::where('producto_id', $producto_id)
-                    ->where('id', (string) $imgId)
+                    ->where('id', $imgId)
                     ->first();
 
                 if (!$imagen) continue;
@@ -42,7 +45,7 @@ class ImagenProductoController extends Controller
             }
         }
 
-        // 2) Subir imágenes nuevas (imagenes[]). Se colocan en slots vacíos según el estado actualizado.
+        // 2) Subir imágenes nuevas
         $archivos = $request->file('imagenes', []);
         if (!is_array($archivos)) $archivos = [];
 
@@ -91,7 +94,7 @@ class ImagenProductoController extends Controller
             }
         }
 
-        // 3) Guardar video (si viene)
+        // 3) Guardar video
         if ($request->hasFile('video')) {
             $rutaProducto = public_path("images/productos/$producto_id");
             if (!file_exists($rutaProducto)) {
@@ -113,10 +116,8 @@ class ImagenProductoController extends Controller
             ->with('success', 'Cambios guardados correctamente.');
     }
 
-    // Reordenar imágenes extra (slots 1..6) según ordenes[slot] => img_id
     public function reordenar(Request $request, $producto_id)
     {
-
         $request->validate([
             'ordenes' => 'required|array',
             'ordenes.*' => 'nullable',
@@ -125,63 +126,57 @@ class ImagenProductoController extends Controller
         $ordenes = $request->input('ordenes', []);
 
         foreach ($ordenes as $slot => $imgId) {
-
             $slot = (int) $slot;
-            if ($slot < 1 || $slot > 6) {
-                continue;
-            }
+            if ($slot < 1 || $slot > 6) continue;
+            if (empty($imgId)) continue;
 
-            if (empty($imgId)) {
-                continue;
-            }
-
-            // En tu proyecto el primary key es string (id como "{producto_id}_{slot}_...")
-            $imagen = ImagenProducto::find((string) $imgId);
+            $imagen = ImagenProducto::where('id', $imgId)->first();
             if (!$imagen || $imagen->producto_id != $producto_id) {
                 continue;
             }
 
-            // Actualiza orden del slot (1..6)
             $imagen->orden = $slot;
             $imagen->save();
-
         }
 
         return redirect()->route('productos.imagenes.show', $producto_id)
             ->with('success', 'Imágenes reordenadas correctamente.');
     }
 
+<<<<<<< HEAD
     // Método para mostrar el formulario de creación de una nueva imagen
     public function create(int $producto_id)
+=======
+    // SE CAMBIÓ EL NOMBRE AQUÍ PARA EVITAR EL DUPLICADO
+    public function subirVideo(Request $request, int $producto_id)
+>>>>>>> 496c4848636d55715c84cb91450b9eceb28a87f3
     {
         $request->validate([
-            'producto_id' => 'required|exists:productos,id',
-            // Validamos que sea video mp4/mov y máximo 50MB
             'video' => 'required|mimetypes:video/mp4,video/quicktime|max:51200',
         ]);
 
         if ($request->hasFile('video')) {
             $file = $request->file('video');
             $nombreVideo = time() . '_' . $file->getClientOriginalName();
-            
-            // Guarda en storage/app/public/videos_productos
             $ruta = $file->storeAs('videos_productos', $nombreVideo, 'public');
-
-            // Aquí puedes guardar en la BD si tienes una tabla de videos
-            /*
-            VideoProducto::create([
-                'producto_id' => $request->producto_id,
-                'ruta' => $ruta,
-            ]);
-            */
         }
 
         return back()->with('success', '¡Video propio subido con éxito!');
     }
 
+<<<<<<< HEAD
 
   
     // Método para almacenar una o varias imágenes (imagenes[]) de un producto
+=======
+    // Este es el create original para la Vista
+    public function create(int $producto_id)
+    {
+        $producto = Producto::findOrFail($producto_id);
+        return view('productos.imagen.create', compact('producto'));
+    }
+
+>>>>>>> 496c4848636d55715c84cb91450b9eceb28a87f3
     public function store(Request $request)
     {
         $request->validate([
@@ -193,7 +188,10 @@ class ImagenProductoController extends Controller
         $producto_id = $request->input('producto_id');
         $archivos = $request->file('imagenes');
 
+<<<<<<< HEAD
         // Limitar a un máximo global de 6 imágenes extra
+=======
+>>>>>>> 496c4848636d55715c84cb91450b9eceb28a87f3
         $cantidadActual = ImagenProducto::where('producto_id', $producto_id)->count();
         $espaciosDisponibles = max(0, 6 - (int) $cantidadActual);
 
@@ -202,10 +200,8 @@ class ImagenProductoController extends Controller
                 ->with('error', 'Ya tienes 6 imágenes. Elimina alguna para subir una nueva.');
         }
 
-        // Tomar solo hasta donde alcance el cupo
         $archivos = array_slice($archivos, 0, $espaciosDisponibles);
 
-        // Slots ocupados por orden (1..6)
         $slotsOcupados = ImagenProducto::where('producto_id', $producto_id)
             ->orderBy('orden', 'asc')
             ->pluck('orden')
@@ -225,9 +221,7 @@ class ImagenProductoController extends Controller
             while (isset($slotsOcupadosSet[$siguienteSlot]) && $siguienteSlot <= 6) {
                 $siguienteSlot++;
             }
-            if ($siguienteSlot > 6) {
-                break;
-            }
+            if ($siguienteSlot > 6) break;
 
             $nombreImagen = time() . '_' . uniqid() . '_' . $archivo->getClientOriginalName();
             $archivo->move($rutaAbsoluta, $nombreImagen);
@@ -250,14 +244,16 @@ class ImagenProductoController extends Controller
             ->with('success', 'Imágenes subidas correctamente.');
     }
 
-    // Método para mostrar el formulario de edición de una imagen
     public function edit(string $id)
     {
         $imagen = ImagenProducto::findOrFail($id);
         return view('productos.imagen.edit', compact('imagen'));
     }
 
+<<<<<<< HEAD
     // Método para actualizar una imagen existente
+=======
+>>>>>>> 496c4848636d55715c84cb91450b9eceb28a87f3
     public function update(Request $request, string $id)
     {
         $request->validate([
@@ -288,13 +284,14 @@ class ImagenProductoController extends Controller
         return redirect()->route('productos.imagenes.show', $producto_id)->with('success', 'Imagen actualizada correctamente.');
     }
 
-    public function destroy(int $id)
+    // Se cambió de 'int $id' a 'string $id' porque tus IDs son textos complejos
+    public function destroy(string $id)
     {
         $imagenProducto = ImagenProducto::findOrFail($id); 
         $rutaImagen = public_path($imagenProducto->ruta);
 
         if (file_exists($rutaImagen)) {
-            unlink($rutaImagen);
+            @unlink($rutaImagen);
         }
 
         $imagenProducto->delete();

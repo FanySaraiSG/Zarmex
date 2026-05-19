@@ -62,7 +62,7 @@
         }
 
         /* Video Preview */
-        #video-preview-container video { width: 100%; border-radius: 12px; background: #000; margin-top: 10px; }
+        #video-preview-container video { width: 50%; border-radius: 50px; background: #000; margin-top: 10px; }
 
         /* Documentos */
         .doc-box { border: 1px solid #e0e0e0; border-radius: 12px; padding: 20px; margin-bottom: 20px; transition: 0.3s; }
@@ -81,12 +81,9 @@
 <div class="container">
     <div class="edit-card">
 
-        <!-- ========================================== -->
-        <!-- MENSAJE DE ÉXITO O ERROR (ÚNICO AGREGADO) -->
-        <!-- ========================================== -->
-        @if(session('success'))
+        @if(session('success_edit'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="bi bi-check-circle-fill me-2"></i> {{ session('success') }}
+                <i class="bi bi-check-circle-fill me-2"></i> {{ session('success_edit') }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         @endif
@@ -101,7 +98,6 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         @endif
-        <!-- ========================================== -->
 
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="fw-bold m-0" style="color: var(--primary-green);">Panel de Edición</h2>
@@ -112,24 +108,20 @@
             @csrf
             @method('PUT')
 
-            <!-- Inputs ocultos para enviar el orden y el registro de eliminaciones -->
             <input type="hidden" name="orden_imagenes" id="orden_imagenes">
             <input type="hidden" name="imagenes_eliminadas" id="imagenes_eliminadas" value="[]">
 
-            <!-- Navegación de Pestañas -->
             <ul class="nav nav-pills nav-justified nav-pills-custom mb-4" id="productTabs" role="tablist">
-                <li class="nav-item"><button class="nav-link active" id="tab-info-btn" data-bs-toggle="tab" data-bs-target="#tab-info" type="button" role="tab">1. Información</button></li>
-                <li class="nav-item"><button class="nav-link" id="tab-media-btn" data-bs-toggle="tab" data-bs-target="#tab-media" type="button" role="tab">2. Multimedia</button></li>
+                <li class="nav-item"><button class="nav-link active" id="tab-info-btn" data-bs-toggle="tab" data-bs-target="#tab-info" type="button" role="tab">1. Información Del Producto</button></li>
+                <li class="nav-item"><button class="nav-link" id="tab-media-btn" data-bs-toggle="tab" data-bs-target="#tab-media" type="button" role="tab">2. Multimedia (Imágenes y Video)</button></li>
                 <li class="nav-item"><button class="nav-link" id="tab-docs-btn" data-bs-toggle="tab" data-bs-target="#tab-docs" type="button" role="tab">3. Documentos</button></li>
             </ul>
 
             <div class="tab-content">
                 
-                <!-- SECCIÓN 1: INFORMACIÓN -->
                 <div class="tab-pane fade show active" id="tab-info" role="tabpanel">
                     <div class="row">
-                        <!-- Selector de Categoría -->
-                        <div class="col-md-8 mb-3">
+                        <div class="col-md-12 mb-3">
                             <label for="categoria_id" class="form-label fw-bold">Categoría</label>
                             <select class="form-select" id="categoria_id" name="categoria_id">
                                 @foreach($categorias as $cat)
@@ -140,29 +132,22 @@
                             </select>
                         </div>
 
-                        <!-- Campo de ID -->
-                        <div class="col-md-4 mb-3">
-                            <label class="form-label fw-bold text-muted small">ID DEL PRODUCTO</label>
-                            <input type="text" class="form-control bg-light text-secondary fw-bold" 
-                                   id="id_producto_input" name="id" value="{{ $producto->id }}" readonly>
-                            <small class="text-muted d-block mt-1">Se actualizará según la categoría.</small>
+                        <div class="col-md-12 mb-3">
+                            <label for="id" class="form-label fw-bold">ID del Producto</label>
+                            <input type="text" name="id" id="id" class="form-control" value="{{ old('id', $producto->id) }}">
+                            <small class="text-muted">Modifica este código solo si es estrictamente necesario.</small>
                         </div>
-                    </div>
 
-                    <!-- Descripción -->
-                    <!-- Descripción -->
-                     <div class="mb-4">
-                      <label class="form-label fw-bold text-muted small">NUEVA DESCRIPCIÓN DEL ADMINISTRADOR</label>
-                     <textarea name="descripcion" class="form-control" rows="8" placeholder="Escriba aquí la descripción desde cero..."></textarea>
+                        <div class="col-md-12 mb-4">
+                            <label class="form-label fw-bold text-muted small">NUEVA DESCRIPCIÓN DEL ADMINISTRADOR</label>
+                            <textarea name="descripcion" class="form-control" rows="6" placeholder="Escriba aquí la descripción..."></textarea>
+                        </div>
                     </div>
 
                     <div class="d-flex justify-content-end">
                         <button type="button" class="btn btn-next-tab px-4 py-2" onclick="cambiarPestaña('#tab-media-btn')">Siguiente Pestaña <i class="bi bi-arrow-right ms-1"></i></button>
                     </div>
-                </div>
-
-                <!-- SECCIÓN 2: MULTIMEDIA -->
-                <div class="tab-pane fade" id="tab-media" role="tabpanel">
+                </div> <div class="tab-pane fade" id="tab-media" role="tabpanel">
                     <label class="form-label fw-bold mb-2">GALERÍA DE IMÁGENES</label>
                     
                     <div class="upload-area" onclick="document.getElementById('mass-image-input').click()">
@@ -181,7 +166,7 @@
                     </div>
 
                     <label class="form-label fw-bold">VIDEO PROMOCIONAL (Archivo Local)</label>
-                    <input type="file" name="video_file" id="video-input" class="form-control mb-4" accept="video/mp4,video/mkv,video/x-m4v,video/*" onchange="previewVideo(this)">
+                    <input type="file" name="video" id="video-input" class="form-control mb-4" accept="video/mp4,video/mkv,video/x-m4v,video/*" onchange="previewVideo(this)">
     
                     <div id="video-preview-container" class="mt-2 mb-4" style="{{ $producto->video_url ? '' : 'display:none;' }}">
                         <p class="small text-muted mb-1">Vista previa del video seleccionado:</p>
@@ -197,7 +182,6 @@
                     </div>
                 </div>
 
-                <!-- SECCIÓN 3: DOCUMENTOS -->
                 <div class="tab-pane fade" id="tab-docs" role="tabpanel">
                     @php 
                         $fields = [
@@ -236,7 +220,6 @@
                 </div>
             </div>
 
-            <!-- PIE DE FORMULARIO -->
             <div class="d-flex justify-content-between align-items-center mt-5 border-top pt-4">
                 <span class="text-muted fw-bold" id="tabIndicator">Pestaña 1 de 3</span>
                 
@@ -344,10 +327,8 @@
         });
     });
 
-    document.getElementById('categoria_id').addEventListener('change', function() {
-        const inputId = document.getElementById('id_producto_input');
-        inputId.value = "Autogenerado al guardar";
-        inputId.classList.add('text-success');
+    document.getElementById('product-form').addEventListener('submit', function(e) {
+        actualizarOrdenFormulario();
     });
 </script>
 </body>
