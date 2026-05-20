@@ -20,9 +20,10 @@
     <script src="{{ asset('js/whatsapp-drag.js') }}"></script>
 
     <style>
+        /* Unificamos tamaños para que el carrusel sea simétrico y no salte */
         .banner-media {
             width: 100%;
-            height: 436px;
+            height: 550px;
             object-fit: cover;
             display: block;
         }
@@ -59,7 +60,10 @@
 
     <section>
         @php
-            $bannerImages = \App\Models\Imagen::where('seccion', 'banner')->get();
+            /* 🟢 MODIFICADO: Ahora el sistema busca tanto las imágenes tradicionales ('banner') 
+               como los videos que subes mediante el formulario ('banner_principal')
+            */
+            $bannerImages = \App\Models\Imagen::whereIn('seccion', ['banner', 'banner_principal'])->get();
         @endphp
 
         @if($bannerImages->isNotEmpty())
@@ -75,14 +79,14 @@
                         @endphp
 
                         <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
-                            @if(in_array($extension, ['mp4','webm','ogg']))
-                                {{-- Se agregó la clase 'banner-video' para que el JS lo reconozca --}}
-                                <video class="banner-video d-block w-100" autoplay muted loop playsinline style="height:436px; object-fit:cover;">
-                                    <source src="{{ asset($image->imagen_url) }}" type="video/{{ $extension }}">
+                            @if(in_array($extension, ['mp4','webm','ogg','mov','avi']))
+                                {{-- 🟢 Adaptado con la clase unificada y atributos clave para autoplay continuo --}}
+                                <video class="banner-video banner-media" autoplay muted loop playsinline>
+                                    <source src="{{ asset($image->imagen_url) }}" type="video/{{ $extension === 'mov' ? 'mp4' : $extension }}">
                                     Tu navegador no soporta video HTML5
                                 </video>
                             @else
-                                <img src="{{ asset($image->imagen_url) }}" class="d-block w-100" alt="Banner" style="height:650px; object-fit:cover;">
+                                <img src="{{ asset($image->imagen_url) }}" class="banner-media" alt="Banner">
                             @endif
                         </div>
                     @endforeach
@@ -98,7 +102,7 @@
 
         @else
             <div class="content-area">
-                <img src="{{ asset('imagenes/banner.jpeg') }}" alt="Banner Predeterminado" style="height:436px; object-fit:cover;">
+                <img src="{{ asset('imagenes/banner.jpeg') }}" alt="Banner Predeterminado" class="banner-media">
             </div>
         @endif
 
@@ -188,8 +192,34 @@
                 .prod-modal {
                     background: #fff; border-radius: 16px; width: 100%; max-width: 740px;
                     max-height: 90vh; overflow-y: auto; border: 1px solid #ddd;
-                    animation: prodPopIn .25s cubic-bezier(.23,1,.32,1);
+                    position: relative;
                 }
+
+                /* Botón cerrar (círculo con tache) */
+                .prod-modal-close {
+                    position: absolute;
+                    top: 14px;
+                    right: 14px;
+                    width: 34px;
+                    height: 34px;
+                    border-radius: 50%;
+                    border: 2px solid rgba(184,161,32,0.55);
+                    background: #fff;
+                    color: #28666e;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    z-index: 3;
+                    transition: transform 0.15s ease, background 0.2s ease, color 0.2s ease;
+                }
+
+                .prod-modal-close:hover {
+                    transform: scale(1.05);
+                    background: rgba(184,161,32,0.15);
+                    color: #1a4a50;
+                }
+
                 @keyframes prodPopIn { from { opacity:0; transform:scale(.94); } to { opacity:1; transform:scale(1); } }
 
                 .prod-modal-header {
@@ -269,32 +299,6 @@
 
                 .prod-btn-whatsapp:hover { background: #1ebe5d; transform: translateY(-1px); }
 
-                /* Botón cerrar (círculo con tache) */
-                .prod-modal-close {
-                    position: absolute;
-                    top: 14px;
-                    right: 14px;
-                    width: 34px;
-                    height: 34px;
-                    border-radius: 50%;
-                    border: 2px solid rgba(184,161,32,0.55);
-                    background: rgba(0,0,0,0.04);
-                    color: #28666e;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    cursor: pointer;
-                    z-index: 3;
-                    transition: transform 15s ease, background 2s ease, color 2s ease;
-                }
-
-                .prod-modal-close:hover {
-                    transform: scale(1.05);
-                    background: rgba(184,161,32,0.15);
-                    color: #1a4a50;
-                }
-
-
                 @media (max-width: 768px) {
                     .prod-modal-body { grid-template-columns: 1fr; }
                     .prod-carousel-wrap { border-right: none; border-bottom: 1px solid #eee; }
@@ -303,7 +307,7 @@
 
             <h2 class="text-center zx-title-playfair" style="color:#28666e; font-size:2em; margin: 20px 0;">PRODUCTOS DESTACADOS</h2>
 
-                <div class="best-sellers-wrap">
+            <div class="best-sellers-wrap">
                 <div class="best-section-actions" aria-label="Secciones de productos destacados">
                     <button type="button" class="best-section-action-btn" onclick="showBestSection('todos')">Todos</button>
                     <button type="button" class="best-section-action-btn" onclick="showBestSection('novedades')">Novedades</button>
@@ -316,10 +320,9 @@
                 @endphp
 
                 @if(($topProducts ?? collect())->count() === 0)
-
                     <div style="text-align:center; color:#666; padding: 24px;">No hay productos destacados disponibles.</div>
                 @else
-                <div id="topProductsTodosCarousel" class="carousel slide best-carousel" data-bs-ride="carousel" data-bs-interval="4500">
+                    <div id="topProductsTodosCarousel" class="carousel slide best-carousel" data-bs-ride="carousel" data-bs-interval="4500">
                         <div class="carousel-inner">
                             @foreach($topProducts->chunk(3) as $chunk)
                                 <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
@@ -368,11 +371,6 @@
                             <span class="visually-hidden">Siguiente</span>
                         </button>
                     </div>
-
-                    @php
-                        $novedades = $topProducts->where('section','novedades')->values();
-                        $populares = $topProducts->where('section','populares')->values();
-                    @endphp
 
                     <div id="topProductsNovedadesCarousel" class="carousel slide best-carousel d-none" data-bs-ride="carousel" data-bs-interval="4500">
                         <div class="carousel-inner">
@@ -454,16 +452,10 @@
                 @endif
             </div>
 
-
-            {{-- ── MODAL (simple: info antigua + WhatsApp) ── --}}
+            {{-- ── MODAL ── --}}
             <div class="prod-overlay" id="prodOverlay" onclick="if(event.target===this) cerrarProdModal()">
                 <div class="prod-modal">
-                    {{-- Botón cerrar arriba derecha (círculo con tache) --}}
-                    <button
-                        type="button"
-                        class="prod-modal-close"
-                        onclick="cerrarProdModal()"
-                        aria-label="Cerrar">
+                    <button type="button" class="prod-modal-close" onclick="cerrarProdModal()" aria-label="Cerrar">
                         <i class="fas fa-times"></i>
                     </button>
 
@@ -472,7 +464,6 @@
                     </div>
 
                     <div class="prod-modal-body">
-                        {{-- Carrusel del Modal --}}
                         <div class="prod-carousel-wrap">
                             <div class="prod-carousel-stage">
                                 <div class="prod-carousel-track" id="pm-track"></div>
@@ -482,7 +473,6 @@
                             <div class="prod-dots" id="pm-dots"></div>
                         </div>
 
-                        {{-- Info (SIN precios / SIN carrito). Se deja solo descripción y colores si ya existían. --}}
                         <div class="prod-modal-right">
                             <p class="prod-info-label">Descripción</p>
                             <p class="prod-desc-full" id="pm-desc"></p>
@@ -493,7 +483,6 @@
                         </div>
                     </div>
 
-                    {{-- WhatsApp centrado --}}
                     <div class="prod-modal-footer">
                         <button class="prod-btn-whatsapp" onclick="abrirWhatsapp()">
                             <i class="fab fa-whatsapp"></i> WhatsApp
@@ -501,7 +490,6 @@
                     </div>
                 </div>
             </div>
-
 
             <script>
                 let pmSlides = [], pmCur = 0, pmNombreActual = '';
@@ -515,16 +503,14 @@
                 }
 
                 function abrirProdModal(nombre, desc, imgPrincipal, colores) {
-                    // Limpieza del nombre para mostrar solo el ID (Última palabra)
                     const partes = nombre.split(' ');
                     const soloCodigo = partes[partes.length - 1];
                     
-                    pmNombreActual = soloCodigo; // Guardamos el ID para WhatsApp
+                    pmNombreActual = soloCodigo;
 
                     document.getElementById('pm-nombre').textContent = soloCodigo;
                     document.getElementById('pm-desc').textContent = desc;
 
-                    // Colores
                     const cw = document.getElementById('pm-colors');
                     cw.innerHTML = '';
                     document.getElementById('pm-color-name').textContent = 'Selecciona un color';
@@ -543,7 +529,6 @@
                         });
                     }
 
-                    // Slides
                     pmSlides = [{ type: 'img', src: imgPrincipal, label: 'Imagen 1' }];
                     pmCur = 0;
                     pmRenderTrack();
@@ -603,9 +588,6 @@
                     pmGoTo(pmCur);
                 }
 
-                // =====================
-                // Secciones botones (encima de carrusel)
-                // =====================
                 function showBestSection(section) {
                     const btns = document.querySelectorAll('.best-section-action-btn');
                     btns.forEach(b => {
@@ -624,7 +606,6 @@
                         if (!el) return;
                         el.classList.toggle('d-none', key !== section);
 
-                        // Si hay carruseles ya inicializados por Bootstrap, forzamos a recalcular tamaño.
                         try {
                             if (!el.classList.contains('d-none')) {
                                 const inst = bootstrap.Carousel.getOrCreateInstance(el, { interval: 4500, ride: true });
@@ -634,7 +615,6 @@
                     });
                 }
 
-                // Inicializa en "todos"
                 document.addEventListener('DOMContentLoaded', () => {
                     try { showBestSection('todos'); } catch(e) {}
                 });
@@ -646,9 +626,8 @@
             <div class="container">
                 <h2 class="text-center mb-4 zx-title-playfair">Reseñas Destacadas</h2>
 
-                {{-- Botón para mostrar/ocultar la sección de agregar reseña (validación/pendiente en backend) --}}
                 <div class="text-center mb-4">
-                                <button type="button" class="btn btn-light" id="btnMostrarAgregarResena">
+                    <button type="button" class="btn btn-light" id="btnMostrarAgregarResena">
                         Agregar reseña
                     </button>
                     <button type="button" class="btn btn-outline-light" id="btnRevisarResenas" style="margin-left: 10px; border-color: rgba(40,102,110,.35); color:#28666e;">
@@ -672,7 +651,6 @@
                                 </select>
                             </div>
 
-                            {{-- Guest --}}
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label class="form-label">Nombre</label>
@@ -705,6 +683,7 @@
                         </form>
                     </div>
                 </div>
+
                 <style>
                     .resenas-nav { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-bottom: 32px; }
                     .resenas-nav-btn {
@@ -720,18 +699,13 @@
                 </style>
 
                 @php
-                    // Ordenadas por mayor cantidad de interacciones (likes)
-                    // Nota: se espera que exista una relación/campo de likes para cada review.
-                    // Si tu modelo aún no tiene esto, ajustar en backend.
                     $reseñasOrdenadas = ($reseñas ?? collect())->sortByDesc(function($r) {
-                        // Ajusta el nombre del campo si tu BD usa otro.
                         return $r->likes_count ?? $r->likes ?? 0;
                     });
 
                     $resenasPorCategoria = $reseñasOrdenadas->groupBy(fn($r) => optional($r->product)->categoria ?? 'General');
                     $categorias = $resenasPorCategoria->keys();
                 @endphp
-
 
                 <div class="resenas-nav">
                     @foreach($categorias as $i => $cat)
@@ -764,8 +738,8 @@
                     </div>
                 @endforeach
             </div>
+
             <script>
-                // Mostrar/ocultar formulario de agregar reseña
                 document.addEventListener('DOMContentLoaded', () => {
                     const btn = document.getElementById('btnMostrarAgregarResena');
                     const revisarBtn = document.getElementById('btnRevisarResenas');
@@ -786,8 +760,6 @@
                         });
                     }
 
-
-                    // Ajustar action según producto seleccionado
                     if (form && select) {
                         const setAction = () => {
                             const id = select.value;
@@ -816,7 +788,7 @@
         <i class="fab fa-whatsapp"></i>
     </a>
 
-    {{-- Script de Control de Banner (Video/Imagen) --}}
+    {{-- Script de Control de Banner Inteligente (Video/Imagen) --}}
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const banner = document.getElementById('carouselBanner');

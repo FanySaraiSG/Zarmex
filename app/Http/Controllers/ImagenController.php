@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Imagen;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class ImagenController extends Controller
 {
@@ -39,32 +40,22 @@ class ImagenController extends Controller
             }
         }
 
-
-
         $file = $request->file('imagen');
         $originalName = $file->getClientOriginalName();
 
         // nombre ÚNICO en DB (evita "Duplicate entry ... nombre_unique")
-        // guardo un nombre "seguro" y único, pero conservando el original dentro del string
         $safeName = time() . '_' . preg_replace('/\s+/', '_', $originalName);
         $rutaImagen = 'imagenes/' . $safeName;
 
         $file->move(public_path('imagenes'), $safeName);
 
         Imagen::create([
-            // OJO: si tu columna "nombre" es UNIQUE, aquí debe ser único
             'nombre'    => $request->nombre . '_' . time(),
             'imagen_url'=> $rutaImagen,
             'seccion'   => $request->seccion,
         ]);
 
         return redirect()->route('imagenes.index')->with('success', 'Imagen subida correctamente.');
-        $img = Image::make($image->getRealPath())
-        ->fit(1200, 1200, function ($constraint) {
-            $constraint->upsize();
-        });
-
-Storage::put('public/productos/'.$nombre, (string) $img->encode());
     }
 
     // Ver una imagen
@@ -116,7 +107,7 @@ Storage::put('public/productos/'.$nombre, (string) $img->encode());
         return redirect()->route('imagenes.index')->with('success', 'Imagen actualizada correctamente.');
     }
 
-    // Eliminar imagen
+    // Eliminar imagen / video
     public function destroyImagen($id)
     {
         $imagen = Imagen::findOrFail($id);
@@ -127,7 +118,7 @@ Storage::put('public/productos/'.$nombre, (string) $img->encode());
 
         $imagen->delete();
 
-        return redirect()->route('imagenes.index')->with('success', 'Imagen eliminada correctamente.');
+        return redirect()->route('imagenes.index')->with('success', 'Recurso eliminado correctamente.');
     }
 
     // Logo (frontend)
@@ -139,7 +130,7 @@ Storage::put('public/productos/'.$nombre, (string) $img->encode());
     // Banner principal (frontend)
     public function mostrarBanner()
     {
-        $bannerImages = Imagen::where('seccion', 'banner')->orderBy('id', 'desc')->get();
+        $bannerImages = Imagen::where('seccion', 'banner', "banner_principal")->orderBy('id', 'desc')->get();
         return view('index', compact('bannerImages'));
     }
 
@@ -151,5 +142,51 @@ Storage::put('public/productos/'.$nombre, (string) $img->encode());
             ->get();
 
         return view('nosotros', compact('nosotrosBannerImages'));
+    }
+
+    // 1. Mostrar formulario para subir video
+    public function createVideoBanner()
+    {
+        return view('videos.create_videos_banner'); 
+    }
+
+    // 2. Procesar, limpiar y guardar el video del banner
+    public function storeVideoBanner(Request $request)
+    {
+        // Validamos que sea un video y que no pase de ~60MB
+        $request->validate([
+            'seccion' => 'required|string',
+            'video' => 'required|file|mimes:mp4,webm,mov,avi|max:61440', 
+        ]);
+
+        if ($request->hasFile('video')) {
+            $file = $request->file('video');
+            
+            // 1. Obtenemos el nombre original sin la extensión
+            $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            
+            // 2. Obtenemos la extensión (mp4, webm, etc.)
+            $extension = $file->getClientOriginalExtension();
+            
+            // 3. Limpiamos por completo caracteres extraños y hashtags (#) convirtiéndolos en guiones
+            $cleanName = Str::slug($originalName);
+            
+            // 4. Armamos el nombre final seguro
+            $filename = time() . '_' . $cleanName . '.' . $extension;
+            
+            // Movemos el archivo purificado a la carpeta que creaste
+            $file->move(public_path('videos/banners'), $filename);
+            
+            // Guardamos usando el modelo Imagen incluyendo el campo 'nombre' para evitar fallos de DB
+            Imagen::create([
+                'nombre'     => 'video_banner_' . time(),
+                'imagen_url' => 'videos/banners/' . $filename, 
+                'seccion'    => $request->seccion,
+            ]);
+
+            return redirect()->route('imagenes.index')->with('success', '¡Video del banner subido con éxito!');
+        }
+
+        return back()->with('error', 'Ocurrió un error al intentar subir el archivo.');
     }
 }
