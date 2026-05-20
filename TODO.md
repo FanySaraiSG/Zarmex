@@ -1,9 +1,8 @@
-- [x] Cambiar fondo global del sitio en `resources/views/layouts/app.blade.php` para usar `fondo.jpg`
-- [x] Agregar estilos (cover/position) y un overlay para legibilidad
-- [ ] Verificar que aplique en páginas no-`employees/*`
+- [x] Leer y confirmar estructura actual del footer
+- [x] Reducir la sección “Contacto” (menos altura/ancho) en `resources/views/footer.blade.php`
+- [x] Aumentar el mapa del footer a altura fija 250px (iframe + contenedor)
+- [x] Asegurar que el mapa se alinee/pegue hacia la parte baja dentro del bloque del footer
 
-- [ ] En el apartado de reseñas (index): mostrar top por likes + formulario para enviar reseña pendiente
-- [ ] Botón para abrir formulario de reseña y enviar a `reviews.store`
-
+- [ ] Probar en la vista principal (index) y ajustar si el pegado al fondo requiere tocar `layouts/app.blade.php`
 
 

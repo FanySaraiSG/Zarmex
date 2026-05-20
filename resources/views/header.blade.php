@@ -8,7 +8,7 @@
         $ruta = ltrim($ruta, '/');
     }
 
-    $logoUrl = $ruta ? asset($ruta) : asset('imagenes/Captura de pantalla 2025-01-19 134751.png');
+    $logoUrl = $ruta ? asset($ruta) : asset('imagenes/logo.jpeg');
 @endphp
 
 <header class="zx-header">
@@ -126,11 +126,15 @@
 .zx-header {
     background: var(--bg-header-dark); 
 
-    position: sticky;
+    /* CAMBIO CLAVE: Cambiamos a absolute para que flote sobre el carrusel sin empujarlo */
+    position: absolute;
     top: 14px;
+    left: 50%;
+    transform: translateX(-50%); /* Centra el header perfectamente al usar absolute */
     z-index: 9999;
     width: 92%;
-    margin: 14px auto 0;
+    margin: 0 auto; /* Eliminamos el margin-top que causaba la franja blanca */
+    
     display: flex;
     align-items: center;
     justify-content: center;
@@ -139,7 +143,8 @@
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
     border-radius: 50px;
     backdrop-filter: blur(10px);
-}
+    -webkit-backdrop-filter: blur(10px);
+}   
 
 .zx-bar {
     width: clamp(95%, 1200px, 98%);

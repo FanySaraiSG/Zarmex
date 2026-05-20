@@ -13388,6 +13388,35 @@ namespace Illuminate\Support\Facades {
         {
                         return \Illuminate\Routing\Router::localizedGroup($callback);
         }
+                    /**
+         * @see \Laravel\Ui\AuthRouteMethods::auth()
+         * @param mixed $options
+         * @static
+         */        public static function auth($options = [])
+        {
+                        return \Illuminate\Routing\Router::auth($options);
+        }
+                    /**
+         * @see \Laravel\Ui\AuthRouteMethods::resetPassword()
+         * @static
+         */        public static function resetPassword()
+        {
+                        return \Illuminate\Routing\Router::resetPassword();
+        }
+                    /**
+         * @see \Laravel\Ui\AuthRouteMethods::confirmPassword()
+         * @static
+         */        public static function confirmPassword()
+        {
+                        return \Illuminate\Routing\Router::confirmPassword();
+        }
+                    /**
+         * @see \Laravel\Ui\AuthRouteMethods::emailVerification()
+         * @static
+         */        public static function emailVerification()
+        {
+                        return \Illuminate\Routing\Router::emailVerification();
+        }
             }
             /**
      * @see \Illuminate\Database\Schema\Builder
@@ -17800,6 +17829,35 @@ namespace Illuminate\Routing {
          */        public static function localizedGroup($callback)
         {
                         return \Illuminate\Routing\Router::localizedGroup($callback);
+        }
+                    /**
+         * @see \Laravel\Ui\AuthRouteMethods::auth()
+         * @param mixed $options
+         * @static
+         */        public static function auth($options = [])
+        {
+                        return \Illuminate\Routing\Router::auth($options);
+        }
+                    /**
+         * @see \Laravel\Ui\AuthRouteMethods::resetPassword()
+         * @static
+         */        public static function resetPassword()
+        {
+                        return \Illuminate\Routing\Router::resetPassword();
+        }
+                    /**
+         * @see \Laravel\Ui\AuthRouteMethods::confirmPassword()
+         * @static
+         */        public static function confirmPassword()
+        {
+                        return \Illuminate\Routing\Router::confirmPassword();
+        }
+                    /**
+         * @see \Laravel\Ui\AuthRouteMethods::emailVerification()
+         * @static
+         */        public static function emailVerification()
+        {
+                        return \Illuminate\Routing\Router::emailVerification();
         }
             }
             /**
