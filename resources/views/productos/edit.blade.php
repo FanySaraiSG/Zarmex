@@ -13,7 +13,7 @@
             --medium-green: #2d6a4f;
             --light-green: #d8f3dc;
             --accent-green: #74c69d;
-            --bg-gray: #f0f4f2;
+            --bg-gray: #9ddabb;
         }
 
         body { background-color: var(--bg-gray); font-family: 'Segoe UI', sans-serif; }

@@ -489,7 +489,12 @@
         ->values();
 
     $descCorta = \Illuminate\Support\Str::limit(strip_tags($producto->descripcion), 180);
+
+    // ⚠️ IMPORTANTE: tus slides del carrusel deben usar el SET completo de imágenes
+    // (principal + extras). Si existe video, no debe reemplazar imágenes extras.
+    // Esta vista controla el render usando $rutasExtras (extras) y $producto->imagen_url (principal).
 @endphp
+
 
 <div class="zx-card">
     <div class="zx-layout">
@@ -534,6 +539,8 @@
                             </div>
                         @endforeach
                     @endif
+
+
 
                 </div>
 

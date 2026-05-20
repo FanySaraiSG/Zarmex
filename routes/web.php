@@ -106,6 +106,10 @@ Route::prefix('employees')->group(function () {
             Route::put('{id}', [ImagenProductoController::class, 'update'])->name('productos.imagenes.update');
             Route::delete('{id}', [ImagenProductoController::class, 'destroy'])->name('productos.imagenes.destroy');
 
+            // Videos Banner
+            Route::get('videos/banner/create', [ImagenController::class, 'createVideoBanner'])->name('videos.create');
+            Route::post('videos/banner', [ImagenController::class, 'storeVideoBanner'])->name('videos.store');
+
             // ✅ Reordenar imágenes extra (slots 1..6)
             Route::post('reordenar/{producto_id}', [ImagenProductoController::class, 'reordenar'])
                 ->name('productos.imagenes.reordenar');
