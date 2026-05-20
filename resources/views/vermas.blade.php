@@ -481,10 +481,8 @@
 <main class="zx-wrap">
 
 @php
-    // 💡 SOLUCIÓN: Extraemos limpiamente las cadenas de texto del array/objeto de imágenes extras
-    $rutasExtras = collect($imagenes)->map(function($img) {
-        return is_object($img) ? ($img->ruta ?? '') : ($img['ruta'] ?? '');
-    })->filter()->toArray();
+    // 💡 SOLUCIÓN APLICADA: Extraemos limpiamente las rutas de la galería usando pluck nativo de Eloquent
+    $rutasExtras = collect($imagenes ?? [])->pluck('ruta')->filter()->toArray();
 
     $thumbs = collect([$producto->imagen_url])
         ->merge($rutasExtras)
@@ -509,24 +507,33 @@
             @endforeach
         </div>
 
-        {{-- IMAGEN GRANDE --}}
+        {{-- IMAGEN GRANDE / VIDEO (si existe) --}}
         <div class="zx-main">
             <div id="carouselProducto" class="carousel slide w-100 h-100" data-bs-ride="carousel" data-bs-interval="2500" data-bs-pause="hover" data-bs-touch="true">
                 <div class="carousel-inner h-100">
 
+                    {{-- Imagen 1: Principal --}}
                     <div class="carousel-item active h-100">
                         <img src="{{ asset($producto->imagen_url) }}" class="zx-main-img" alt="principal">
                     </div>
 
-                    {{-- 💡 CORREGIDO: Lectura segura tanto si llega como objeto o como array --}}
-                    @foreach($imagenes as $imagen)
-                        @php
-                            $rutaExtra = is_object($imagen) ? $imagen->ruta : $imagen['ruta'];
-                        @endphp
+                    {{-- Video (opcional) --}}
+                    @if(!empty($producto->video_url))
                         <div class="carousel-item h-100">
-                            <img src="{{ asset($rutaExtra) }}" class="zx-main-img" alt="extra">
+                            <video controls style="width:100%;height:100%;object-fit:contain;background:#000;" playsinline>
+                                <source src="{{ asset($producto->video_url) }}" type="video/mp4">
+                            </video>
                         </div>
-                    @endforeach
+                    @endif
+
+                    {{-- Imagenes Extras cargadas dinámicamente --}}
+                    @if(!empty($rutasExtras))
+                        @foreach($rutasExtras as $rutaExtra)
+                            <div class="carousel-item h-100">
+                                <img src="{{ asset($rutaExtra) }}" class="zx-main-img" alt="extra">
+                            </div>
+                        @endforeach
+                    @endif
 
                 </div>
 
@@ -541,6 +548,7 @@
                 @endif
             </div>
         </div>
+
 
         {{-- INFO DERECHA --}}
         <aside class="zx-info">

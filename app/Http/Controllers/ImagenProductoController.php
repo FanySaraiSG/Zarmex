@@ -10,11 +10,7 @@ use Illuminate\Support\Facades\Storage;
 
 class ImagenProductoController extends Controller
 {
-<<<<<<< HEAD
-    public function guardarTodo(Request $request,  $producto_id)
-=======
-    public function guardarTodo(Request $request, int $producto_id)
->>>>>>> 496c4848636d55715c84cb91450b9eceb28a87f3
+    public function guardarTodo(Request $request,int $producto_id)
     {
         $request->validate([
             'imagenes' => 'nullable|array',
@@ -116,7 +112,7 @@ class ImagenProductoController extends Controller
             ->with('success', 'Cambios guardados correctamente.');
     }
 
-    public function reordenar(Request $request, $producto_id)
+    public function reordenar(Request $request,int  $producto_id)
     {
         $request->validate([
             'ordenes' => 'required|array',
@@ -143,13 +139,8 @@ class ImagenProductoController extends Controller
             ->with('success', 'Imágenes reordenadas correctamente.');
     }
 
-<<<<<<< HEAD
-    // Método para mostrar el formulario de creación de una nueva imagen
-    public function create(int $producto_id)
-=======
     // SE CAMBIÓ EL NOMBRE AQUÍ PARA EVITAR EL DUPLICADO
     public function subirVideo(Request $request, int $producto_id)
->>>>>>> 496c4848636d55715c84cb91450b9eceb28a87f3
     {
         $request->validate([
             'video' => 'required|mimetypes:video/mp4,video/quicktime|max:51200',
@@ -164,19 +155,9 @@ class ImagenProductoController extends Controller
         return back()->with('success', '¡Video propio subido con éxito!');
     }
 
-<<<<<<< HEAD
 
   
     // Método para almacenar una o varias imágenes (imagenes[]) de un producto
-=======
-    // Este es el create original para la Vista
-    public function create(int $producto_id)
-    {
-        $producto = Producto::findOrFail($producto_id);
-        return view('productos.imagen.create', compact('producto'));
-    }
-
->>>>>>> 496c4848636d55715c84cb91450b9eceb28a87f3
     public function store(Request $request)
     {
         $request->validate([
@@ -188,10 +169,6 @@ class ImagenProductoController extends Controller
         $producto_id = $request->input('producto_id');
         $archivos = $request->file('imagenes');
 
-<<<<<<< HEAD
-        // Limitar a un máximo global de 6 imágenes extra
-=======
->>>>>>> 496c4848636d55715c84cb91450b9eceb28a87f3
         $cantidadActual = ImagenProducto::where('producto_id', $producto_id)->count();
         $espaciosDisponibles = max(0, 6 - (int) $cantidadActual);
 
@@ -250,10 +227,7 @@ class ImagenProductoController extends Controller
         return view('productos.imagen.edit', compact('imagen'));
     }
 
-<<<<<<< HEAD
     // Método para actualizar una imagen existente
-=======
->>>>>>> 496c4848636d55715c84cb91450b9eceb28a87f3
     public function update(Request $request, string $id)
     {
         $request->validate([

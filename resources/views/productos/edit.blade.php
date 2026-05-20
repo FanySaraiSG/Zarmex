@@ -48,7 +48,9 @@
             border-radius: 12px; position: relative; overflow: hidden;
             background: #fff; display: flex; align-items: center; justify-content: center;
             cursor: grab; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            max-width: 150px;
         }
+
         .img-slot:active { cursor: grabbing; }
         .img-slot img { width: 100%; height: 100%; object-fit: cover; }
         
@@ -62,7 +64,8 @@
         }
 
         /* Video Preview */
-        #video-preview-container video { width: 50%; border-radius: 50px; background: #000; margin-top: 10px; }
+        #video-preview-container video { width: 35%; border-radius: 50px; background: #000; margin-top: 10px; }
+
 
         /* Documentos */
         .doc-box { border: 1px solid #e0e0e0; border-radius: 12px; padding: 20px; margin-bottom: 20px; transition: 0.3s; }
@@ -120,8 +123,8 @@
             <div class="tab-content">
                 
                 <div class="tab-pane fade show active" id="tab-info" role="tabpanel">
-                    <div class="row">
-                        <div class="col-md-12 mb-3">
+                    <div class="row align-items-start">
+                        <div class="col-md-8 mb-3">
                             <label for="categoria_id" class="form-label fw-bold">Categoría</label>
                             <select class="form-select" id="categoria_id" name="categoria_id">
                                 @foreach($categorias as $cat)
@@ -132,15 +135,17 @@
                             </select>
                         </div>
 
-                        <div class="col-md-12 mb-3">
-                            <label for="id" class="form-label fw-bold">ID del Producto</label>
+                        <div class="col-md-4 mb-3">
+                            <label for="id" class="form-label fw-bold">ID</label>
                             <input type="text" name="id" id="id" class="form-control" value="{{ old('id', $producto->id) }}">
                             <small class="text-muted">Modifica este código solo si es estrictamente necesario.</small>
                         </div>
 
                         <div class="col-md-12 mb-4">
+
                             <label class="form-label fw-bold text-muted small">NUEVA DESCRIPCIÓN DEL ADMINISTRADOR</label>
-                            <textarea name="descripcion" class="form-control" rows="6" placeholder="Escriba aquí la descripción..."></textarea>
+                            <textarea name="descripcion" class="form-control" rows="6" placeholder="Escriba aquí la descripción...">{{ old('descripcion', $producto->descripcion) }}</textarea>
+
                         </div>
                     </div>
 
@@ -166,9 +171,18 @@
                     </div>
 
                     <label class="form-label fw-bold">VIDEO PROMOCIONAL (Archivo Local)</label>
-                    <input type="file" name="video" id="video-input" class="form-control mb-4" accept="video/mp4,video/mkv,video/x-m4v,video/*" onchange="previewVideo(this)">
-    
+                    <div class="d-flex gap-3 align-items-start mb-3">
+                        <div style="flex: 1;">
+                            <input type="file" name="video" id="video-input" class="form-control" accept="video/mp4,video/mkv,video/x-m4v,video/*" onchange="previewVideo(this)">
+                            <div class="form-text">Se reemplaza el video anterior (si subes uno nuevo).</div>
+                        </div>
+                        @if(!empty($producto->video_url))
+                            <button type="button" class="btn btn-outline-danger btn-sm mt-2" onclick="borrarVideoActual({{ $producto->id }})">Borrar video actual</button>
+                        @endif
+                    </div>
+                    
                     <div id="video-preview-container" class="mt-2 mb-4" style="{{ $producto->video_url ? '' : 'display:none;' }}">
+
                         <p class="small text-muted mb-1">Vista previa del video seleccionado:</p>
                         <video id="video-tag" controls style="width: 100%; border-radius: 12px; background: #000;">
                             <source src="{{ $producto->video_url ? asset($producto->video_url) : '' }}" id="video-source">
@@ -290,6 +304,25 @@
             container.style.display = 'block';
         }
     }
+
+    function borrarVideoActual(productoId) {
+        if (!confirm('¿Seguro que deseas borrar el video actual?')) return;
+
+        fetch(`{{ url('/employees/productos') }}/${productoId}/video`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data && data.success) location.reload();
+            else alert('No se pudo borrar el video.');
+        })
+        .catch(() => alert('Error al borrar el video.'));
+    }
+
 
     function previewDoc(input, displayId) {
         const display = document.getElementById(displayId);

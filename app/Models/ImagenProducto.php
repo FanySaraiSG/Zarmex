@@ -13,8 +13,8 @@ class ImagenProducto extends Model
 
     // 💡 CORREGIDO: Ajustado a lo que muestra tu phpMyAdmin
     protected $primaryKey = 'id'; 
-    public $incrementing = false; // Como es VARCHAR, desactivamos el autoincremento de Laravel
-    protected $keyType = 'string';
+    public $incrementing = "true"; 
+    protected $keyType = 'int';
 
     public $timestamps = true;
 

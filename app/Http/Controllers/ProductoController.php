@@ -50,6 +50,8 @@ class ProductoController extends Controller
             'stock' => 'nullable|integer|min:0',
             'categoria_id' => 'required|exists:categorias,id_categoria',
             'imagen_url' => 'required|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'imagenes'    => 'nullable|array',
+            'imagenes.*' => 'image|mimes:jpg,jpeg,png,gif,webp|max:2048',
             'doc1' => 'nullable|file|max:10240|mimes:pdf,doc,docx,xls,xlsx',
             'doc2' => 'nullable|file|max:10240|mimes:pdf,doc,docx,xls,xlsx',
             'doc3' => 'nullable|file|max:10240|mimes:pdf,doc,docx,xls,xlsx',
@@ -92,6 +94,26 @@ class ProductoController extends Controller
             'categoria_id' => $request->categoria_id,
             'imagen_url' => $imagenPath,
         ]);
+
+        // Procesar imágenes extras (MySQL asignará el ID de forma automática)
+        if ($request->hasFile('imagenes')) {
+            $orden = 1;
+            foreach ($request->file('imagenes') as $img) {
+                $nombre = "extra_" . time() . "_" . uniqid() . ".jpg";
+                $manager = new ImageManager(new Driver());
+                $imagenExtraProcesada = $manager->read($img)->cover(1200, 1200)->toJpeg(85);
+                file_put_contents($rutaProducto . '/' . $nombre, (string) $imagenExtraProcesada);
+
+                ImagenProducto::create([
+                    // Se omitió la columna 'id' para permitir el Auto-Increment
+                    'producto_id' => (string) $producto->id, 
+                    'ruta'        => "images/productos/{$producto->id}/{$nombre}",
+                    'orden'       => $orden,
+                ]);
+
+                $orden++;
+            }
+        }
 
         // Subir documentos utilizando el método optimizado privado
         $this->procesarDocumentos($request, $producto);
@@ -185,7 +207,7 @@ class ProductoController extends Controller
             $producto->imagen_url = "images/productos/{$producto->id}/{$nombreImagen}";
         }
 
-       // Subir imágenes de la Galería Extra
+        // Subir imágenes de la Galería Extra (MySQL asignará el ID de forma automática)
         if ($request->hasFile('imagenes')) {
             $ultimoOrden = (int) ImagenProducto::where('producto_id', $producto->id)->max('orden');
             $orden = $ultimoOrden + 1;
@@ -196,12 +218,8 @@ class ProductoController extends Controller
                 $imagenExtraProcesada = $manager->read($img)->cover(1200, 1200)->toJpeg(85);
                 file_put_contents($rutaProducto . '/' . $nombre, (string) $imagenExtraProcesada);
 
-                // 💡 SOLUCIÓN DEFINITIVA: Generamos un ID único de texto para el VARCHAR
-                $idUnicoTexto = 'IMG_' . time() . '_' . strtoupper(Str::random(5));
-
-                // Guardamos con Eloquent usando la estructura real de tu BD
                 ImagenProducto::create([
-                    'id'          => $idUnicoTexto, // Le pasamos un string único (ej: IMG_1779222_A8F2K)
+                    // Se omitió la columna 'id' para permitir el Auto-Increment
                     'producto_id' => (string) $producto->id, 
                     'ruta'        => "images/productos/{$producto->id}/{$nombre}",
                     'orden'       => $orden,
@@ -211,7 +229,6 @@ class ProductoController extends Controller
             }
         }
             
-
         // Eliminar documentos si se marcó su respectiva casilla
         foreach (['doc1', 'doc2', 'doc3'] as $campo) {
             $columna = $campo . '_url';
@@ -225,7 +242,24 @@ class ProductoController extends Controller
 
         // Procesar y subir nuevos documentos reemplazando los viejos
         $this->procesarDocumentos($request, $producto);
+
+        // ✅ VIDEO: si el admin sube un nuevo video en esta edición, guardar y reemplazar el anterior
+        if ($request->hasFile('video')) {
+            if (!file_exists($rutaProducto)) {
+                mkdir($rutaProducto, 0755, true);
+            }
+
+            if (!empty($producto->video_url) && file_exists(public_path($producto->video_url))) {
+                @unlink(public_path($producto->video_url));
+            }
+
+            $nombre = 'video_' . time() . '.mp4';
+            $request->file('video')->move($rutaProducto, $nombre);
+            $producto->video_url = "images/productos/{$producto->id}/{$nombre}";
+        }
+
         $producto->save();
+
 
         return redirect()->route('productos.edit', $producto->id)
             ->with('success_edit', 'Producto actualizado correctamente.');
@@ -242,13 +276,11 @@ class ProductoController extends Controller
     }
 
     // Vista pública de "Ver más"
-    // Vista pública de "Ver más"
     public function verMas($id)
     {
         $producto = Producto::findOrFail($id);
         $nombreCategoria = DB::table('categorias')->where('id_categoria', $producto->categoria_id)->value('nombre');
         
-        // 💡 CONEXIÓN DIRECTA Y SEGURA: Traemos las imágenes extras usando Query Builder directo para evitar fallas de relación
         $imagenes = DB::table('imagenes_productos')
             ->where('producto_id', $producto->id)
             ->orderBy('orden')
@@ -372,7 +404,6 @@ class ProductoController extends Controller
                 'doc3_url'   => DB::raw("REPLACE(doc3_url, 'docs/productos/{$idAnterior}/', 'docs/productos/{$nuevoId}/')")
             ]);
 
-        // 💡 CORREGIDO EN PLURAL: Sincronizado con el nombre de tu tabla imagenes_productos
         DB::table('imagenes_productos')
             ->where('producto_id', $nuevoId)
             ->update([
