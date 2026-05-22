@@ -101,7 +101,7 @@ class ProductoController extends Controller
     }
 
     // Formulario de edición
-    public function edit(int $id)
+    public function edit( $id)
     {
         $producto = Producto::find($id);
 
@@ -118,7 +118,7 @@ class ProductoController extends Controller
     }
 
     // Actualizar producto existente
-    public function update(Request $request, int $id)
+    public function update(Request $request,  $id)
     {
         $request->validate([
             'id' => 'required|string|max:50|unique:productos,id,' . $id . ',id',
