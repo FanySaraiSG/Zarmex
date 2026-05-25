@@ -18,4 +18,10 @@ class Review extends Model
         'calificacion',
         'estatus',
     ];
+
+    // ✅ Relación con el modelo Producto
+    public function product()
+    {
+        return $this->belongsTo(Producto::class, 'producto_id', 'id');
+    }
 }

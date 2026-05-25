@@ -622,207 +622,416 @@
         </section>
         {{-- ===================== FIN PRODUCTOS DESTACADOS ===================== --}}
 
-        <section class="testimonials py-5" id="resenasDestacadasSection">
-            <div class="container">
-                <h2 class="text-center mb-4 zx-title-playfair">Reseñas Destacadas</h2>
+        <section class="testimonials py-5" id="resenasDestacadasSection" style="display: block; width: 100%; position: relative;">
+    @php
+        // 1. Ordenamos todas las reseñas por la cantidad de likes de forma descendente
+        $reseñasOrdenadas = ($reseñas ?? collect())->sortByDesc(function($r) {
+            return $r->likes_count ?? $r->likes ?? 0;
+        });
 
-                <div class="text-center mb-4">
-                    <button type="button" class="btn btn-light" id="btnMostrarAgregarResena">
-                        Agregar reseña
-                    </button>
-                    <button type="button" class="btn btn-outline-light" id="btnRevisarResenas" style="margin-left: 10px; border-color: rgba(40,102,110,.35); color:#28666e;">
-                        Revisar reseñas
-                    </button>
-                </div>
+        // 2. Agrupamos las reseñas por su calificación para el menú de navegación inferior
+        $resenasPorPuntuacion = $reseñasOrdenadas->groupBy(function($r) {
+            $estrellas = (int)($r->calificacion ?? 0);
+            return $estrellas . ($estrellas === 1 ? ' Estrella' : ' Estrellas');
+        })->sortByDesc(function($value, $key) {
+            return (int)$key;
+        });
 
-                <div id="agregarResenaWrap" class="mb-5" style="display:none;">
-                    <div class="review-section" style="max-width: 760px; margin: 0 auto;">
-                        <h3>DEJA TU COMENTARIO DEL PRODUCTO</h3>
+        $puntuacionesDisponibles = $resenasPorPuntuacion->keys();
 
-                        <form id="formAgregarResena" action="{{ url('/productos') }}/" method="POST">
-                            @csrf
+        // ✅ imagen de fallback en caso de que el producto no tenga imagen
+        $imagenFallback = asset('Imagenes/84493-4540581.jpg');
+    @endphp
 
-                            <div class="mb-3">
-                                <label class="form-label">Producto</label>
-                                <select name="producto_id" class="form-select" id="resenaProductoSelect" required>
-                                    @foreach(($topProducts ?? collect())->pluck('product')->filter() as $prod)
-                                        <option value="{{ $prod->id }}">{{ $prod->nombre }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
+    <div class="container">
+        <h2 class="text-center mb-2 zx-title-playfair">Reseñas Destacadas</h2>
+        
+        {{-- BOTONES DE ACCIÓN PRINCIPALES --}}
+        <div class="text-center mb-4">
+            <button type="button" class="btn btn-light" id="btnMostrarAgregarResena" style="border: 1px solid #28666e; color: #28666e;">
+                Agregar reseña
+            </button>
+            <button type="button" class="btn btn-outline-light" id="btnRevisarResenas" style="margin-left: 10px; border-color: rgba(40,102,110,.35); color:#28666e;">
+                Revisar reseñas
+            </button>
+        </div>
 
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">Nombre</label>
-                                    <input type="text" name="guest_nombre" class="form-control" placeholder="Opcional" maxlength="60">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Email</label>
-                                    <input type="email" name="guest_email" class="form-control" placeholder="Opcional" maxlength="120">
-                                </div>
-                            </div>
+        {{-- CONTENEDOR DE REVISAR RESEÑAS --}}
+        <div id="zxContenedorGeneralResenas" style="display: none; margin-top: 30px;">
+            
+            {{-- CARRUSEL TOP 5 --}}
+            <div class="zx-carousel-review-container mb-5">
+                <p class="text-center text-muted small uppercase mb-4" style="letter-spacing: 2px;">
+                    <i class="fas fa-crown text-warning"></i> Las opiniones generales más valoradas por la comunidad
+                </p>
+                
+                <div class="zx-carousel-review-wrapper">
+                    <div class="zx-carousel-review-track" id="zxReviewCarousel">
+                        
+                        @forelse($reseñasOrdenadas->take(5) as $review)
+                            @php 
+                                $starsTop     = (int) ($review->calificacion ?? 0); 
+                                $reviewId     = $review->id_reseña ?? $review->id;
+                                $likesActuales = $review->likes_count ?? $review->likes ?? 0;
 
-                            <div class="row g-3 mt-2">
-                                <div class="col-md-4">
-                                    <label class="form-label">Calificación</label>
-                                    <select name="calificacion" class="form-select" required>
-                                        @for($i=1;$i<=5;$i++)
-                                            <option value="{{ $i }}">{{ $i }}</option>
-                                        @endfor
-                                    </select>
-                                </div>
-                                <div class="col-md-8">
-                                    <label class="form-label">Descripción</label>
-                                    <textarea name="descripcion" class="form-control" rows="3" minlength="5" maxlength="1000" required placeholder="Escribe tu reseña..."></textarea>
-                                </div>
-                            </div>
-
-                            <div class="text-center mt-4">
-                                <button type="submit" class="btn btn-primary">Enviar reseña</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <style>
-                    .resenas-nav { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-bottom: 32px; }
-                    .resenas-nav-btn {
-                        padding: 8px 22px; border-radius: 999px; border: 2px solid #28666e;
-                        background: transparent; color: #28666e; font-weight: 700;
-                        font-size: 0.88em; cursor: pointer; transition: background .25s, color .25s, transform .2s;
-                    }
-                    .resenas-nav-btn:hover, .resenas-nav-btn.active { background: #28666e; color: #fedc97; transform: translateY(-2px); }
-                    .resenas-grid { display: none; grid-template-columns: repeat(3, 1fr); gap: 24px; max-width: 1100px; margin: 0 auto; }
-                    .resenas-grid.active { display: grid; }
-                    .resena-prod-card { background: #fff; border: 1px solid #ddd; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,.10); transition: transform .25s ease; }
-                    .resena-prod-card img { width: 100%; height: 200px; object-fit: contain; background: #f7f7f7; padding: 16px; }
-                </style>
-
-                @php
-                    $reseñasOrdenadas = ($reseñas ?? collect())->sortByDesc(function($r) {
-                        return $r->likes_count ?? $r->likes ?? 0;
-                    });
-
-                    $resenasPorCategoria = $reseñasOrdenadas->groupBy(fn($r) => optional($r->product)->categoria ?? 'General');
-                    $categorias = $resenasPorCategoria->keys();
-                @endphp
-
-                <div class="resenas-nav">
-                    @foreach($categorias as $i => $cat)
-                        <button class="resenas-nav-btn {{ $i === 0 ? 'active' : '' }}" onclick="switchResenas('{{ Str::slug($cat) }}', this)">
-                            {{ $cat }}
-                        </button>
-                    @endforeach
-                </div>
-
-                @foreach($resenasPorCategoria as $cat => $resenas)
-                    <div class="resenas-grid {{ $loop->first ? 'active' : '' }}" id="resenas-{{ Str::slug($cat) }}">
-                        @foreach($resenas->take(3) as $review)
-                            @php
-                                $cal = (int) ($review->calificacion ?? 0);
+                                // ✅ optional() evita error si product es null
+                                $imagenCarrusel = optional($review->product)->imagen_url ?? $imagenFallback;
+                                $nombreProducto = optional($review->product)->nombre ?? 'General';
                             @endphp
-                            <div class="resena-prod-card">
-                                <img src="{{ $review->product->imagen_url ?? asset('Imagenes/84493-4540581.jpg') }}" alt="Producto">
-                                <div class="card-body">
-                                    <h4>{{ $review->product->nombre ?? 'Producto' }}</h4>
-                                    <div class="stars">
+                            <div class="zx-carousel-review-card" data-card-id="{{ $reviewId }}">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="zx-review-user font-weight-bold">
+                                        {{ $review->guest_nombre ?? 'Usuario Anónimo' }}
+                                    </span>
+                                    <div class="zx-review-stars">
                                         @for($i = 1; $i <= 5; $i++)
-                                            <i class="fas fa-star {{ $i <= $cal ? 'text-warning' : 'text-muted' }}"></i>
+                                            <i class="fas fa-star {{ $i <= $starsTop ? 'text-warning' : 'text-muted' }}"></i>
                                         @endfor
                                     </div>
-                                    <p>{{ $review->descripcion }}</p>
-                                    <p class="reviewer">— {{ $review->guest_nombre ?? 'Usuario desconocido' }}</p>
+                                </div>
+                                <div class="d-flex gap-3 align-items-center mb-3">
+                                    <img
+                                        src="{{ $imagenCarrusel }}"
+                                        alt="Producto"
+                                        style="width:72px;height:72px;object-fit:contain;background:#f7f7f7;padding:8px;border-radius:12px;border:1px solid rgba(0,0,0,.05);">
+                                    <div>
+                                        <h6 class="text-muted mb-1" style="font-size: 0.85em; color: #28666e !important;">
+                                            Producto: {{ $nombreProducto }}
+                                        </h6>
+                                    </div>
+                                </div>
+
+                                <p class="zx-review-text mb-2">"{{ $review->descripcion }}"</p>
+
+                                <div class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+                                    <button
+                                        type="button"
+                                        class="btn btn-light p-2 d-flex align-items-center gap-2 js-review-like"
+                                        style="pointer-events:auto; border:1px solid rgba(40,102,110,.2); border-radius:12px;"
+                                        data-review-id="{{ $review->id_reseña ?? $review->id }}"
+                                        aria-label="Dar like">
+                                        <i class="fas fa-heart text-danger"></i>
+                                        <span class="likes-count">{{ $likesActuales }}</span>
+                                        <span class="text-muted" style="font-size:12px;">Me gusta</span>
+                                    </button>
                                 </div>
                             </div>
-                        @endforeach
+                        @empty
+                            <div class="w-100 text-center text-muted py-3">
+                                Aún no hay reseñas destacadas disponibles con interacciones.
+                            </div>
+                        @endforelse
+
                     </div>
+                    
+                    <button class="zx-carousel-control prev" id="zxCarouselPrev" type="button">&#10094;</button>
+                    <button class="zx-carousel-control next" id="zxCarouselNext" type="button">&#10095;</button>
+                </div>
+            </div>
+
+            <hr style="border-color: rgba(40,102,110,.15);" class="my-5">
+
+            <p class="text-center text-muted small uppercase mb-3" style="letter-spacing: 2px;">
+                Filtrar opiniones por calificación
+            </p>
+
+            {{-- NAVEGACIÓN DE CALIFICACIONES --}}
+            <div class="resenas-nav">
+                @foreach($puntuacionesDisponibles as $i => $puntos)
+                    <button class="resenas-nav-btn {{ $i === 0 ? 'active' : '' }}" onclick="switchResenas('{{ Str::slug($puntos) }}', this)">
+                        {{ $puntos }}
+                    </button>
                 @endforeach
             </div>
 
-            <script>
-                document.addEventListener('DOMContentLoaded', () => {
-                    const btn = document.getElementById('btnMostrarAgregarResena');
-                    const revisarBtn = document.getElementById('btnRevisarResenas');
-                    const wrap = document.getElementById('agregarResenaWrap');
-                    const form = document.getElementById('formAgregarResena');
-                    const select = document.getElementById('resenaProductoSelect');
+            {{-- GRIDS POR PUNTUACIÓN --}}
+            @foreach($resenasPorPuntuacion as $puntos => $resenas)
+                <div class="resenas-grid {{ $loop->first ? 'active' : '' }}" id="resenas-{{ Str::slug($puntos) }}">
+                    @foreach($resenas->take(6) as $review)
+                        @php 
+                            $cal              = (int) ($review->calificacion ?? 0); 
+                            $reviewGridId     = $review->id_reseña ?? $review->id;
+                            $likesGridActuales = $review->likes_count ?? $review->likes ?? 0;
 
-                    if (btn && wrap) {
-                        btn.addEventListener('click', () => {
-                            wrap.style.display = (wrap.style.display === 'none' || !wrap.style.display) ? 'block' : 'none';
-                        });
-                    }
+                            // ✅ optional() evita error si product es null
+                            $imagenGrid      = optional($review->product)->imagen_url ?? $imagenFallback;
+                            $nombreGrid      = optional($review->product)->nombre ?? 'Producto';
+                        @endphp
+                        <div class="resena-prod-card" data-card-id="{{ $reviewGridId }}">
+                            <img src="{{ $imagenGrid }}" alt="Producto">
+                            <div class="card-body p-3">
+                                <h4>{{ $nombreGrid }}</h4>
+                                <div class="stars mb-2">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        <i class="fas fa-star {{ $i <= $cal ? 'text-warning' : 'text-muted' }}"></i>
+                                    @endfor
+                                </div>
+                                <p class="card-text">{{ $review->descripcion }}</p>
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <p class="reviewer m-0 font-italic" style="font-size:0.9em;">— {{ $review->guest_nombre ?? 'Usuario desconocido' }}</p>
+                                    <small class="text-muted">
+                                        <button type="button" class="btn btn-sm btn-link text-decoration-none p-0 js-review-like text-muted" data-review-id="{{ $reviewGridId }}">
+                                            <i class="fas fa-heart text-danger"></i> 
+                                            <span class="likes-count">{{ $likesGridActuales }}</span>
+                                        </button>
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @endforeach
 
-                    if (revisarBtn) {
-                        revisarBtn.addEventListener('click', () => {
-                            const section = document.getElementById('resenasDestacadasSection');
-                            if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        });
-                    }
+        </div> {{-- FIN CONTENEDOR REVISAR RESEÑAS --}}
 
-                    if (form && select) {
-                        const setAction = () => {
-                            const id = select.value;
-                            form.action = `{{ url('/productos') }}/${id}/reviews`;
-                        };
-                        select.addEventListener('change', setAction);
-                        setAction();
-                    }
-                });
+        {{-- FORMULARIO AGREGAR RESEÑA --}}
+        <div id="agregarResenaWrap" class="mb-5" style="display:none; margin-top: 30px;">
+            <div class="review-section" style="max-width: 760px; margin: 0 auto; background: #fff; padding: 24px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee;">
+                <h3 class="mb-3 text-center" style="font-size: 1.25rem; color: #28666e; font-weight: bold;">DEJA TU COMENTARIO DEL PRODUCTO</h3>
 
-                function switchResenas(slug, btn) { 
-                    document.querySelectorAll('.resenas-grid').forEach(g => g.classList.remove('active'));
-                    document.querySelectorAll('.resenas-nav-btn').forEach(b => b.classList.remove('active'));
-                    document.getElementById('resenas-' + slug).classList.add('active');
-                    btn.classList.add('active');
-                }
-            </script>
-        </section>
-    </section>
+                <form id="formAgregarResena" action="{{ url('/productos') }}/" method="POST">
+                    @csrf
+                    <div class="mb-3">
+                        <label class="form-label font-weight-bold">Producto</label>
+                        <select name="producto_id" class="form-select" id="resenaProductoSelect" required>
+                            @foreach(($topProducts ?? collect())->pluck('product')->filter() as $prod)
+                                <option value="{{ $prod->id }}">{{ $prod->nombre }}</option>
+                            @endforeach
+                        </select>
+                    </div>
 
-    @include('footer')
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Nombre</label>
+                            <input type="text" name="guest_nombre" class="form-control" placeholder="Opcional" maxlength="60">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="guest_email" class="form-control" placeholder="Opcional" maxlength="120">
+                        </div>
+                    </div>
 
-    {{-- BOTÓN WHATSAPP FLOTANTE --}}
-    <a href="https://wa.me/+525581366555?text=Hola,%20estoy%20interesado%20en%20los%20productos%20de%20Zarmex"
-       target="_blank" class="whatsapp-float">
-        <i class="fab fa-whatsapp"></i>
-    </a>
+                    <div class="row g-3 mt-2">
+                        <div class="col-md-4">
+                            <label class="form-label">Calificación</label>
+                            <select name="calificacion" class="form-select" required>
+                                @for($i=5;$i>=1;$i--)
+                                    <option value="{{ $i }}">{{ $i }} {{ $i == 5 ? '(Excelente)' : '' }}</option>
+                                @endfor
+                            </select>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label">Descripción</label>
+                            <textarea name="descripcion" class="form-control" rows="3" minlength="5" maxlength="1000" required placeholder="Escribe tu reseña..."></textarea>
+                        </div>
+                    </div>
 
-    {{-- Script de Control de Banner Inteligente (Video/Imagen) --}}
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary" style="background-color: #28666e; border-color: #28666e;">Enviar reseña</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <style>
+            .resenas-nav { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-bottom: 32px; }
+            .resenas-nav-btn {
+                padding: 8px 22px; border-radius: 999px; border: 2px solid #28666e;
+                background: transparent; color: #28666e; font-weight: 700;
+                font-size: 0.88em; cursor: pointer; transition: background .25s, color .25s, transform .2s;
+            }
+            .resenas-nav-btn:hover, .resenas-nav-btn.active { background: #28666e; color: #fedc97; transform: translateY(-2px); }
+            .resenas-grid { display: none; grid-template-columns: repeat(3, 1fr); gap: 24px; max-width: 1100px; margin: 0 auto; }
+            .resenas-grid.active { display: grid; }
+            @media (max-width: 991px) { .resenas-grid.active { grid-template-columns: repeat(2, 1fr); } }
+            @media (max-width: 576px) { .resenas-grid.active { grid-template-columns: 1fr; } }
+            
+            .resena-prod-card { background: #fff; border: 1px solid #ddd; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,.10); transition: transform .25s ease; }
+            .resena-prod-card img { width: 100%; height: 200px; object-fit: contain; background: #f7f7f7; padding: 16px; }
+            
+            .zx-carousel-review-container { max-width: 960px; margin: 0 auto; padding: 0 15px; }
+            .zx-carousel-review-wrapper { position: relative; overflow: hidden; border-radius: 20px; background: #f8fafb; border: 1px solid rgba(40,102,110,.15); padding: 24px; box-shadow: inset 0 0 10px rgba(0,0,0,0.02); }
+            .zx-carousel-review-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1); gap: 20px; }
+            .zx-carousel-review-card { flex: 0 0 100%; background: #ffffff; border-radius: 14px; padding: 20px; box-sizing: border-box; border-left: 4px solid #28666e; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
+            @media (min-width: 768px) { .zx-carousel-review-card { flex: 0 0 calc(50% - 10px); } }
+            .zx-review-user { color: #333; font-weight: 700; }
+            .zx-review-text { font-style: italic; color: #555; line-height: 1.5; font-size: 0.95rem; }
+            
+            .zx-carousel-control { position: absolute; top: 50%; transform: translateY(-50%); background: #ffffff; color: #28666e; border: 1px solid rgba(40,102,110,.3); width: 38px; height: 38px; border-radius: 50%; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; box-shadow: 0 2px 6px rgba(0,0,0,0.1); z-index: 10; }
+            .zx-carousel-control:hover { background: #28666e; color: #fff; border-color: #28666e; }
+            .zx-carousel-control.prev { left: 10px; }
+            .zx-carousel-control.next { right: 10px; }
+        </style>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const banner = document.getElementById('carouselBanner');
-            if (!banner) return;
+            const revisarBtn = document.getElementById('btnRevisarResenas');
+            const contenedorGeneral = document.getElementById('zxContenedorGeneralResenas');
+            const btnAgregar = document.getElementById('btnMostrarAgregarResena');
+            const wrapAgregar = document.getElementById('agregarResenaWrap');
+            const form = document.getElementById('formAgregarResena');
+            const select = document.getElementById('resenaProductoSelect');
 
-            const bsCarousel = bootstrap.Carousel.getOrCreateInstance(banner, {
-                interval: 5000,
-                ride: true
-            });
-
-            function pauseAllVideos() {
-                banner.querySelectorAll('video.banner-video').forEach(v => {
-                    try { v.pause(); v.currentTime = 0; } catch(e) {}
+            if (revisarBtn && contenedorGeneral) {
+                revisarBtn.addEventListener('click', () => {
+                    if (contenedorGeneral.style.display === 'none' || contenedorGeneral.style.display === '') {
+                        contenedorGeneral.style.display = 'block';
+                        revisarBtn.textContent = 'Ocultar reseñas';
+                        setTimeout(() => { moveCarousel(); }, 150);
+                        contenedorGeneral.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    } else {
+                        contenedorGeneral.style.display = 'none';
+                        revisarBtn.textContent = 'Revisar reseñas';
+                        document.getElementById('resenasDestacadasSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
                 });
             }
 
-            function handleActiveSlide() {
-                const active = banner.querySelector('.carousel-item.active');
-                if (!active) return;
+            document.addEventListener('click', async (event) => {
+                const btnLike = event.target.closest('.js-review-like');
+                if (!btnLike) return;
 
-                const video = active.querySelector('video.banner-video');
-                if (video) {
-                    bsCarousel.pause();
-                    video.play().catch(() => {});
-                    video.onended = () => bsCarousel.next();
-                } else {
-                    bsCarousel.cycle();
+                const id = btnLike.getAttribute('data-review-id');
+                if (!id) return;
+
+                const metaToken = document.querySelector('meta[name="csrf-token"]');
+                const csrfToken = metaToken ? metaToken.getAttribute('content') : '{{ csrf_token() }}';
+
+                try {
+                    const res = await fetch(`/reviews/${id}/like`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': csrfToken,
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        }
+                    });
+
+                    if (!res.ok) return;
+
+                    const data = await res.json();
+                    
+                    if (data?.ok || data?.success) {
+                        const nuevoTotalLikes = data.likes_count ?? data.likes ?? 0;
+                        document.querySelectorAll(`[data-review-id="${id}"]`).forEach(btn => {
+                            const span = btn.querySelector('.likes-count');
+                            if (span) span.textContent = nuevoTotalLikes;
+                        });
+                    }
+                } catch (e) {
+                    console.error('Error al conectar con el endpoint de likes:', e);
                 }
+            });
+
+            if (btnAgregar && wrapAgregar) {
+                btnAgregar.addEventListener('click', () => {
+                    wrapAgregar.style.display = (wrapAgregar.style.display === 'none' || !wrapAgregar.style.display) ? 'block' : 'none';
+                    if (wrapAgregar.style.display === 'block') {
+                        wrapAgregar.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                });
             }
 
-            banner.addEventListener('slide.bs.carousel', () => pauseAllVideos());
-            banner.addEventListener('slid.bs.carousel', () => handleActiveSlide());
-            handleActiveSlide();
+            if (form && select) {
+                const setAction = () => {
+                    const id = select.value;
+                    form.action = `{{ url('/productos') }}/${id}/reviews`;
+                };
+                select.addEventListener('change', setAction);
+                setAction();
+            }
+
+            const track = document.getElementById('zxReviewCarousel');
+            const prevBtn = document.getElementById('zxCarouselPrev');
+            const nextBtn = document.getElementById('zxCarouselNext');
+            let currentIndex = 0;
+            
+            const getVisibleCards = () => window.innerWidth >= 768 ? 2 : 1;
+            
+            const moveCarousel = () => {
+                if (!track) return;
+                const cards = track.querySelectorAll('.zx-carousel-review-card');
+                if (cards.length === 0) return;
+                const cardWidth = cards[0].getBoundingClientRect().width;
+                const gap = 20;
+                const maxIndex = cards.length - getVisibleCards();
+                if (currentIndex > maxIndex) currentIndex = Math.max(0, maxIndex);
+                track.style.transform = `translateX(-${currentIndex * (cardWidth + gap)}px)`;
+            };
+
+            if (track && prevBtn && nextBtn) {
+                nextBtn.addEventListener('click', () => {
+                    const cards = track.querySelectorAll('.zx-carousel-review-card');
+                    const visibleCards = getVisibleCards();
+                    if (currentIndex < cards.length - visibleCards) { currentIndex++; } else { currentIndex = 0; }
+                    moveCarousel();
+                });
+
+                prevBtn.addEventListener('click', () => {
+                    const cards = track.querySelectorAll('.zx-carousel-review-card');
+                    if (currentIndex > 0) { currentIndex--; } else { currentIndex = Math.max(0, cards.length - getVisibleCards()); }
+                    moveCarousel();
+                });
+                window.addEventListener('resize', moveCarousel);
+            }
         });
+
+        function switchResenas(slug, btn) { 
+            document.querySelectorAll('.resenas-grid').forEach(g => g.classList.remove('active'));
+            document.querySelectorAll('.resenas-nav-btn').forEach(b => b.classList.remove('active'));
+            const targetGrid = document.getElementById('resenas-' + slug);
+            if (targetGrid) targetGrid.classList.add('active');
+            btn.classList.add('active');
+        }
     </script>
+    <div style="clear: both;"></div>
+</section>
+
+{{-- INCLUSIÓN DEL FOOTER --}}
+@include('footer')
+
+{{-- BOTÓN WHATSAPP FLOTANTE --}}
+<a href="https://wa.me/+525581366555?text=Hola,%20estoy%20interesado%20en%20los%20productos%20de%20Zarmex"
+   target="_blank" class="whatsapp-float">
+    <i class="fab fa-whatsapp"></i>
+</a>
+
+{{-- Control de Banners de Video/Imagen --}}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const banner = document.getElementById('carouselBanner');
+        if (!banner) return;
+
+        const bsCarousel = bootstrap.Carousel.getOrCreateInstance(banner, {
+            interval: 5000,
+            ride: true
+        });
+
+        function pauseAllVideos() {
+            banner.querySelectorAll('video.banner-video').forEach(v => {
+                try { v.pause(); v.currentTime = 0; } catch(e) {}
+            });
+        }
+
+        function handleActiveSlide() {
+            const active = banner.querySelector('.carousel-item.active');
+            if (!active) return;
+
+            const video = active.querySelector('video.banner-video');
+            if (video) {
+                bsCarousel.pause();
+                video.play().catch(() => {});
+                video.onended = () => bsCarousel.next();
+            } else {
+                bsCarousel.cycle();
+            }
+        }
+
+        banner.addEventListener('slide.bs.carousel', () => pauseAllVideos());
+        banner.addEventListener('slid.bs.carousel', () => handleActiveSlide());
+        handleActiveSlide();
+    });
+</script>
 </body>
 </html>

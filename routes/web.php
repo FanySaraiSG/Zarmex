@@ -56,6 +56,10 @@ Route::get('/reportes/{reporte}', [ReporteController::class, 'show'])->name('rep
 Route::post('/productos/{producto_id}/reviews', [ReviewController::class, 'store'])
     ->middleware('throttle:10,1')
     ->name('reviews.store');
+Route::post('/reviews/{id}/like', [ReviewController::class, 'like'])
+    ->middleware('throttle:30,1')
+    ->name('reviews.like');
+ 
 
 
 /*|

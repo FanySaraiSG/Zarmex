@@ -27,6 +27,19 @@ class Producto extends Model
 
     public $timestamps = false;
 
+    // ✅ Accessor: convierte la ruta relativa de la BD en URL completa con asset()
+    // Ejemplo BD: "images/productos/ZAR-CQP-001/principal.jpg"
+    // Resultado:  "http://127.0.0.1:8000/images/productos/ZAR-CQP-001/principal.jpg"
+    public function getImagenUrlAttribute($value): ?string
+    {
+        if (!$value) return null;
+        // Si ya es una URL completa (http/https), la devuelve tal cual
+        if (str_starts_with($value, 'http://') || str_starts_with($value, 'https://')) {
+            return $value;
+        }
+        return asset($value);
+    }
+
     public function categoria()
     {
         return $this->belongsTo(Categoria::class, 'categoria_id', 'id_categoria');
