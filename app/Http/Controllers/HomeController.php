@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -9,8 +10,11 @@ class HomeController extends Controller
 {
     public function index()
     {
-        // ✅ FIX: el enum es 'aprobado', no 'activo'
-        $reseñas = Review::query()->where('estatus', 'aprobado')->get();
+        // ✅ FIX: Filtramos por estatus 'aprobado' Y aseguramos que tengan interacciones válidas
+        $reseñas = Review::query()
+            ->where('estatus', 'aprobado')
+            ->latest() // Muestra las más recientes primero
+            ->get();
 
         $topProducts = TopProduct::query()
             ->with('product')

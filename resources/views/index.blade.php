@@ -689,6 +689,14 @@
             </script>
         </section>
 
+
+{{-- Seccion de reseñas  --}}
+
+
+
+
+
+
         <section class="testimonials py-5" id="resenasDestacadasSection" style="display: block; width: 100%; position: relative;">
     @php
         // 1. Ordenamos todas las reseñas por la cantidad de likes de forma descendente
@@ -811,7 +819,7 @@
                 @endforeach
             </div>
 
-            {{-- GRIDS POR PUNTUACIÓN --}}
+            {{-- GRIDS POR PUNTUACIÓN (REDISEÑO EXACTO CON ORIENTACIÓN HORIZONTAL) --}}
             @foreach($resenasPorPuntuacion as $puntos => $resenas)
                 <div class="resenas-grid {{ $loop->first ? 'active' : '' }}" id="resenas-{{ Str::slug($puntos) }}">
                     @foreach($resenas->take(6) as $review)
@@ -820,29 +828,32 @@
                             $reviewGridId     = $review->id_reseña ?? $review->id;
                             $likesGridActuales = $review->likes_count ?? $review->likes ?? 0;
 
-                            // ✅ optional() evita error si product es null
                             $imagenGrid      = optional($review->product)->imagen_url ?? $imagenFallback;
                             $nombreGrid      = optional($review->product)->nombre ?? 'Producto';
                         @endphp
                         <div class="resena-prod-card" data-card-id="{{ $reviewGridId }}">
-                            <img src="{{ $imagenGrid }}" alt="Producto">
-                            <div class="card-body p-3">
-                                <h4>{{ $nombreGrid }}</h4>
-                                <div class="stars mb-2">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <i class="fas fa-star {{ $i <= $cal ? 'text-warning' : 'text-muted' }}"></i>
-                                    @endfor
+                            <div class="resena-card-main-row">
+                                <div class="resena-img-wrapper">
+                                    <img src="{{ $imagenGrid }}" alt="Producto">
                                 </div>
-                                <p class="card-text">{{ $review->descripcion }}</p>
-                                <div class="d-flex justify-content-between align-items-center mt-3">
-                                    <p class="reviewer m-0 font-italic" style="font-size:0.9em;">— {{ $review->guest_nombre ?? 'Usuario desconocido' }}</p>
-                                    <small class="text-muted">
-                                        <button type="button" class="btn btn-sm btn-link text-decoration-none p-0 js-review-like text-muted" data-review-id="{{ $reviewGridId }}">
-                                            <i class="fas fa-heart text-danger"></i> 
-                                            <span class="likes-count">{{ $likesGridActuales }}</span>
-                                        </button>
-                                    </small>
+                                <div class="card-body p-0">
+                                    <h4>{{ $nombreGrid }}</h4>
+                                    <div class="stars mb-2">
+                                        @for($i = 1; $i <= 5; $i++)
+                                            <i class="fas fa-star {{ $i <= $cal ? 'text-warning' : 'text-muted' }}"></i>
+                                        @endfor
+                                    </div>
+                                    <p class="card-text">{{ $review->descripcion }}</p>
                                 </div>
+                            </div>
+                            <div class="resena-card-footer">
+                                <p class="reviewer m-0 font-italic">— {{ $review->guest_nombre ?? 'Usuario desconocido' }}</p>
+                                <small class="text-muted m-0">
+                                    <button type="button" class="btn btn-sm btn-link text-decoration-none p-0 js-review-like text-muted btn-like-fixed" data-review-id="{{ $reviewGridId }}">
+                                        <i class="fas fa-heart text-danger"></i> 
+                                        <span class="likes-count">{{ $likesGridActuales }}</span>
+                                    </button>
+                                </small>
                             </div>
                         </div>
                     @endforeach
@@ -908,14 +919,116 @@
                 font-size: 0.88em; cursor: pointer; transition: background .25s, color .25s, transform .2s;
             }
             .resenas-nav-btn:hover, .resenas-nav-btn.active { background: #28666e; color: #fedc97; transform: translateY(-2px); }
-            .resenas-grid { display: none; grid-template-columns: repeat(3, 1fr); gap: 24px; max-width: 1100px; margin: 0 auto; }
+            
+            /* GRID MÁS LIMPIO Y ULTRA RESPONSIVE */
+            .resenas-grid { display: none; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 1200px; margin: 0 auto; }
             .resenas-grid.active { display: grid; }
-            @media (max-width: 991px) { .resenas-grid.active { grid-template-columns: repeat(2, 1fr); } }
-            @media (max-width: 576px) { .resenas-grid.active { grid-template-columns: 1fr; } }
+            @media (max-width: 1100px) { .resenas-grid.active { grid-template-columns: repeat(2, 1fr); } }
+            @media (max-width: 680px) { .resenas-grid.active { grid-template-columns: 1fr; gap: 16px; } }
             
-            .resena-prod-card { background: #fff; border: 1px solid #ddd; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,.10); transition: transform .25s ease; }
-            .resena-prod-card img { width: 100%; height: 200px; object-fit: contain; background: #f7f7f7; padding: 16px; }
+            /* TARJETA COMPACTA CON ALINEACIÓN HORIZONTAL INTERNA */
+            .resena-prod-card { 
+                background: #fff; 
+                border: 1px solid #eef2f4; 
+                border-radius: 14px; 
+                overflow: hidden; 
+                box-shadow: 0 4px 12px rgba(0,0,0,.06); 
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                min-height: 200px; /* Asegura homogeneidad de las tarjetas */
+                position: relative;
+                transition: transform .2s ease, box-shadow .2s ease;
+            }
+            .resena-prod-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,.09); }
             
+            /* FILA DE CONTENIDO: IMAGEN + TEXTOS */
+            .resena-card-main-row {
+                display: flex;
+                padding: 16px;
+                gap: 16px;
+                flex-grow: 1;
+                align-items: flex-start;
+            }
+            
+            /* CONTENEDOR DE IMAGEN (REDUCIDO / MÁS COMPACTO) */
+            .resena-img-wrapper {
+                flex: 0 0 110px; /* Ancho fijo para la imagen de manera limpia */
+                height: 110px;    /* Altura menor controlada */
+                background: #fdfdfd;
+                border: 1px solid #f0f3f5;
+                border-radius: 10px;
+                padding: 6px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
+            }
+            .resena-img-wrapper img { max-width: 100%; max-height: 100%; object-fit: contain; }
+            
+            /* CONTENEDOR DE TEXTOS DENTRO DE LA TARJETA */
+            .resena-prod-card .card-body {
+                flex-grow: 1;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+            }
+            .resena-prod-card .card-body h4 {
+                font-size: 0.95rem;
+                font-weight: 700;
+                color: #1a1a1a;
+                margin: 0 0 3px 0;
+                line-height: 1.3;
+            }
+            .resena-prod-card .stars { font-size: 0.78rem; margin-bottom: 6px; }
+            .resena-prod-card .card-text {
+                font-size: 0.84rem;
+                color: #555;
+                margin: 0;
+                line-height: 1.4;
+                display: -webkit-box;
+                -webkit-line-clamp: 3; /* Corta textos excesivamente largos si los hubiera */
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+            
+            /* FOOTER TOTALMENTE LIMPIO Y BOTÓN DE LIKE FIJO A LA DERECHA */
+            .resena-card-footer {
+                padding: 10px 16px;
+                background: #fafbfc;
+                border-top: 1px solid #f1f4f6;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                min-height: 40px;
+                margin-top: auto; /* Fuerza el footer a quedarse abajo siempre */
+            }
+            .resena-card-footer .reviewer {
+                font-size: 0.8rem;
+                color: #6c757d;
+                max-width: 70%;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .btn-like-fixed {
+                display: flex;
+                align-items: center;
+                gap: 4px;
+                font-size: 0.85rem;
+                font-weight: 600;
+                transition: transform 0.15s ease;
+            }
+            .btn-like-fixed:hover { transform: scale(1.08); text-decoration: none; }
+            
+            /* Responsive específico para móviles pequeños */
+            @media (max-width: 420px) {
+                .resena-card-main-row { flex-direction: column; align-items: center; text-align: center; }
+                .resena-img-wrapper { flex: 0 0 100px; width: 100px; height: 100px; }
+                .resena-prod-card .card-body { align-items: center; }
+            }
+
+            /* Estilos del carrusel superior */
             .zx-carousel-review-container { max-width: 960px; margin: 0 auto; padding: 0 15px; }
             .zx-carousel-review-wrapper { position: relative; overflow: hidden; border-radius: 20px; background: #f8fafb; border: 1px solid rgba(40,102,110,.15); padding: 24px; box-shadow: inset 0 0 10px rgba(0,0,0,0.02); }
             .zx-carousel-review-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1); gap: 20px; }
