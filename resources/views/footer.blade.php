@@ -70,15 +70,30 @@
         color: #145555;
     }
 
-    /* ========================================================= */
-    /* ACOMODO ESTÉTICO: Flexbox para la sección Síguenos       */
-    /* ========================================================= */
+    /* Flexbox para la sección Síguenos */
+
     .zx-follow-flex {
         display: flex;
         flex-wrap: wrap;
         gap: 10px 30px; /* 10px de espacio arriba/abajo, 30px entre elementos */
         max-width: 400px;
     }
+
+    /* Evita que los links sociales tomen color azul (hover / estilos globales) */
+    .zx-social-item {
+        color: #FFFFFF;
+        text-decoration: none;
+    }
+    .zx-social-item:hover,
+    .zx-social-item:focus {
+        color: #FFFFFF !important;
+        text-decoration: none;
+    }
+
+    .zx-social-item i {
+        flex: 0 0 auto;
+    }
+
 
     .zx-double-list {
         display: grid;
@@ -134,16 +149,21 @@
         <div class="zx-main-grid">
             
             <div class="zx-sections-wrapper">
-                <div style="flex: 1.5; margin-left: 25px;"> <h4>Síguenos</h4>
+<div style="flex: 1.5; margin-left: 25px;"> <h4>Síguenos</h4>
                     <div class="zx-follow-flex">
-                        <a href="#" class="zx-list-item">
-                            <i class="fab fa-facebook-f" style="color:#1877F2;"></i> Equipos Médicos Zarmex
+                        <a href="https://www.facebook.com/share/1KgteSrEB2/" class="zx-social-item zx-list-item" target="_blank" rel="noopener noreferrer">
+                            <i class="fab fa-facebook-f" style="color:#1877F2;"></i>
+                            <span style="color: #FFFFFF;">Equipos Médicos Zarmex</span>
                         </a>
-                        <a href="#" class="zx-list-item">
-                            <i class="fab fa-instagram" style="color:#E4405F;"></i> Zarmex_oficialmx
+
+                        <a href="https://www.instagram.com/zarmex_oficialmx/" class="zx-social-item zx-list-item" target="_blank" rel="noopener noreferrer">
+                            <i class="fab fa-instagram" style="color:#E4405F;"></i>
+                            <span style="color: #FFFFFF;">Zarmex_oficialmx</span>
                         </a>
-                        <a href="#" class="zx-list-item">
-                            <i class="fab fa-tiktok" style="color:#000000;"></i> Zarmex_oficial
+
+                        <a href="https://www.tiktok.com/@zarmex_oficial" class="zx-social-item zx-list-item" target="_blank" rel="noopener noreferrer">
+                            <i class="fab fa-tiktok" style="color:#000000;"></i>
+                            <span style="color: #FFFFFF;">Zarmex_oficial</span>
                         </a>
                     </div>
                 </div>
@@ -195,4 +215,6 @@
             <div class="zx-line-gold"></div>
         </div>
     </div>
+
 </footer>
+

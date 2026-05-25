@@ -7,181 +7,276 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 
-<title>Top Productos</title>
+<title>Control de Productos - Destacados Claros</title>
 
 <style>
-:root{
-    --zx-dark: #234d50;
-    --zx-mid: #3f6f76;
-    --zx-soft: #d9d9d9;
-    --zx-border: #c7cdcf;
-    --zx-white: #ffffff;
-    --zx-blue: #3d6ee8;
+:root {
+    /* Paleta de Verdes Claros Armoniosos */
+    --bg-light-green: #f2f9f6;    /* Fondo general */
+    --panel-white: #ffffff;        /* Fondo del contenedor principal */
+    --table-header-green: #e1f2eb;/* Fondo del encabezado */
+    --table-hover-green: #f0f7f4; /* Fondo al pasar el cursor*/
+    --mint-accent: #22c55e;       /* Color de éxito y acento */
+    --forest-text: #164e35;       /* Texto principal  */
+    --muted-green: #60a582;       /* Texto secundario y bordes suaves */
+    --border-light: #d1e7dd;      /* Líneas divisorias de la tabla */
 }
 
-/* fondo */
-body{
-    background: #0f1720;
+body {
+    background-color: var(--bg-light-green);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    color: var(--forest-text);
 }
 
-/* contenedor */
-.crud-box{
-    background: var(--zx-soft);
-    border-radius: 10px;
-    padding: 10px;
-    box-shadow: 0 10px 30px rgba(77, 19, 19, 0.12);
-}
-
-/* título */
-.crud-title{
-    text-align: center;
-    color: var(--zx-dark);
-    font-weight: 800;
-    margin-bottom: 20px;
-}
-
-/* tabla */
-.table{
-    background: white;
+/* Contenedor del Panel */
+.panel-box {
+    background: var(--panel-white);
+    border: 1px solid var(--border-light);
     border-radius: 14px;
-    overflow: hidden;
+    padding: 24px;
+    box-shadow: 0 10px 25px rgba(22, 78, 53, 0.05);
 }
 
-.table thead th{
-    background: var(--zx-mid);
-    color: white;
-    text-align: center;
-}
-
-.table tbody td{
-    text-align: center;
-    background: #efefef;
-}
-
-/* botón */
-.btn-back{
-    background: #2f555b;
-    color: white;
-    border-radius: 16px;
-    padding: 10px 20px;
+.panel-title {
+    font-size: 1.6rem;
     font-weight: 700;
-    border: none;
+    color: var(--forest-text);
+    letter-spacing: -0.01em;
 }
 
-.btn-back:hover{
-    background: #24464b;
+/* TABLA EN LÍNEA VERDE CLARA */
+.green-table-responsive {
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--border-light);
 }
 
-/* select bonito */
-.select-product{
-    border: none;
-    outline: none;
-    border-radius: 20px;
-    padding: 8px 14px;
+.table-green {
+    margin-bottom: 0;
+    background-color: var(--panel-white);
+    color: var(--forest-text);
+    vertical-align: middle;
+}
+
+/* Encabezado de la tabla */
+.table-green thead th {
+    background-color: var(--table-header-green);
+    color: var(--forest-text);
     font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.06em;
+    padding: 14px 16px;
+    border-bottom: 2px solid var(--border-light);
+}
+
+/* Filas de la tabla */
+.table-green tbody tr {
+    border-bottom: 1px solid var(--border-light);
+    background-color: var(--panel-white);
+    transition: background-color 0.2s ease;
+}
+
+/* Efecto hover interactivo en verde suave */
+.table-green tbody tr:hover {
+    background-color: var(--table-hover-green) !important;
+}
+
+.table-green tbody td {
+    padding: 12px 16px;
+    color: var(--forest-text);
+    background-color: transparent !important;
+}
+
+/* Inputs / Selectores Claros */
+.table-select {
+    background-color: #ffffff;
+    color: var(--forest-text);
+    border: 1px solid var(--muted-green);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    width: 100%;
     cursor: pointer;
-    background: #e0e0e0;
+    transition: all 0.2s ease;
 }
 
-/* hover */
-.select-product:hover{
-    background: #d4d4d4;
+.table-select:focus {
+    border-color: var(--mint-accent);
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
+    outline: none;
 }
 
-header, footer, .whatsapp, #whatsapp{
-    display:none !important;
+/* Botones en tonos Verdes */
+.btn-mint {
+    background-color: #25a266;
+    color: #ffffff;
+    font-weight: 600;
+    border-radius: 6px;
+    padding: 8px 18px;
+    border: none;
+    transition: all 0.2s ease;
+}
+
+.btn-mint:hover {
+    background-color: #1b744a;
+    color: white;
+}
+
+.btn-outline-green {
+    background-color: transparent;
+    color: var(--forest-text);
+    border: 1px solid var(--muted-green);
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.btn-outline-green:hover {
+    background-color: var(--table-header-green);
+    color: var(--forest-text);
+}
+
+.btn-table-delete {
+    background-color: transparent;
+    color: #dc2626;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    padding: 6px 10px;
+    border-radius: 6px;
+    transition: all 0.2s;
+}
+
+.btn-table-delete:hover {
+    background-color: #dc2626;
+    color: white;
+    border-color: #dc2626;
+}
+
+header, footer, .whatsapp, #whatsapp {
+    display: none !important;
+}
+
+/* Toast Notificación Flotante Clara */
+.toast-green-sync {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background-color: #ffffff;
+    color: var(--forest-text);
+    border: 1px solid var(--mint-accent);
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.95rem;
+    box-shadow: 0 8px 24px rgba(22, 78, 53, 0.1);
+    z-index: 9999;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.toast-green-sync.show {
+    opacity: 1;
+    transform: translateY(0);
 }
 </style>
 </head>
 
 <body>
 
-<div class="container mt-4">
-    <div class="crud-box">
+<div class="container my-5">
+    <div class="panel-box">
 
-        <!-- HEADER -->
-        <div class="d-flex justify-content-between align-items-center mb-3 gap-2 flex-wrap">
-            <a class="btn btn-back" href="{{ route('admin.dashboard') }}">
-                ← Regresar
-            </a>
+        <!-- ENCABEZADO DE HERRAMIENTAS -->
+        <div class="row align-items-center mb-4 g-3">
+            <div class="col-sm-4 order-2 order-sm-1">
+                <a class="btn btn-outline-green" href="{{ route('admin.dashboard') }}">
+                    <i class="bi bi-arrow-left-short"></i> Volver al Menú
+                </a>
+            </div>
+            <div class="col-sm-4 text-sm-center order-1 order-sm-2">
+                <h2 class="panel-title mb-0">Productos Destacados</h2>
+            </div>
+            <div class="col-sm-4 text-sm-end order-3 order-sm-3">
+                <div class="d-inline-flex gap-2 justify-content-sm-end w-100">
+                    
+                    <!-- Filtro maestro integrado -->
+                    <select class="table-select" id="newBestSection" style="max-width: 170px;">
+                        <option value="todos"> Ver Todo</option>
+                        <option value="novedades"> Novedades</option>
+                        <option value="populares"> Populares</option>
+                    </select>
 
-            <div class="d-flex align-items-center gap-2">
-                <select class="select-product" id="newBestSection" style="min-width: 180px;">
-                    <option value="todos">Todos</option>
-                    <option value="novedades">Novedades</option>
-                    <option value="populares">Populares</option>
-                </select>
-
-                <button type="button" class="btn btn-back" id="btnAddTopProduct" style="background:#1b5a61;">+ Agregar</button>
+                    <button type="button" class="btn btn-mint" id="btnAddTopProduct">
+                        <i class="bi bi-plus-lg"></i> Agregar
+                    </button>
+                </div>
             </div>
         </div>
 
-        <h2 class="crud-title">Top Productos Destacados</h2>
-
-
         @if (session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
+            <div class="alert alert-success border-0 mb-4" style="background-color: var(--table-header-green); color: var(--forest-text);">
+                {{ session('success') }}
+            </div>
         @endif
 
-        <!-- TABLA -->
-        <div class="table-responsive">
-            <table class="table table-striped table-bordered">
-
+        <!-- TABLA COMPACTA CLARA -->
+        <div class="green-table-responsive table-responsive">
+            <table class="table table-green">
                 <thead>
                     <tr>
-                        <th>#</th>
+                        <th style="width: 70px;" class="text-center">Posición</th>
                         <th>Producto</th>
-                        <th>Sección</th>
-                        <th>Acciones</th>
+                        <th style="width: 240px;">Sección del Sitio</th>
+                        <th style="width: 90px;" class="text-center">Remover</th>
                     </tr>
-
                 </thead>
-
 
                 <tbody id="topProductsTbody">
                     @foreach ($topProducts as $topProduct)
-                    <tr data-top-product-id="{{ $topProduct->id }}">
-                        <td>{{ $loop->iteration }}</td>
+                    <tr data-top-product-id="{{ $topProduct->id }}" class="table-row-item">
+                        
+                        <!-- Posición secuencial -->
+                        <td class="text-center fw-bold" style="color: #1b744a;">
+                            #{{ $loop->iteration }}
+                        </td>
 
+                        <!-- Selector Producto -->
                         <td>
-                            <select class="select-product auto-submit"
-                                data-id="{{ $topProduct->id }}">
-
-                                <option value="">Ninguno</option>
-
+                            <select class="table-select auto-submit" data-id="{{ $topProduct->id }}">
+                                <option value="">— Ningún producto seleccionado —</option>
                                 @foreach ($products as $product)
-                                <option value="{{ $product->id }}"
-                                    {{ $topProduct->product_id == $product->id ? 'selected' : '' }}>
-                                    {{ $product->id }}
+                                <option value="{{ $product->id }}" {{ $topProduct->product_id == $product->id ? 'selected' : '' }}>
+                                    ID: {{ $product->id }} — {{ $product->name ?? 'Producto ' }}
                                 </option>
                                 @endforeach
-
                             </select>
                         </td>
 
+                        <!-- Selector Sección -->
                         <td>
-                            <select class="select-product auto-submit auto-submit-section"
-                                data-id="{{ $topProduct->id }}"
-                                data-section-current="{{ $topProduct->section ?? 'todos' }}">
-
-                                <option value="todos" {{ ($topProduct->section ?? 'todos') === 'todos' ? 'selected' : '' }}>Todos</option>
-                                <option value="novedades" {{ ($topProduct->section ?? 'todos') === 'novedades' ? 'selected' : '' }}>Novedades</option>
-                                <option value="populares" {{ ($topProduct->section ?? 'todos') === 'populares' ? 'selected' : '' }}>Populares</option>
-
+                            <select class="table-select auto-submit auto-submit-section" data-id="{{ $topProduct->id }}">
+                                <option value="todos" {{ ($topProduct->section ?? 'todos') === 'todos' ? 'selected' : '' }}> Todos</option>
+                                <option value="novedades" {{ ($topProduct->section ?? 'todos') === 'novedades' ? 'selected' : '' }}> Novedades</option>
+                                <option value="populares" {{ ($topProduct->section ?? 'todos') === 'populares' ? 'selected' : '' }}> Populares</option>
                             </select>
                         </td>
 
-                        <td>
-                            <button type="button" class="btn btn-back btn-delete" style="background:#7a2b2b; padding: 10px 14px;" title="Eliminar">
-                                Eliminar
+                        <!-- Botón Eliminar Fila -->
+                        <td class="text-center">
+                            <button type="button" class="btn btn-table-delete btn-delete" title="Quitar fila">
+                                <i class="bi bi-trash"></i>
                             </button>
                         </td>
+
                     </tr>
                     @endforeach
                 </tbody>
-
-
             </table>
         </div>
 
@@ -190,11 +285,35 @@ header, footer, .whatsapp, #whatsapp{
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    // Actualizar (PUT) al cambiar selects
+
+    // Sincronización automática con Toast claro
+    function lanzarToastGuardado(mensaje) {
+        let toast = document.createElement('div');
+        toast.className = 'toast-green-sync';
+        toast.innerHTML = `<i class="bi bi-check-circle-fill" style="color:var(--mint-accent); font-size:1.2rem;"></i> ${mensaje}`;
+        document.body.appendChild(toast);
+
+        setTimeout(() => toast.classList.add('show'), 50);
+
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, 1800);
+    }
+    
+    // ==========================================
+    // Guardado Automático (Fetch / AJAX)
+    // ==========================================
     document.querySelectorAll('.auto-submit').forEach(select => {
         select.addEventListener('change', function() {
-            let productId = this.value;
+            let fila = this.closest('.table-row-item');
             let topProductId = this.dataset.id;
+            
+            let productSelect = fila.querySelector('.table-select:not(.auto-submit-section)');
+            let sectionSelect = fila.querySelector('.auto-submit-section');
+
+            let productId = productSelect ? productSelect.value : null;
+            let sectionValue = sectionSelect ? sectionSelect.value : 'todos';
 
             fetch(`/employees/top-products/${topProductId}`, {
                 method: 'PUT',
@@ -205,48 +324,73 @@ document.addEventListener("DOMContentLoaded", function() {
                 },
                 body: JSON.stringify({
                     product_id: productId,
-                    section: select.closest('tr').querySelector('.auto-submit-section')?.value || 'todos'
+                    section: sectionValue
                 })
             })
             .then(res => res.json())
             .then(data => {
-                console.log(data);
+                lanzarToastGuardado('Cambio guardado automáticamente');
             })
             .catch(err => {
                 console.error(err);
-                alert('Error al actualizar');
+                alert('No se pudo guardar la información');
             });
         });
     });
 
-    // Eliminar
+    // ==========================================
+    // Filtro en Tiempo Real por Sección
+    // ==========================================
+    const filterSection = document.getElementById('newBestSection');
+    filterSection?.addEventListener('change', function() {
+        let seccionSeleccionada = this.value;
+        
+        document.querySelectorAll('#topProductsTbody .table-row-item').forEach(fila => {
+            let selectSeccionFila = fila.querySelector('.auto-submit-section');
+            let seccionFila = selectSeccionFila ? selectSeccionFila.value : 'todos';
+
+            if (seccionSeleccionada === 'todos' || seccionFila === seccionSeleccionada) {
+                fila.style.display = ''; 
+            } else {
+                fila.style.display = 'none'; 
+            }
+        });
+    });
+
+    // Eliminación asíncrona de fila con efecto visual limpio
     document.querySelectorAll('.btn-delete').forEach(btn => {
         btn.addEventListener('click', async function() {
-            const tr = btn.closest('tr');
-            const topProductId = tr?.dataset.topProductId;
+            const fila = btn.closest('.table-row-item');
+            const topProductId = fila?.dataset.topProductId;
             if (!topProductId) return;
 
-            if (!confirm('¿Eliminar este registro de TopProduct?')) return;
+            if (!confirm('¿Seguro que deseas eliminar esta fila de destacados?')) return;
 
             try {
-                const res = await fetch(`/employees/top-products/${topProductId}`, {
+                await fetch(`/employees/top-products/${topProductId}`, {
                     method: 'DELETE',
                     headers: {
                         'Accept': 'application/json',
                         'X-CSRF-TOKEN': '{{ csrf_token() }}'
                     }
                 });
-                const data = await res.json().catch(() => ({}));
+                
+                fila.style.opacity = '0';
+                fila.style.backgroundColor = '#fde8e8';
+                fila.style.transition = 'all 0.3s ease';
+                setTimeout(() => {
+                    fila.remove();
+                    lanzarToastGuardado('Fila eliminada correctamente');
+                }, 300);
 
-                tr?.remove();
             } catch (e) {
                 console.error(e);
-                alert('Error al eliminar');
+                alert('Ocurrió un problema técnico al eliminar');
             }
         });
     });
 
-    // Agregar (CREATE)
+    // Agregar nueva fila vacía
     const btnAdd = document.getElementById('btnAddTopProduct');
     const newSection = document.getElementById('newBestSection');
 
@@ -254,7 +398,7 @@ document.addEventListener("DOMContentLoaded", function() {
         const section = newSection?.value || 'todos';
 
         try {
-            const res = await fetch(`/employees/top-products`, {
+            await fetch(`/employees/top-products`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -266,18 +410,14 @@ document.addEventListener("DOMContentLoaded", function() {
                     section
                 })
             });
-            const data = await res.json();
-
-            // Recargar para evitar lógica de pintar fila
             window.location.reload();
         } catch (e) {
             console.error(e);
-            alert('Error al agregar');
+            alert('Error al agregar un nuevo espacio en la lista');
         }
     });
 });
 </script>
-
 
 </body>
 </html>

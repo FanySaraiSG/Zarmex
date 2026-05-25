@@ -23,7 +23,7 @@
             <span class="zx-brand-name">ZARMEX</span>
         </a>
 
-        {{-- BOTÓN HAMBURGUESA (Se movió fuera del contenedor de menú para control estructural limpio) --}}
+        {{-- BOTÓN HAMBURGUESA--}}
         <button class="zx-ham" id="zxHam" type="button" aria-label="Abrir menú">
             <span></span><span></span><span></span>
         </button>
@@ -67,15 +67,14 @@
 
         {{-- 3. BUSCADOR --}}
         <div class="zx-search-wrap" id="zxSearchWrap">
-            <form class="zx-search" action="{{ route('buscar.resultados') }}" method="GET" autocomplete="off">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input id="zxSearchInput" type="text" name="q" placeholder="¿Qué estás buscando hoy?" value="{{ request('q','') }}">
-            </form>
-
+          <form class="zx-search" action="{{ route('buscar.resultados') }}" method="GET" autocomplete="off">
+           <img src="{{ asset('iconos/buscador.png') }}" class="zx-search-icon" alt="Buscar">
+           <input id="zxSearchInput" type="text" name="q" placeholder="¿Qué estás buscando hoy?" value="{{ request('q','') }}">
+          </form>
             <div class="zx-results" id="zxResults" hidden>
-                <div class="zx-results-title">Resultados de búsqueda</div>
-                <div class="zx-results-list" id="zxResultsList"></div>
-            </div>
+            <div class="zx-results-title">Resultados de búsqueda</div>
+            <div class="zx-results-list" id="zxResultsList"></div>
+          </div>
         </div>
 
         {{-- 4. ACCESO ADMIN / LOGIN --}}
@@ -138,7 +137,7 @@
     border-top: 3px solid var(--gold);
     border-bottom: 3px solid var(--gold);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    border-radius: 50px;
+    border-radius: 25px;
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
 }   
@@ -165,8 +164,8 @@
 }
 
 .zx-logo-circle {
-    width: 70px;
-    height: 70px;
+    width: 75px;
+    height: 75px;
     border-radius: 50%;
     border: 2px solid var(--gold);
     overflow: hidden;
@@ -185,12 +184,12 @@
 
 .zx-brand-name {
     color: #ffffff;
-    font-size: 28px;
-    font-family: serif;
-    letter-spacing: 2px;
+    font-size: 30px;
+    font-family: Georgia;
+    letter-spacing: 5px;
     font-weight: bold;
     white-space: nowrap;
-    padding: 0 14px;
+    padding: 0 15px;
     border-right: 3px dotted rgba(184, 161, 32, 0.55);
 }
 
@@ -213,26 +212,32 @@
     align-items: center;
     justify-content: center;
     width: 100%;
+    max-width:500px;
 }
 
 .zx-item {
     display: flex;
     align-items: center;
+    justify-content: center;
+    flex: 1;
+    min-width:140px;
 }
 
 .zx-item-link {
     font-weight: 600;
     color: var(--text-menu);
     text-decoration: none;
-    padding: 8px 14px;
+    padding: 10px 0px;
+    width: 100%;
     font-size: 16px;
     white-space: nowrap;
-    border-radius: 6px;
+    border-radius: 10px;
     transition: all 0.3s ease;
     display: flex;
     align-items: center;
     gap: 0;
     justify-content: center;
+    position: relative;
 }
 
 /* iconos removidos: se deja estilo vacío para no romper CSS */
@@ -240,7 +245,7 @@
 
 .zx-item:not(:last-child) {
     border-right: 3px dotted rgba(184, 161, 32, 0.55);
-    padding-right: 20px; /* separación para que se vea el punteado centrado entre items */
+    padding-right: 14px;
 }
 
 .zx-item-link:hover {
@@ -301,6 +306,15 @@
 
 .zx-search input::placeholder {
     color: rgba(255, 255, 255, 0.55);
+
+}
+
+.zx-search-icon {
+    width: 20px;          
+    height: 20px;         
+    object-fit: contain;  
+    flex-shrink: 0;       
+    opacity: 0.7;         
 }
 
 /* SUGERENCIAS */
