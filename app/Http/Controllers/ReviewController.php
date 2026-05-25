@@ -48,18 +48,21 @@ class ReviewController extends Controller
         ]);
     }
 
-    // ✅ FIX: usar id_reseña como primaryKey y valores correctos del enum
+    // ✅ CORREGIDO: Enfoque directo con save() para asegurar la persistencia
     public function estado(Request $request, $id)
     {
         $request->validate([
             'estatus' => 'required|in:pendiente,aprobado,oculto',
         ]);
 
-        Review::where('id', $id)->update([
-            'estatus' => $request->estatus,
-        ]);
+        // Buscamos la reseña por ID, si no existe arroja un error 404
+        $review = Review::findOrFail($id);
+        
+        // Asignamos el estatus validado ('aprobado', 'pendiente' u 'oculto')
+        $review->estatus = $request->estatus;
+        $review->save();
 
-        return back()->with('ok', 'Estatus actualizado');
+        return back()->with('ok', 'Estatus actualizado con éxito');
     }
 
     public function destroy($id)

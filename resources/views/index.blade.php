@@ -689,7 +689,14 @@
             </script>
         </section>
 
-<<<<<<< HEAD
+
+{{-- Seccion de reseñas  --}}
+
+
+
+
+
+
         <section class="testimonials py-5" id="resenasDestacadasSection" style="display: block; width: 100%; position: relative;">
     @php
         // 1. Ordenamos todas las reseñas por la cantidad de likes de forma descendente
@@ -782,88 +789,6 @@
                                         <span class="likes-count">{{ $likesActuales }}</span>
                                         <span class="text-muted" style="font-size:12px;">Me gusta</span>
                                     </button>
-=======
-        {{-- ===================== SECCIÓN RESEÑAS ===================== --}}
-        <section class="testimonials py-5" id="resenasDestacadasSection">
-            <div class="container">
-                <h2 class="text-center mb-4 zx-title-playfair">Reseñas Destacadas</h2>
-
-                <div class="text-center mb-4">
-                    <button type="button" class="btn btn-light" id="btnMostrarAgregarResena">Agregar reseña</button>
-                    <button type="button" class="btn btn-outline-light" id="btnRevisarResenas" style="margin-left: 10px; border-color: rgba(40,102,110,.35); color:#28666e;">Revisar reseñas</button>
-                </div>
-
-                <div id="agregarResenaWrap" class="mb-5" style="display:none;">
-                    <div class="review-section" style="max-width: 760px; margin: 0 auto;">
-                        <h3>DEJA TU COMENTARIO DEL PRODUCTO</h3>
-                        <form id="formAgregarResena" action="{{ url('/productos') }}/" method="POST">
-                            @csrf
-                            <div class="mb-3">
-                                <label class="form-label">Producto</label>
-                                <select name="producto_id" class="form-select" id="resenaProductoSelect" required>
-                                    @foreach(($topProducts ?? collect())->pluck('product')->filter() as $prod)
-                                        <option value="{{ $prod->id }}">{{ $prod->nombre }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">Nombre</label>
-                                    <input type="text" name="guest_nombre" class="form-control" placeholder="Opcional" maxlength="60">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">Email</label>
-                                    <input type="email" name="guest_email" class="form-control" placeholder="Opcional" maxlength="120">
-                                </div>
-                            </div>
-                            <div class="row g-3 mt-2">
-                                <div class="col-md-4">
-                                    <label class="form-label">Calificación</label>
-                                    <select name="calificacion" class="form-select" required>
-                                        @for($i=1;$i<=5;$i++)
-                                            <option value="{{ $i }}">{{ $i }}</option>
-                                        @endfor
-                                    </select>
-                                </div>
-                                <div class="col-md-8">
-                                    <label class="form-label">Descripción</label>
-                                    <textarea name="descripcion" class="form-control" rows="3" minlength="5" maxlength="1000" required placeholder="Escribe tu reseña..."></textarea>
-                                </div>
-                            </div>
-                            <div class="text-center mt-4">
-                                <button type="submit" class="btn btn-primary">Enviar reseña</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                @php
-                    $reseñasOrdenadas = ($reseñas ?? collect())->sortByDesc(fn($r) => $r->likes_count ?? $r->likes ?? 0);
-                    $resenasPorCategoria = $reseñasOrdenadas->groupBy(fn($r) => optional($r->product)->categoria ?? 'General');
-                    $categorias = $resenasPorCategoria->keys();
-                @endphp
-
-                <div class="resenas-nav">
-                    @foreach($categorias as $i => $cat)
-                        <button class="resenas-nav-btn {{ $i === 0 ? 'active' : '' }}" onclick="switchResenas('{{ Str::slug($cat) }}', this)">{{ $cat }}</button>
-                    @endforeach
-                </div>
-
-                @foreach($resenasPorCategoria as $cat => $resenas)
-                    <div class="resenas-grid {{ $loop->first ? 'active' : '' }}" id="resenas-{{ Str::slug($cat) }}">
-                        @foreach($resenas->take(3) as $review)
-                            <div class="resena-prod-card">
-                                <img src="{{ $review->product->imagen_url ?? asset('Imagenes/84493-4540581.jpg') }}" alt="Producto">
-                                <div class="card-body" style="padding: 15px;">
-                                    <h4>{{ $review->product->nombre ?? 'Producto' }}</h4>
-                                    <div class="stars" style="margin-bottom: 10px;">
-                                        @for($i = 1; $i <= 5; $i++)
-                                            <i class="fas fa-star {{ $i <= (int)($review->calificacion ?? 0) ? 'text-warning' : 'text-muted' }}"></i>
-                                        @endfor
-                                    </div>
-                                    <p>{{ $review->descripcion }}</p>
-                                    <p class="reviewer" style="font-weight: bold; font-style: italic;">— {{ $review->guest_nombre ?? 'Usuario desconocido' }}</p>
->>>>>>> c9b56c91752fd6aebaef7ef8c1e0db8b75eeacdd
                                 </div>
                             </div>
                         @empty
@@ -894,8 +819,7 @@
                 @endforeach
             </div>
 
-<<<<<<< HEAD
-            {{-- GRIDS POR PUNTUACIÓN --}}
+            {{-- GRIDS POR PUNTUACIÓN (REDISEÑO EXACTO CON ORIENTACIÓN HORIZONTAL) --}}
             @foreach($resenasPorPuntuacion as $puntos => $resenas)
                 <div class="resenas-grid {{ $loop->first ? 'active' : '' }}" id="resenas-{{ Str::slug($puntos) }}">
                     @foreach($resenas->take(6) as $review)
@@ -904,29 +828,32 @@
                             $reviewGridId     = $review->id_reseña ?? $review->id;
                             $likesGridActuales = $review->likes_count ?? $review->likes ?? 0;
 
-                            // ✅ optional() evita error si product es null
                             $imagenGrid      = optional($review->product)->imagen_url ?? $imagenFallback;
                             $nombreGrid      = optional($review->product)->nombre ?? 'Producto';
                         @endphp
                         <div class="resena-prod-card" data-card-id="{{ $reviewGridId }}">
-                            <img src="{{ $imagenGrid }}" alt="Producto">
-                            <div class="card-body p-3">
-                                <h4>{{ $nombreGrid }}</h4>
-                                <div class="stars mb-2">
-                                    @for($i = 1; $i <= 5; $i++)
-                                        <i class="fas fa-star {{ $i <= $cal ? 'text-warning' : 'text-muted' }}"></i>
-                                    @endfor
+                            <div class="resena-card-main-row">
+                                <div class="resena-img-wrapper">
+                                    <img src="{{ $imagenGrid }}" alt="Producto">
                                 </div>
-                                <p class="card-text">{{ $review->descripcion }}</p>
-                                <div class="d-flex justify-content-between align-items-center mt-3">
-                                    <p class="reviewer m-0 font-italic" style="font-size:0.9em;">— {{ $review->guest_nombre ?? 'Usuario desconocido' }}</p>
-                                    <small class="text-muted">
-                                        <button type="button" class="btn btn-sm btn-link text-decoration-none p-0 js-review-like text-muted" data-review-id="{{ $reviewGridId }}">
-                                            <i class="fas fa-heart text-danger"></i> 
-                                            <span class="likes-count">{{ $likesGridActuales }}</span>
-                                        </button>
-                                    </small>
+                                <div class="card-body p-0">
+                                    <h4>{{ $nombreGrid }}</h4>
+                                    <div class="stars mb-2">
+                                        @for($i = 1; $i <= 5; $i++)
+                                            <i class="fas fa-star {{ $i <= $cal ? 'text-warning' : 'text-muted' }}"></i>
+                                        @endfor
+                                    </div>
+                                    <p class="card-text">{{ $review->descripcion }}</p>
                                 </div>
+                            </div>
+                            <div class="resena-card-footer">
+                                <p class="reviewer m-0 font-italic">— {{ $review->guest_nombre ?? 'Usuario desconocido' }}</p>
+                                <small class="text-muted m-0">
+                                    <button type="button" class="btn btn-sm btn-link text-decoration-none p-0 js-review-like text-muted btn-like-fixed" data-review-id="{{ $reviewGridId }}">
+                                        <i class="fas fa-heart text-danger"></i> 
+                                        <span class="likes-count">{{ $likesGridActuales }}</span>
+                                    </button>
+                                </small>
                             </div>
                         </div>
                     @endforeach
@@ -939,27 +866,6 @@
         <div id="agregarResenaWrap" class="mb-5" style="display:none; margin-top: 30px;">
             <div class="review-section" style="max-width: 760px; margin: 0 auto; background: #fff; padding: 24px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #eee;">
                 <h3 class="mb-3 text-center" style="font-size: 1.25rem; color: #28666e; font-weight: bold;">DEJA TU COMENTARIO DEL PRODUCTO</h3>
-=======
-            <script>
-                document.addEventListener('DOMContentLoaded', () => {
-                    document.getElementById('btnMostrarAgregarResena')?.addEventListener('click', () => {
-                        const wrap = document.getElementById('agregarResenaWrap');
-                        wrap.style.display = (wrap.style.display === 'none' || !wrap.style.display) ? 'block' : 'none';
-                    });
-
-                    document.getElementById('btnRevisarResenas')?.addEventListener('click', () => {
-                        document.getElementById('resenasDestacadasSection')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    });
-
-                    const select = document.getElementById('resenaProductoSelect');
-                    const form = document.getElementById('formAgregarResena');
-                    if (form && select) {
-                        const setAction = () => { form.action = `{{ url('/productos') }}/${select.value}/reviews`; };
-                        select.addEventListener('change', setAction);
-                        setAction();
-                    }
-                });
->>>>>>> c9b56c91752fd6aebaef7ef8c1e0db8b75eeacdd
 
                 <form id="formAgregarResena" action="{{ url('/productos') }}/" method="POST">
                     @csrf
@@ -983,7 +889,6 @@
                         </div>
                     </div>
 
-<<<<<<< HEAD
                     <div class="row g-3 mt-2">
                         <div class="col-md-4">
                             <label class="form-label">Calificación</label>
@@ -1014,14 +919,116 @@
                 font-size: 0.88em; cursor: pointer; transition: background .25s, color .25s, transform .2s;
             }
             .resenas-nav-btn:hover, .resenas-nav-btn.active { background: #28666e; color: #fedc97; transform: translateY(-2px); }
-            .resenas-grid { display: none; grid-template-columns: repeat(3, 1fr); gap: 24px; max-width: 1100px; margin: 0 auto; }
+            
+            /* GRID MÁS LIMPIO Y ULTRA RESPONSIVE */
+            .resenas-grid { display: none; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 1200px; margin: 0 auto; }
             .resenas-grid.active { display: grid; }
-            @media (max-width: 991px) { .resenas-grid.active { grid-template-columns: repeat(2, 1fr); } }
-            @media (max-width: 576px) { .resenas-grid.active { grid-template-columns: 1fr; } }
+            @media (max-width: 1100px) { .resenas-grid.active { grid-template-columns: repeat(2, 1fr); } }
+            @media (max-width: 680px) { .resenas-grid.active { grid-template-columns: 1fr; gap: 16px; } }
             
-            .resena-prod-card { background: #fff; border: 1px solid #ddd; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,.10); transition: transform .25s ease; }
-            .resena-prod-card img { width: 100%; height: 200px; object-fit: contain; background: #f7f7f7; padding: 16px; }
+            /* TARJETA COMPACTA CON ALINEACIÓN HORIZONTAL INTERNA */
+            .resena-prod-card { 
+                background: #fff; 
+                border: 1px solid #eef2f4; 
+                border-radius: 14px; 
+                overflow: hidden; 
+                box-shadow: 0 4px 12px rgba(0,0,0,.06); 
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                min-height: 200px; /* Asegura homogeneidad de las tarjetas */
+                position: relative;
+                transition: transform .2s ease, box-shadow .2s ease;
+            }
+            .resena-prod-card:hover { transform: translateY(-3px); box-shadow: 0 6px 16px rgba(0,0,0,.09); }
             
+            /* FILA DE CONTENIDO: IMAGEN + TEXTOS */
+            .resena-card-main-row {
+                display: flex;
+                padding: 16px;
+                gap: 16px;
+                flex-grow: 1;
+                align-items: flex-start;
+            }
+            
+            /* CONTENEDOR DE IMAGEN (REDUCIDO / MÁS COMPACTO) */
+            .resena-img-wrapper {
+                flex: 0 0 110px; /* Ancho fijo para la imagen de manera limpia */
+                height: 110px;    /* Altura menor controlada */
+                background: #fdfdfd;
+                border: 1px solid #f0f3f5;
+                border-radius: 10px;
+                padding: 6px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
+            }
+            .resena-img-wrapper img { max-width: 100%; max-height: 100%; object-fit: contain; }
+            
+            /* CONTENEDOR DE TEXTOS DENTRO DE LA TARJETA */
+            .resena-prod-card .card-body {
+                flex-grow: 1;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+            }
+            .resena-prod-card .card-body h4 {
+                font-size: 0.95rem;
+                font-weight: 700;
+                color: #1a1a1a;
+                margin: 0 0 3px 0;
+                line-height: 1.3;
+            }
+            .resena-prod-card .stars { font-size: 0.78rem; margin-bottom: 6px; }
+            .resena-prod-card .card-text {
+                font-size: 0.84rem;
+                color: #555;
+                margin: 0;
+                line-height: 1.4;
+                display: -webkit-box;
+                -webkit-line-clamp: 3; /* Corta textos excesivamente largos si los hubiera */
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+            }
+            
+            /* FOOTER TOTALMENTE LIMPIO Y BOTÓN DE LIKE FIJO A LA DERECHA */
+            .resena-card-footer {
+                padding: 10px 16px;
+                background: #fafbfc;
+                border-top: 1px solid #f1f4f6;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                min-height: 40px;
+                margin-top: auto; /* Fuerza el footer a quedarse abajo siempre */
+            }
+            .resena-card-footer .reviewer {
+                font-size: 0.8rem;
+                color: #6c757d;
+                max-width: 70%;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .btn-like-fixed {
+                display: flex;
+                align-items: center;
+                gap: 4px;
+                font-size: 0.85rem;
+                font-weight: 600;
+                transition: transform 0.15s ease;
+            }
+            .btn-like-fixed:hover { transform: scale(1.08); text-decoration: none; }
+            
+            /* Responsive específico para móviles pequeños */
+            @media (max-width: 420px) {
+                .resena-card-main-row { flex-direction: column; align-items: center; text-align: center; }
+                .resena-img-wrapper { flex: 0 0 100px; width: 100px; height: 100px; }
+                .resena-prod-card .card-body { align-items: center; }
+            }
+
+            /* Estilos del carrusel superior */
             .zx-carousel-review-container { max-width: 960px; margin: 0 auto; padding: 0 15px; }
             .zx-carousel-review-wrapper { position: relative; overflow: hidden; border-radius: 20px; background: #f8fafb; border: 1px solid rgba(40,102,110,.15); padding: 24px; box-shadow: inset 0 0 10px rgba(0,0,0,0.02); }
             .zx-carousel-review-track { display: flex; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1); gap: 20px; }
@@ -1094,32 +1101,6 @@
                     }
                 } catch (e) {
                     console.error('Error al conectar con el endpoint de likes:', e);
-=======
-    <a href="https://wa.me/+525581366555?text=Hola,%20estoy%20interesado%20en%20los%20productos%20de%20Zarmex" target="_blank" class="whatsapp-float">
-        <i class="fab fa-whatsapp"></i>
-    </a>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const banner = document.getElementById('carouselBanner');
-            if (!banner) return;
-            const bsCarousel = bootstrap.Carousel.getOrCreateInstance(banner, { interval: 5000, ride: true });
-
-            function pauseAllVideos() {
-                banner.querySelectorAll('video.banner-video').forEach(v => { try { v.pause(); v.currentTime = 0; } catch(e) {} });
-            }
-
-            function handleActiveSlide() {
-                const active = banner.querySelector('.carousel-item.active');
-                if (!active) return;
-                const video = active.querySelector('video.banner-video');
-                if (video) {
-                    bsCarousel.pause();
-                    video.play().catch(() => {});
-                    video.onended = () => bsCarousel.next();
-                } else {
-                    bsCarousel.cycle();
->>>>>>> c9b56c91752fd6aebaef7ef8c1e0db8b75eeacdd
                 }
             });
 
