@@ -1,8 +1,10 @@
-- [x] Leer y confirmar estructura actual del footer
-- [x] Reducir la sección “Contacto” (menos altura/ancho) en `resources/views/footer.blade.php`
-- [x] Aumentar el mapa del footer a altura fija 250px (iframe + contenedor)
-- [x] Asegurar que el mapa se alinee/pegue hacia la parte baja dentro del bloque del footer
+# TODO
 
-- [ ] Probar en la vista principal (index) y ajustar si el pegado al fondo requiere tocar `layouts/app.blade.php`
+- [ ] Actualizar `resources/views/header.blade.php`:
+  - [x] Quitar la línea punteada izquierda del texto “ZARMEX” del logo (queda solo a la derecha).
+  - [x] Hacer el texto “ZARMEX” más grande.
+  - [x] Acomodar centricamente Productos/Servicios/Nosotros y dejar el punteado SOLO entre items.
+  - [x] Asegurar que en pantallas pequeñas NO desaparezcan: logo+ZARMEX, menú hamburguesa, buscador y acceso a inicio de sesión (quitando el rule raro de 1150px).
+  - [x] Dejar una línea punteada también a la derecha de “ZARMEX” (como pediste).
 
 
