@@ -17,7 +17,7 @@
         }
 
         body { background-color: var(--bg-gray); font-family: 'Segoe UI', sans-serif; }
-        
+
         .edit-card {
             width: 100%; max-width: 1000px; background: #fff;
             border-radius: 20px; border-top: 10px solid var(--primary-green);
@@ -25,7 +25,6 @@
             margin: 40px auto;
         }
 
-        /* Tabs Verdes */
         .nav-pills-custom { background-color: var(--light-green); border-radius: 15px; padding: 6px; }
         .nav-pills-custom .nav-link { color: var(--medium-green); font-weight: 600; border-radius: 12px; border: none; }
         .nav-pills-custom .nav-link.active {
@@ -33,7 +32,6 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
-        /* Zona de Carga Masiva Unificada */
         .upload-area {
             border: 2px dashed var(--accent-green); background: #fafafa;
             border-radius: 15px; padding: 40px; text-align: center;
@@ -41,7 +39,6 @@
         }
         .upload-area:hover { background: var(--light-green); border-color: var(--primary-green); }
 
-        /* Contenedor de Previsualización Dinámica */
         .gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
         .img-slot {
             aspect-ratio: 1; border: 1px solid #e0e0e0;
@@ -50,11 +47,23 @@
             cursor: grab; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
             max-width: 150px;
         }
-
         .img-slot:active { cursor: grabbing; }
+        .sortable-ghost  { opacity: 0.35; border: 2px dashed var(--primary-green) !important; }
+        .sortable-chosen { box-shadow: 0 8px 20px rgba(0,0,0,.18); transform: scale(1.03); }
+        /* Indicador visual de que los slots son arrastrables */
+        #sortable-gallery .img-slot::after {
+            content: '⠿';
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255,255,255,0.85);
+            font-size: 14px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+            pointer-events: none;
+        }
         .img-slot img { width: 100%; height: 100%; object-fit: cover; }
-        
-        /* Botón para remover imágenes individuales */
+
         .remove-btn {
             position: absolute; top: 8px; right: 8px;
             background: rgba(220, 53, 69, 0.9); color: white;
@@ -63,18 +72,14 @@
             cursor: pointer; z-index: 10;
         }
 
-        /* Video Preview */
         #video-preview-container video { width: 35%; border-radius: 50px; background: #000; margin-top: 10px; }
 
-
-        /* Documentos */
         .doc-box { border: 1px solid #e0e0e0; border-radius: 12px; padding: 20px; margin-bottom: 20px; transition: 0.3s; }
         .doc-box:hover { border-color: var(--primary-green); background: var(--bg-gray); }
 
         .btn-save { background-color: var(--primary-green); color: white; border: none; padding: 15px 40px; border-radius: 12px; font-weight: bold; }
         .btn-back { background-color: #6c757d; color: white; border: none; padding: 12px 25px; border-radius: 12px; text-decoration: none; display: inline-flex; align-items: center; }
         .btn-back:hover { background-color: #5a6268; color: white; }
-        
         .btn-next-tab { background-color: var(--medium-green); color: white; border-radius: 10px; font-weight: 600; }
         .btn-next-tab:hover { background-color: var(--primary-green); color: white; }
     </style>
@@ -111,19 +116,26 @@
             @csrf
             @method('PUT')
 
-            <input type="hidden" name="orden_imagenes" id="orden_imagenes">
+            {{-- 
+                CORRECCIÓN: estos dos campos hidden sincronizan con el controlador
+                el orden final de la galería y los IDs de imágenes eliminadas.
+                El JS los actualiza en cada cambio antes del submit.
+            --}}
+            <input type="hidden" name="orden_imagenes"     id="orden_imagenes">
             <input type="hidden" name="imagenes_eliminadas" id="imagenes_eliminadas" value="[]">
 
             <ul class="nav nav-pills nav-justified nav-pills-custom mb-4" id="productTabs" role="tablist">
-                <li class="nav-item"><button class="nav-link active" id="tab-info-btn" data-bs-toggle="tab" data-bs-target="#tab-info" type="button" role="tab">1. Información Del Producto</button></li>
-                <li class="nav-item"><button class="nav-link" id="tab-media-btn" data-bs-toggle="tab" data-bs-target="#tab-media" type="button" role="tab">2. Multimedia (Imágenes y Video)</button></li>
-                <li class="nav-item"><button class="nav-link" id="tab-docs-btn" data-bs-toggle="tab" data-bs-target="#tab-docs" type="button" role="tab">3. Documentos</button></li>
+                <li class="nav-item"><button class="nav-link active" id="tab-info-btn"  data-bs-toggle="tab" data-bs-target="#tab-info"  type="button" role="tab">1. Información Del Producto</button></li>
+                <li class="nav-item"><button class="nav-link"        id="tab-media-btn" data-bs-toggle="tab" data-bs-target="#tab-media" type="button" role="tab">2. Multimedia (Imágenes y Video)</button></li>
+                <li class="nav-item"><button class="nav-link"        id="tab-docs-btn"  data-bs-toggle="tab" data-bs-target="#tab-docs"  type="button" role="tab">3. Documentos</button></li>
             </ul>
 
             <div class="tab-content">
-                
+
+                {{-- ══════════════ TAB 1: INFORMACIÓN ══════════════ --}}
                 <div class="tab-pane fade show active" id="tab-info" role="tabpanel">
                     <div class="row align-items-start">
+
                         <div class="col-md-8 mb-3">
                             <label for="categoria_id" class="form-label fw-bold">Categoría</label>
                             <select class="form-select" id="categoria_id" name="categoria_id">
@@ -142,48 +154,103 @@
                         </div>
 
                         <div class="col-md-12 mb-4">
-
-                            <label class="form-label fw-bold text-muted small">NUEVA DESCRIPCIÓN DEL ADMINISTRADOR</label>
+                            <label class="form-label fw-bold text-muted small">DESCRIPCIÓN</label>
                             <textarea name="descripcion" class="form-control" rows="6" placeholder="Escriba aquí la descripción...">{{ old('descripcion', $producto->descripcion) }}</textarea>
-
                         </div>
+
                     </div>
 
                     <div class="d-flex justify-content-end">
                         <button type="button" class="btn btn-next-tab px-4 py-2" onclick="cambiarPestaña('#tab-media-btn')">Siguiente Pestaña <i class="bi bi-arrow-right ms-1"></i></button>
                     </div>
-                </div> <div class="tab-pane fade" id="tab-media" role="tabpanel">
-                    <label class="form-label fw-bold mb-2">GALERÍA DE IMÁGENES</label>
-                    
-                    <div class="upload-area" onclick="document.getElementById('mass-image-input').click()">
-                        <i class="bi bi-images fs-1 text-muted"></i>
-                        <p class="mb-0 fw-bold text-muted mt-2">Haz clic aquí para seleccionar o arrastrar tus imágenes (Máx. 6)</p>
-                        <input type="file" id="mass-image-input" name="imagenes[]" class="d-none" accept="image/*" multiple>
-                    </div>
+                </div>
 
-                    <div class="gallery-grid mb-4" id="sortable-gallery">
-                        @foreach($imagenesExtra as $img)
-                            <div class="img-slot" data-id="existente-{{ $img->id }}">
-                                <button type="button" class="remove-btn" onclick="eliminarImagenSlot(this, '{{ $img->id }}')">✕</button>
-                                <img src="{{ asset($img->ruta) }}" alt="Producto">
+                {{-- ══════════════ TAB 2: MULTIMEDIA ══════════════ --}}
+                <div class="tab-pane fade" id="tab-media" role="tabpanel">
+
+                    {{-- ── Imagen Principal ── --}}
+                    <label class="form-label fw-bold mb-1">IMAGEN PRINCIPAL</label>
+                    <div class="mb-3">
+                        @if($producto->imagen_url)
+                            <div class="mb-2 d-flex align-items-center gap-3">
+                                <img src="{{ asset($producto->getRawOriginal('imagen_url')) }}"
+                                     alt="Imagen actual"
+                                     style="width:100px; height:100px; object-fit:cover; border-radius:10px; border:1px solid #e0e0e0;">
+                                <span class="text-muted small">Imagen actual. Sube una nueva para reemplazarla.</span>
                             </div>
-                        @endforeach
+                        @endif
+                        <input type="file"
+                               name="imagen_url"
+                               id="imagen_url_input"
+                               class="form-control"
+                               accept="image/jpg,image/jpeg,image/png,image/webp"
+                               onchange="previewImagenPrincipal(this)">
+                        <div id="preview-principal" class="mt-2" style="display:none;">
+                            <img id="preview-principal-img"
+                                 src=""
+                                 alt="Nueva imagen"
+                                 style="width:120px; height:120px; object-fit:cover; border-radius:10px; border:2px solid var(--accent-green);">
+                            <p class="small text-success mt-1 mb-0"><i class="bi bi-check-circle"></i> Nueva imagen lista para guardar</p>
+                        </div>
                     </div>
 
+                    {{-- ── Galería Extra ── --}}
+                    <label class="form-label fw-bold mb-2">GALERÍA DE IMÁGENES ADICIONALES</label>
+
+                    {{-- Imágenes ya guardadas en la BD --}}
+                    @if($imagenesExtra->count() > 0)
+                        <div class="gallery-grid mb-3" id="sortable-gallery">
+                            @foreach($imagenesExtra as $img)
+                                <div class="img-slot" data-id="existente-{{ $img->id }}">
+                                    <button type="button" class="remove-btn"
+                                            onclick="eliminarImagenSlot(this, 'existente-{{ $img->id }}')">✕</button>
+                                    <img src="{{ asset($img->ruta) }}" alt="Producto">
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="gallery-grid mb-3" id="sortable-gallery"></div>
+                    @endif
+
+                    {{-- 
+                        Input directo sin manipulación JS del FileList.
+                        El usuario selecciona sus imágenes nuevas aquí y se envían nativamente.
+                    --}}
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted">AGREGAR IMÁGENES NUEVAS</label>
+                        <input type="file"
+                               id="mass-image-input"
+                               name="imagenes[]"
+                               class="form-control"
+                               accept="image/jpg,image/jpeg,image/png,image/webp,image/gif"
+                               multiple
+                               onchange="previsualizarNuevas(this)">
+                        <div class="form-text">Puedes seleccionar varias a la vez. Formatos: jpg, png, webp.</div>
+                    </div>
+
+                    {{-- Previsualización de las imágenes recién seleccionadas --}}
+                    <div class="gallery-grid mb-4" id="preview-nuevas"></div>
+
+                    {{-- ── Video Promocional ── --}}
                     <label class="form-label fw-bold">VIDEO PROMOCIONAL (Archivo Local)</label>
                     <div class="d-flex gap-3 align-items-start mb-3">
                         <div style="flex: 1;">
-                            <input type="file" name="video" id="video-input" class="form-control" accept="video/mp4,video/mkv,video/x-m4v,video/*" onchange="previewVideo(this)">
-                            <div class="form-text">Se reemplaza el video anterior (si subes uno nuevo).</div>
+                            <input type="file" name="video" id="video-input" class="form-control"
+                                   accept="video/mp4,video/mkv,video/x-m4v,video/*"
+                                   onchange="previewVideo(this)">
+                            <div class="form-text">Se reemplaza el video anterior si subes uno nuevo.</div>
                         </div>
                         @if(!empty($producto->video_url))
-                            <button type="button" class="btn btn-outline-danger btn-sm mt-2" onclick="borrarVideoActual({{ $producto->id }})">Borrar video actual</button>
+                            <button type="button" class="btn btn-outline-danger btn-sm mt-2"
+                                    onclick="borrarVideoActual({{ $producto->id }})">
+                                Borrar video actual
+                            </button>
                         @endif
                     </div>
-                    
-                    <div id="video-preview-container" class="mt-2 mb-4" style="{{ $producto->video_url ? '' : 'display:none;' }}">
 
-                        <p class="small text-muted mb-1">Vista previa del video seleccionado:</p>
+                    <div id="video-preview-container" class="mt-2 mb-4"
+                         style="{{ $producto->video_url ? '' : 'display:none;' }}">
+                        <p class="small text-muted mb-1">Vista previa:</p>
                         <video id="video-tag" controls style="width: 100%; border-radius: 12px; background: #000;">
                             <source src="{{ $producto->video_url ? asset($producto->video_url) : '' }}" id="video-source">
                             Tu navegador no soporta carga de videos.
@@ -191,17 +258,20 @@
                     </div>
 
                     <div class="d-flex justify-content-between">
-                        <button type="button" class="btn btn-outline-secondary btn-next-tab bg-white text-secondary px-4 py-2" onclick="cambiarPestaña('#tab-info-btn')"><i class="bi bi-arrow-left me-1"></i> Anterior</button>
-                        <button type="button" class="btn btn-next-tab px-4 py-2" onclick="cambiarPestaña('#tab-docs-btn')">Siguiente Pestaña <i class="bi bi-arrow-right ms-1"></i></button>
+                        <button type="button" class="btn btn-outline-secondary btn-next-tab bg-white text-secondary px-4 py-2"
+                                onclick="cambiarPestaña('#tab-info-btn')"><i class="bi bi-arrow-left me-1"></i> Anterior</button>
+                        <button type="button" class="btn btn-next-tab px-4 py-2"
+                                onclick="cambiarPestaña('#tab-docs-btn')">Siguiente Pestaña <i class="bi bi-arrow-right ms-1"></i></button>
                     </div>
                 </div>
 
+                {{-- ══════════════ TAB 3: DOCUMENTOS ══════════════ --}}
                 <div class="tab-pane fade" id="tab-docs" role="tabpanel">
-                    @php 
+                    @php
                         $fields = [
-                            'doc1' => ['label' => 'Garantía', 'icon' => 'bi-shield-check', 'path' => $producto->doc1_url],
-                            'doc2' => ['label' => 'Manual de Usuario', 'icon' => 'bi-book', 'path' => $producto->doc2_url],
-                            'doc3' => ['label' => 'Ficha Técnica', 'icon' => 'bi-file-earmark-pdf', 'path' => $producto->doc3_url]
+                            'doc1' => ['label' => 'Garantía',         'icon' => 'bi-shield-check',         'path' => $producto->doc1_url],
+                            'doc2' => ['label' => 'Manual de Usuario', 'icon' => 'bi-book',                 'path' => $producto->doc2_url],
+                            'doc3' => ['label' => 'Ficha Técnica',    'icon' => 'bi-file-earmark-pdf',      'path' => $producto->doc3_url],
                         ];
                     @endphp
 
@@ -221,7 +291,8 @@
                                 </div>
                             </div>
                             <label class="btn btn-sm btn-outline-success">
-                                <input type="file" name="{{$key}}" class="d-none" onchange="previewDoc(this, 'new-{{$key}}')">
+                                <input type="file" name="{{$key}}" class="d-none"
+                                       onchange="previewDoc(this, 'new-{{$key}}')">
                                 <i class="bi bi-upload"></i> Nuevo Archivo
                             </label>
                         </div>
@@ -229,15 +300,20 @@
                     @endforeach
 
                     <div class="d-flex justify-content-start mt-4">
-                        <button type="button" class="btn btn-outline-secondary btn-next-tab bg-white text-secondary px-4 py-2" onclick="cambiarPestaña('#tab-media-btn')"><i class="bi bi-arrow-left me-1"></i> Anterior</button>
+                        <button type="button"
+                                class="btn btn-outline-secondary btn-next-tab bg-white text-secondary px-4 py-2"
+                                onclick="cambiarPestaña('#tab-media-btn')">
+                            <i class="bi bi-arrow-left me-1"></i> Anterior
+                        </button>
                     </div>
                 </div>
-            </div>
+
+            </div>{{-- /tab-content --}}
 
             <div class="d-flex justify-content-between align-items-center mt-5 border-top pt-4">
                 <span class="text-muted fw-bold" id="tabIndicator">Pestaña 1 de 3</span>
-                
-                <button type="submit" id="btn-global-submit" class="btn btn-save px-5 py-2 fs-5 shadow-sm d-none">
+                <button type="submit" id="btn-global-submit"
+                        class="btn btn-save px-5 py-2 fs-5 shadow-sm d-none">
                     <i class="bi bi-check-circle me-2"></i> Guardar Todos los Cambios
                 </button>
             </div>
@@ -247,42 +323,43 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    const massInput = document.getElementById('mass-image-input');
-    const galleryEl = document.getElementById('sortable-gallery');
+    /* ════════════════════════════════════════════════════════════════════════
+       GALERÍA — lógica simplificada sin DataTransfer
+       • Las imágenes nuevas se envían con el input nativo name="imagenes[]"
+       • previsualizarNuevas() muestra previews visuales sin tocar el FileList
+       • eliminarImagenSlot() maneja solo imágenes existentes de la BD
+       ════════════════════════════════════════════════════════════════════════ */
+
+    const galleryEl       = document.getElementById('sortable-gallery');
     const eliminadasInput = document.getElementById('imagenes_eliminadas');
     const btnGlobalSubmit = document.getElementById('btn-global-submit');
+
     let listaEliminadas = [];
 
-    function cambiarPestaña(tabButtonId) {
-        const triggerEl = document.querySelector(tabButtonId);
-        bootstrap.Tab.getOrCreateInstance(triggerEl).show();
+    // ── Preview visual de imágenes recién seleccionadas (solo cosmético) ──────
+    function previsualizarNuevas(input) {
+        const contenedor = document.getElementById('preview-nuevas');
+        contenedor.innerHTML = '';
+
+        if (!input.files || !input.files.length) return;
+
+        Array.from(input.files).forEach((file) => {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const slot = document.createElement('div');
+                slot.classList.add('img-slot');
+                slot.style.cursor = 'default';
+                slot.innerHTML = `<img src="${e.target.result}" alt="${file.name}">
+                    <span style="position:absolute;bottom:4px;left:0;right:0;
+                        text-align:center;font-size:10px;background:rgba(0,0,0,.45);
+                        color:#fff;padding:2px 4px;">${file.name}</span>`;
+                contenedor.appendChild(slot);
+            };
+            reader.readAsDataURL(file);
+        });
     }
 
-    massInput.addEventListener('change', function() {
-        if (this.files) {
-            const imagenesActuales = galleryEl.querySelectorAll('.img-slot').length;
-            const espaciosDisponibles = 6 - imagenesActuales;
-            const filesToProcess = Array.from(this.files).slice(0, espaciosDisponibles);
-
-            filesToProcess.forEach((file) => {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const slot = document.createElement('div');
-                    slot.classList.add('img-slot');
-                    slot.setAttribute('data-id', `nueva-${file.name}`);
-                    
-                    slot.innerHTML = `
-                        <button type="button" class="remove-btn" onclick="eliminarImagenSlot(this)">✕</button>
-                        <img src="${e.target.result}" alt="Previa">
-                    `;
-                    galleryEl.appendChild(slot);
-                    actualizarOrdenFormulario();
-                }
-                reader.readAsDataURL(file);
-            });
-        }
-    });
-
+    // ── Eliminar imagen existente de la BD ────────────────────────────────────
     function eliminarImagenSlot(btn, idBaseDatos = null) {
         if (idBaseDatos) {
             listaEliminadas.push(idBaseDatos);
@@ -292,14 +369,47 @@
         actualizarOrdenFormulario();
     }
 
+    // ── Orden de la galería existente ─────────────────────────────────────────
+    function actualizarOrdenFormulario() {
+        const slots    = galleryEl.querySelectorAll('.img-slot');
+        const mapeoIds = Array.from(slots).map(slot => slot.getAttribute('data-id'));
+        document.getElementById('orden_imagenes').value = JSON.stringify(mapeoIds);
+    }
+
+    // ── Drag & drop de reordenamiento ─────────────────────────────────────────
+    Sortable.create(galleryEl, {
+        animation: 150,
+        ghostClass: 'sortable-ghost',
+        chosenClass: 'sortable-chosen',
+        dragClass: 'sortable-drag',
+        onStart: function () { galleryEl.style.cursor = 'grabbing'; },
+        onEnd: function () {
+            galleryEl.style.cursor = '';
+            actualizarOrdenFormulario();
+        }
+    });
+
+    /* ════════════════════════════════════════════════════════════════════════
+       IMAGEN PRINCIPAL — previsualización instantánea
+       ════════════════════════════════════════════════════════════════════════ */
+    function previewImagenPrincipal(input) {
+        const container = document.getElementById('preview-principal');
+        const img       = document.getElementById('preview-principal-img');
+        if (input.files && input.files[0]) {
+            img.src             = URL.createObjectURL(input.files[0]);
+            container.style.display = 'block';
+        }
+    }
+
+    /* ════════════════════════════════════════════════════════════════════════
+       VIDEO
+       ════════════════════════════════════════════════════════════════════════ */
     function previewVideo(input) {
         const container = document.getElementById('video-preview-container');
-        const video = document.getElementById('video-tag');
-        const source = document.getElementById('video-source');
-
+        const video     = document.getElementById('video-tag');
+        const source    = document.getElementById('video-source');
         if (input.files && input.files[0]) {
-            const fileURL = URL.createObjectURL(input.files[0]);
-            source.src = fileURL;
+            source.src = URL.createObjectURL(input.files[0]);
             video.load();
             container.style.display = 'block';
         }
@@ -307,7 +417,6 @@
 
     function borrarVideoActual(productoId) {
         if (!confirm('¿Seguro que deseas borrar el video actual?')) return;
-
         fetch(`{{ url('/employees/productos') }}/${productoId}/video`, {
             method: 'DELETE',
             headers: {
@@ -323,46 +432,44 @@
         .catch(() => alert('Error al borrar el video.'));
     }
 
-
+    /* ════════════════════════════════════════════════════════════════════════
+       DOCUMENTOS
+       ════════════════════════════════════════════════════════════════════════ */
     function previewDoc(input, displayId) {
         const display = document.getElementById(displayId);
         if (input.files && input.files[0]) {
-            display.innerText = "📄 Nuevo: " + input.files[0].name;
-            display.style.display = 'block';
+            display.innerText      = "📄 Nuevo: " + input.files[0].name;
+            display.style.display  = 'block';
         }
     }
 
-    Sortable.create(galleryEl, {
-        animation: 150,
-        ghostClass: 'bg-light',
-        onEnd: function () {
-            actualizarOrdenFormulario();
-        }
-    });
-
-    function actualizarOrdenFormulario() {
-        const slots = galleryEl.querySelectorAll('.img-slot');
-        const mapeoIds = Array.from(slots).map(slot => slot.getAttribute('data-id'));
-        document.getElementById('orden_imagenes').value = JSON.stringify(mapeoIds);
+    /* ════════════════════════════════════════════════════════════════════════
+       TABS — indicador y botón de guardar
+       ════════════════════════════════════════════════════════════════════════ */
+    function cambiarPestaña(tabButtonId) {
+        const triggerEl = document.querySelector(tabButtonId);
+        bootstrap.Tab.getOrCreateInstance(triggerEl).show();
     }
-
-    document.addEventListener("DOMContentLoaded", actualizarOrdenFormulario);
 
     document.querySelectorAll('button[data-bs-toggle="tab"]').forEach((btn, idx) => {
         btn.addEventListener('shown.bs.tab', () => {
             document.getElementById('tabIndicator').innerText = `Pestaña ${idx + 1} de 3`;
-            
-            if (idx === 2) {
-                btnGlobalSubmit.classList.remove('d-none');
-            } else {
-                btnGlobalSubmit.classList.add('d-none');
-            }
+            if (idx === 2) btnGlobalSubmit.classList.remove('d-none');
+            else           btnGlobalSubmit.classList.add('d-none');
         });
     });
 
-    document.getElementById('product-form').addEventListener('submit', function(e) {
+    /* ════════════════════════════════════════════════════════════════════════
+       SUBMIT — asegurar que todo esté sincronizado antes de enviar
+       ════════════════════════════════════════════════════════════════════════ */
+    document.getElementById('product-form').addEventListener('submit', function () {
         actualizarOrdenFormulario();
+        eliminadasInput.value = JSON.stringify(listaEliminadas);
+        // El input name="imagenes[]" se envía nativamente, sin manipulación JS
     });
+
+    // Inicializar al cargar
+    document.addEventListener('DOMContentLoaded', actualizarOrdenFormulario);
 </script>
 </body>
 </html>

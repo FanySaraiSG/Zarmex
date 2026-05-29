@@ -19,14 +19,31 @@
     <script src="{{ asset('js/whatsapp-drag.js') }}"></script>
 
     <style>
-        /* ===================== ESTILOS GENERALES Y BANNER ===================== */
+        /* ===================== BANNER FLUIDO - AJUSTE DE AIRE ===================== */
+       body > section,
+        #carouselBanner, 
+        #carouselBanner .carousel-inner, 
+        #carouselBanner .carousel-item {
+            height: 600px !important; /* ← ¡AQUÍ! Cambia este valor para modificar la altura real del carrusel */
+            min-height: 700px !important;
+        }
+
+        /* 2. Forzamos a que la imagen cubra TODO el contenedor sin dejar espacios vacíos */
         .banner-media {
-            width: 100%;
-            height: 600px;
-            object-fit: cover;
+            width: 100% !important;
+            height: 100% !important;
+            /* 'fill' obliga a la imagen a adaptarse al molde exacto del carrusel sin cortar los textos */
+            object-fit: fill !important; 
             display: block;
         }
 
+        /* Ajuste opcional para pantallas de celulares */
+        @media (max-width: 768px) {
+            body > section, #carouselBanner, #carouselBanner .carousel-inner, #carouselBanner .carousel-item {
+                height: 380px !important;
+                min-height: 380px !important;
+            }
+        }
         .whatsapp-float {
             position: fixed;
             bottom: 25px;

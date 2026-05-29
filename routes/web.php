@@ -4,14 +4,13 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EmployeesController;
 use App\Http\Controllers\Auth\EmployeeLoginController;
 use App\Http\Controllers\CategoriaController;
-//use App\Http\Controllers\ReseñaController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MantenimientoController;
 use App\Http\Controllers\ReporteController;
+use App\Http\Controllers\DireccionController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\ColorController;
 use App\Http\Controllers\TopProductController;
-// use App\Http\Controllers\ComentarioController;
 use App\Http\Controllers\ImagenProductoController;
 use App\Http\Controllers\ImagenController;
 use App\Http\Controllers\PagoController;
@@ -33,8 +32,8 @@ Route::get('/nosotros', [ImagenController::class, 'mostrarBannerN'])->name('noso
 Route::get('/buscar-sugerencias', [BusquedaController::class, 'sugerencias'])->name('buscar.sugerencias');
 Route::get('/buscar', [BusquedaController::class, 'index'])->name('buscar.resultados');
 
-Route::get('/Catalogo/{categoria}', [ProductoController::class, 'index'])->name('Catalogo');
-Route::get('/catalogo/{id_categoria}', [ProductoController::class, 'mostrarProductosPorCategoria'])->name('categoria.productos');
+// RUTAS DE CATÁLOGO Y DETALLES (CORREGIDAS: Sin duplicados y parámetro opcional)
+Route::get('/catalogo/{id_categoria?}', [ProductoController::class, 'mostrarProductosPorCategoria'])->name('categoria.productos');
 Route::get('/vermas/{id}', [ProductoController::class, 'verMas'])->name('productos.vermas');
 
 Route::get('/mantenimiento', fn() => view('mantenimiento'))->name('mantenimiento');
@@ -59,8 +58,6 @@ Route::post('/productos/{producto_id}/reviews', [ReviewController::class, 'store
 Route::post('/reviews/{id}/like', [ReviewController::class, 'like'])
     ->middleware('throttle:30,1')
     ->name('reviews.like');
- 
-
 
 /*|
 | LOGIN SOLO EMPLEADOS
@@ -114,15 +111,12 @@ Route::prefix('employees')->group(function () {
             Route::get('videos/banner/create', [ImagenController::class, 'createVideoBanner'])->name('videos.create');
             Route::post('videos/banner', [ImagenController::class, 'storeVideoBanner'])->name('videos.store');
 
-            // ✅ Reordenar imágenes extra (slots 1..6)
-            Route::post('reordenar/{producto_id}', [ImagenProductoController::class, 'reordenar'])
-                ->name('productos.imagenes.reordenar');
+            // Reordenar imágenes extra (slots 1..6)
+            Route::post('reordenar/{producto_id}', [ImagenProductoController::class, 'reordenar'])->name('productos.imagenes.reordenar');
 
-            // ✅ Guardar TODO (imágenes + video + orden) en una sola request
-            Route::post('guardarTodo/{producto_id}', [ImagenProductoController::class, 'guardarTodo'])
-                ->name('productos.imagenes.guardarTodo');
+            // Guardar TODO (imágenes + video + orden) en una sola request
+            Route::post('guardarTodo/{producto_id}', [ImagenProductoController::class, 'guardarTodo'])->name('productos.imagenes.guardarTodo');
         });
-
 
         Route::get('imagenes', [ImagenController::class, 'indexImagen'])->name('imagenes.index');
         Route::get('imagenes/create', [ImagenController::class, 'createImagen'])->name('imagenes.create');

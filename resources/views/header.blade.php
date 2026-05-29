@@ -11,19 +11,28 @@
     $logoUrl = $ruta ? asset($ruta) : asset('imagenes/logo.jpeg');
 @endphp
 
-<header class="zx-header">
+{{-- AÑADIDA LA CLASE zx-hidden-mode AQUÍ PARA QUE AL CARGAR LA PÁGINA INICIE SÓLO EL LOGO --}}
+<header class="zx-header zx-hidden-mode" id="zxMainHeader">
     <div class="zx-bar">
 
-        {{-- 1. LOGO --}}
-        <a class="zx-brand" href="{{ url('/') }}">
-            <div class="zx-logo-circle">
-                <img src="{{ $logoUrl }}" alt="Zarmex"
-                     onerror="this.style.display='none';">
-            </div>
-            <span class="zx-brand-name">ZARMEX</span>
-        </a>
+        {{-- 1. LOGO INTERACTIVO CON INDICADOR DE FLECHAS DINÁMICAS (FontAwesome v5) --}}
+        <div class="zx-brand-wrapper">
+            <button type="button" class="zx-logo-toggle-btn zx-pulse-waves" id="zxLogoToggle" title="Ocultar/Mostrar menú">
+                <div class="zx-logo-circle">
+                    <img src="{{ $logoUrl }}" alt="Zarmex" onerror="this.style.display='none';">
+                    
+                    <div class="zx-logo-badge" id="zxLogoBadge">
+                        <i class="fas fa-arrow-right" id="zxBadgeIcon"></i>
+                    </div>
+                </div>
+            </button>
+            
+            <a class="zx-brand-text-link" href="{{ url('/') }}">
+                <span class="zx-brand-name">ZARMEX</span>
+            </a>
+        </div>
 
-        {{-- BOTÓN HAMBURGUESA--}}
+        {{-- BOTÓN HAMBURGUESA PRINCIPAL (MÓVIL)--}}
         <button class="zx-ham" id="zxHam" type="button" aria-label="Abrir menú">
             <span></span><span></span><span></span>
         </button>
@@ -33,9 +42,9 @@
             <ul class="zx-menu-root">
                 <li class="zx-item zx-has-sub">
                     <a href="#" class="zx-item-link">
-<span style="display:none;"></span>
+                        <span style="display:none;"></span>
                         <span>Productos</span>
-                        <i class="fa-solid zx-chevron"></i>
+                        <i class="fas fa-chevron-down zx-chevron"></i>
                     </a>
                     <ul class="zx-sub">
                         @foreach(App\Models\Categoria::all() as $categoria)
@@ -46,9 +55,9 @@
 
                 <li class="zx-item zx-has-sub">
                     <a href="#" class="zx-item-link">
-<span style="display:none;"></span>
+                        <span style="display:none;"></span>
                         <span>Servicios</span>
-                        <i class="fa-solid zx-chevron"></i>
+                        <i class="fas fa-chevron-down zx-chevron"></i>
                     </a>
                     <ul class="zx-sub">
                         <li><a href="{{ url('mantenimiento') }}">Mantenimiento</a></li>
@@ -58,7 +67,7 @@
 
                 <li class="zx-item">
                     <a href="{{ route('nosotros') }}" class="zx-item-link">
-<span style="display:none;"></span>
+                        <span style="display:none;"></span>
                         <span>Nosotros</span>
                     </a>
                 </li>
@@ -83,20 +92,20 @@
                 @auth('employee')
                     <form method="POST" action="{{ route('admin.logo.update') }}" enctype="multipart/form-data" class="zx-inline-form">
                         @csrf @method('PUT')
-                        <label class="zx-user-btn" title="Subir Logo"><i class="fa-solid fa-camera-retro"></i><input type="file" name="logo" onchange="this.form.submit()" hidden></label>
+                        <label class="zx-user-btn" title="Subir Logo"><i class="fas fa-camera"></i><input type="file" name="logo" onchange="this.form.submit()" hidden></label>
                     </form>
                     <form method="POST" action="{{ route('admin.logo.reset') }}" class="zx-inline-form">
                         @csrf @method('DELETE')
-                        <button class="zx-user-btn" type="submit" title="Resetear"><i class="fa-solid fa-arrow-rotate-left"></i></button>
+                        <button class="zx-user-btn" type="submit" title="Resetear"><i class="fas fa-undo"></i></button>
                     </form>
                     <form method="POST" action="{{ route('employee.logout') }}" class="zx-inline-form">
                         @csrf
-                        <button class="zx-user-btn zx-logout" type="submit" title="Salir"><i class="fa-solid fa-power-off"></i></button>
+                        <button class="zx-user-btn zx-logout" type="submit" title="Salir"><i class="fas fa-power-off"></i></button>
                     </form>
                 @else
                     <a class="zx-user-profile" href="{{ route('employee.login') }}" title="Mi Cuenta">
                         <div class="zx-avatar-icon">
-                            <i class="fa-solid fa-user-tie"></i>
+                            <i class="fas fa-user-tie"></i>
                         </div>
                     </a>
                 @endauth
@@ -140,7 +149,33 @@
     border-radius: 25px;
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
+    
+    transition: width 0.4s cubic-bezier(0.25, 1, 0.5, 1), 
+                left 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+                transform 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+                background-color 0.4s ease, 
+                border-color 0.4s ease;
 }   
+
+/* ESTADO COLAPSADO (EN LA ORILLA IZQUIERDA) */
+.zx-header.zx-hidden-mode {
+    left: 4%; 
+    transform: translateX(0); 
+    width: 95px !important; 
+    background: rgba(14, 43, 36, 0.65) !important; 
+    border-top-color: transparent !important;
+    border-bottom-color: transparent !important;
+    box-shadow: 0 6px 22px rgba(184, 161, 32, 0.45) !important; 
+}
+
+/* Ocultar elementos en modo colapsado */
+.zx-header.zx-hidden-mode .zx-brand-text-link,
+.zx-header.zx-hidden-mode .zx-ham,
+.zx-header.zx-hidden-mode .zx-menu,
+.zx-header.zx-hidden-mode .zx-search-wrap,
+.zx-header.zx-hidden-mode .zx-user-actions {
+    display: none !important;
+}
 
 .zx-bar {
     width: 100%;
@@ -154,13 +189,36 @@
     padding: 0 20px;
 }
 
-/* LOGO */
-.zx-brand {
+.zx-header.zx-hidden-mode .zx-bar {
+    padding: 0 10px;
+    justify-content: center;
+}
+
+/* CONTENEDOR DE LOGO */
+.zx-brand-wrapper {
     display: flex;
     align-items: center;
     gap: 10px;
-    text-decoration: none;
     flex-shrink: 0;
+}
+
+.zx-logo-toggle-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    outline: none;
+    display: block;
+    position: relative;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.zx-brand-text-link {
+    text-decoration: none;
+    display: flex;
+    align-items: center;
 }
 
 .zx-logo-circle {
@@ -168,18 +226,87 @@
     height: 75px;
     border-radius: 50%;
     border: 2px solid var(--gold);
-    overflow: hidden;
+    overflow: visible; 
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(14, 43, 36, 0.4); 
+    background: rgba(14, 43, 36, 0.8); 
+    position: relative;
     flex-shrink: 0;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.3s ease;
 }
 
 .zx-logo-circle img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    border-radius: 50%;
+}
+
+/* CÍRCULO INDICADOR EN LA ESQUINA DEL LOGO */
+.zx-logo-badge {
+    position: absolute;
+    bottom: -1px;
+    right: -1px;
+    background: var(--gold);
+    color: #0e2b24;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: bold;
+    border: 2px solid #ffffff;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.4);
+    z-index: 2;
+    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+/* ANIMACIÓN DE PULSACIONES Y ONDAS EXPANSIVAS POTENTES */
+.zx-pulse-waves::before,
+.zx-pulse-waves::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    border-radius: 50%;
+    border: 3.5px solid var(--gold); 
+    opacity: 0;
+    z-index: -1;
+    pointer-events: none;
+    animation: zxWaveEffectPotent 2.4s infinite cubic-bezier(0.25, 0, 0, 1);
+}
+
+.zx-pulse-waves::after {
+    animation-delay: 1.2s;
+}
+
+@keyframes zxWaveEffectPotent {
+    0% {
+        transform: scale(0.98);
+        opacity: 0.85; 
+    }
+    50% {
+        opacity: 0.55;
+    }
+    100% {
+        transform: scale(1.45); 
+        opacity: 0;
+    }
+}
+
+/* EFECTO HOVER */
+.zx-logo-toggle-btn:hover .zx-logo-circle {
+    transform: scale(1.06);
+    border-color: #ffffff;
+    box-shadow: 0 0 15px rgba(184, 161, 32, 0.6);
+}
+
+.zx-logo-toggle-btn:hover .zx-logo-badge {
+    background: #ffffff;
+    color: var(--bg);
+    transform: scale(1.15);
 }
 
 .zx-brand-name {
@@ -191,15 +318,20 @@
     white-space: nowrap;
     padding: 0 15px;
     border-right: 3px dotted rgba(184, 161, 32, 0.55);
+    transition: color 0.2s ease;
 }
 
-/* MENÚ OPTIMIZADO PARA EVITAR DESBORDES */
+.zx-brand-text-link:hover .zx-brand-name {
+    color: var(--gold);
+}
+
+/* MENÚ OPTIMIZADO */
 .zx-menu {
     display: flex;
     align-items: center;
     justify-content: center;
-    flex: 1 1 auto; /* Permite que el menú use el espacio intermedio flexiblemente */
-    min-width: 0;   /* Evita bugs de desborde flex */
+    flex: 1 1 auto;
+    min-width: 0;
 }
 
 .zx-menu-root {
@@ -240,7 +372,6 @@
     position: relative;
 }
 
-/* iconos removidos: se deja estilo vacío para no romper CSS */
 .zx-item-icon { display: none; }
 
 .zx-item:not(:last-child) {
@@ -255,7 +386,7 @@
 
 .zx-chevron {
     font-size: 0.7em;
-    margin-left: 2px;
+    margin-left: 5px;
 }
 
 /* BUSCADOR ADAPTATIVO */
@@ -264,7 +395,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    flex: 1 1 300px; /* Crece y se encoge dinámicamente */
+    flex: 1 1 300px;
     max-width: 400px;
 }
 
@@ -287,12 +418,6 @@
     box-shadow: 0 4px 15px rgba(184, 161, 32, 0.2);
 }
 
-.zx-search i {
-    color: rgba(255, 255, 255, 0.5); 
-    font-size: 16px;
-    flex-shrink: 0;
-}
-
 .zx-search input {
     border: none;
     outline: none;
@@ -306,7 +431,6 @@
 
 .zx-search input::placeholder {
     color: rgba(255, 255, 255, 0.55);
-
 }
 
 .zx-search-icon {
@@ -405,7 +529,7 @@
 
 .zx-has-sub:hover .zx-sub { display: block; }
 
-/* MENÚ HAMBURGUESA (MECANISMO MOBILE) */
+/* MENÚ HAMBURGUESA GENERAL */
 .zx-ham {
     display: none;
     background: none;
@@ -424,25 +548,13 @@
     margin: 4px 0;
 }
 
-/* ==========================================================================
-   MEDIA QUERIES MEJORADAS: CONTROL TOTAL DE DESBORDES POR TAMAÑO DE PANTALLA
-   ========================================================================== */
-
 @media (max-width: 1150px) {
-    .zx-brand-name {
-        display: inline-block;
-    }
+    .zx-brand-name { display: inline-block; }
 }
 
 @media (max-width: 991px) {
-    .zx-bar {
-        height: 75px;
-    }
-    .zx-ham {
-        display: block; /* Activamos la hamburguesa */
-    }
-
-    /* Transformación del menú tradicional a caja lateral/desplegable limpia */
+    .zx-bar { height: 75px; }
+    .zx-ham { display: block; }
     .zx-menu {
         position: absolute;
         top: 100%;
@@ -454,93 +566,66 @@
         border: 2px solid var(--gold);
         box-shadow: 0 12px 30px rgba(0,0,0,0.4);
         padding: 15px;
-        display: none; /* JS lo controla */
+        display: none; 
         z-index: 10002;
         margin-left: 0;
         margin-top: 8px;
     }
-    .zx-menu.is-open {
-        display: flex;
-    }
-    .zx-menu-root {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 8px;
-    }
+    .zx-menu.is-open { display: flex; }
+    .zx-menu-root { flex-direction: column; align-items: stretch; gap: 8px; }
     .zx-item:not(:last-child) {
         border-right: none;
         padding-right: 0;
         border-bottom: 1px dashed rgba(184, 161, 32, 0.2);
         padding-bottom: 8px;
     }
-    .zx-item-link {
-        width: 100%;
-        padding: 10px;
-        justify-content: space-between;
-    }
-    .zx-sub {
-        position: static;
-        transform: none;
-        width: 100%;
-        box-shadow: none;
-        background: rgba(20, 85, 85, 0.4);
-        margin-top: 6px;
-        display: none;
-    }
-    .zx-has-sub:hover .zx-sub {
-        display: none;
-    }
-    .zx-has-sub.is-open .zx-sub {
-        display: block;
-    }
+    .zx-item-link { width: 100%; padding: 10px; justify-content: space-between; }
+    .zx-sub { position: static; transform: none; width: 100%; box-shadow: none; background: rgba(20, 85, 85, 0.4); margin-top: 6px; display: none; }
+    .zx-has-sub:hover .zx-sub { display: none; }
+    .zx-has-sub.is-open .zx-sub { display: block; }
 }
 
-/* Teléfonos móviles: Mantiene todo alineado horizontalmente */
 @media (max-width: 650px) {
-    .zx-bar {
-        display: flex; /* Mantiene la fila única original */
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-        gap: 8px;
-        height: 75px;
-        padding: 0 12px;
-    }
-
-    .zx-brand-name {
-        display: none; /* Esconde el texto ZARMEX en móviles para dar espacio al buscador */
-    }
-
-    .zx-brand {
-        padding-right: 0;
-    }
-
-    .zx-search-wrap {
-        flex: 1 1 auto; /* El buscador ocupa el centro dinámicamente sin bajarse */
-        max-width: 100%;
-    }
-
-    .zx-search {
-        height: 40px;
-        padding: 0 10px;
-    }
+    .zx-bar { display: flex; flex-direction: row; justify-content: space-between; align-items: center; gap: 8px; height: 75px; padding: 0 12px; }
+    .zx-brand-name { display: none; }
+    .zx-brand { padding-right: 0; }
+    .zx-search-wrap { flex: 1 1 auto; max-width: 100%; }
+    .zx-search { height: 40px; padding: 0 10px; }
+    .zx-search input { font-size: 12px; }
+    .zx-menu { top: 100%; max-height: calc(100vh - 120px); overflow: auto; -webkit-overflow-scrolling: touch; }
     
-    .zx-search input {
-        font-size: 12px;
-    }
-
-    .zx-menu {
-        top: 100%;
-        max-height: calc(100vh - 120px);
-        overflow: auto;
-        -webkit-overflow-scrolling: touch;
+    .zx-header.zx-hidden-mode {
+        left: 4%;
     }
 }
-
 </style>
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
+    const logoToggle = document.getElementById('zxLogoToggle');
+    const mainHeader = document.getElementById('zxMainHeader');
+    const badgeIcon = document.getElementById('zxBadgeIcon');
+
+    if (logoToggle && mainHeader) {
+      logoToggle.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation(); 
+        
+        const isHidden = mainHeader.classList.toggle('zx-hidden-mode');
+        
+        // Cambiar dinámicamente el sentido de la flecha con clases de FontAwesome v5
+        if (badgeIcon) {
+          if (isHidden) {
+            // Si está cerrado (sólo el logo), la flecha apunta a la derecha indicando que se abrirá hacia allá
+            badgeIcon.className = 'fas fa-arrow-right';
+          } else {
+            // Si está abierto (toda la barra), la flecha apunta a la izquierda indicando que se guardará
+            badgeIcon.className = 'fas fa-arrow-left';
+          }
+        }
+      });
+    }
+
     const ham = document.getElementById('zxHam');
     const menu = document.getElementById('zxMenu');
 
@@ -586,9 +671,9 @@
 
     const input = document.getElementById('zxSearchInput');
     const resultsWrap = document.getElementById('zxResults');
-    const resultsList = document.getElementById('zxResultsList');
+    const GalaList = document.getElementById('zxResultsList');
 
-    if (!input || !resultsWrap || !resultsList) return;
+    if (!input || !resultsWrap || !GalaList) return;
 
     const debounce = (fn, ms = 250) => {
       let t;
@@ -599,10 +684,10 @@
     };
 
     const renderItems = (items) => {
-      resultsList.innerHTML = '';
+      GalaList.innerHTML = '';
 
       if (!items || items.length === 0) {
-        resultsList.innerHTML = '<div style="padding: 10px; color:#58776f;">Sin resultados</div>';
+        GalaList.innerHTML = '<div style="padding: 10px; color:#58776f;">Sin resultados</div>';
         resultsWrap.hidden = false;
         return;
       }
@@ -622,11 +707,11 @@
         frag.appendChild(a);
       });
 
-      resultsList.appendChild(frag);
+      GalaList.appendChild(frag);
       resultsWrap.hidden = false;
     };
 
-    const hideResults = () => { resultsWrap.hidden = true; resultsList.innerHTML = ''; };
+    const hideResults = () => { resultsWrap.hidden = true; GalaList.innerHTML = ''; };
 
     const buscarSugerencias = async (q) => {
       const query = (q || '').trim();
@@ -642,7 +727,7 @@
     input.addEventListener('focus', () => { buscarSugerencias(input.value); });
 
     let activeIndex = -1;
-    const getItems = () => Array.from(resultsList.querySelectorAll('.zx-search-item'));
+    const getItems = () => Array.from(GalaList.querySelectorAll('.zx-search-item'));
 
     const setActive = (idx) => {
       const items = getItems();

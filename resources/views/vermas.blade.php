@@ -21,12 +21,16 @@
     <style>
         :root{
             --zx:#234d50;
-            --zx2:rgba(35,77,80,.08);
-            --bd:rgba(0,0,0,.08);
+            --zx2:rgba(13,39,68,.10);
+            --bd:rgba(13,39,68,.15);
+            --card-bg:#d6e0ea;
+            --card-bg2:#bdd0e0;
+            --text-dark:#0f2744;
+            --text-mid:#1e3a5f;
         }
 
         body{
-            background:#fff;
+            background:#c2d2e2;
         }
 
         .zx-wrap{
@@ -36,10 +40,10 @@
         }
 
         .zx-card{
-            background:#fff;
+            background: var(--card-bg);
             border: 1px solid var(--bd);
             border-radius: 18px;
-            box-shadow: 0 12px 28px rgba(0,0,0,.08);
+            box-shadow: 0 12px 28px rgba(15,39,68,.12);
             padding: 18px;
         }
 
@@ -66,7 +70,7 @@
         }
 
         .zx-thumbs::-webkit-scrollbar-thumb{
-            background: rgba(0,0,0,.18);
+            background: #8aabca;
             border-radius:999px;
         }
 
@@ -74,7 +78,7 @@
             border:2px solid transparent;
             border-radius:12px;
             padding:3px;
-            background:#fff;
+            background: var(--card-bg2);
             cursor:pointer;
             transition:.2s ease;
             width: 74px;
@@ -135,14 +139,14 @@
             border: 1px solid var(--bd);
             border-radius: 18px;
             padding: 16px;
-            background:#fff;
+            background: var(--card-bg);
         }
 
         .zx-brand{
             text-transform: uppercase;
             font-weight: 800;
             font-size: 14px;
-            color:#222;
+            color: var(--text-dark);
             letter-spacing:.6px;
             text-align:center;
             margin-bottom:6px;
@@ -151,14 +155,14 @@
         .zx-title{
             font-weight: 900;
             font-size: 22px;
-            color:#111;
+            color: var(--text-dark);
             text-align:center;
             margin: 0 0 8px;
         }
 
         .zx-sub{
             text-align:center;
-            color:#666;
+            color: var(--text-mid);
             margin-bottom: 10px;
             font-size: 14px;
         }
@@ -169,18 +173,18 @@
             justify-content: space-between;
             gap:12px;
             padding: 10px 0;
-            border-top: 1px solid rgba(0,0,0,.06);
+            border-top: 1px solid var(--bd);
         }
 
         .zx-label{
-            color:#444;
+            color: var(--text-mid);
             font-weight:700;
             font-size: 14px;
             min-width: 92px;
         }
 
         .zx-val{
-            color:#222;
+            color: var(--text-dark);
             font-weight:700;
             font-size: 14px;
             text-align:right;
@@ -257,7 +261,7 @@
 
         .docs-title{
             font-weight: 900;
-            color: var(--zx);
+            color: var(--text-dark);
             margin-bottom: 4px;
         }
 
@@ -268,12 +272,13 @@
             align-items:center;
             padding:10px;
             border-radius:12px;
-            background: var(--zx2);
+            background: var(--card-bg2);
+            border: 1px solid var(--bd);
         }
 
         .doc-name{
             font-weight: 800;
-            color: var(--zx);
+            color: var(--text-dark);
         }
 
         .doc-btn{
@@ -480,19 +485,38 @@
 
 <main class="zx-wrap">
 
+{{-- ════ DEBUG TEMPORAL — borra este bloque cuando todo funcione ════ --}}
+<div style="background:#fff3cd;border:2px solid #ffc107;border-radius:10px;padding:16px;margin-bottom:20px;font-family:monospace;font-size:13px;">
+    <strong>🔍 DEBUG IMÁGENES</strong><br><br>
+    <b>producto->id:</b> {{ $producto->id }}<br>
+    <b>imagen_url raw:</b> {{ $producto->getRawOriginal('imagen_url') }}<br>
+    <b>video_url:</b> {{ $producto->video_url ?? 'ninguno' }}<br><br>
+    <b>$imagenes (count):</b> {{ count($imagenes ?? []) }}<br>
+    @foreach(($imagenes ?? []) as $dbImg)
+        &nbsp;&nbsp;→ ruta: {{ $dbImg->ruta }}<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;¿archivo existe?: 
+        @php $existe = file_exists(public_path($dbImg->ruta)); @endphp
+        <span style="color:{{ $existe ? 'green' : 'red' }}">{{ $existe ? '✅ SÍ' : '❌ NO existe en disco' }}</span><br>
+    @endforeach
+</div>
+{{-- ════ FIN DEBUG ════ --}}
+
 @php
-    // 💡 SOLUCIÓN APLICADA: Extraemos limpiamente las rutas de la galería usando pluck nativo de Eloquent
-    $rutasExtras = collect($imagenes ?? [])->pluck('ruta')->filter()->toArray();
+    // Ruta de imagen principal (sin pasar por el accessor que llama asset() internamente)
+    $rutaPrincipal = $producto->getRawOriginal('imagen_url');
 
-    $thumbs = collect([$producto->imagen_url])
-        ->merge($rutasExtras)
-        ->values();
+    // Imágenes extra: iteramos directamente sobre $imagenes (colección de stdClass)
+    // y extraemos la propiedad ->ruta de cada objeto
+    $rutasExtras = [];
+    foreach (($imagenes ?? []) as $imgExtra) {
+        if (!empty($imgExtra->ruta)) {
+            $rutasExtras[] = $imgExtra->ruta;
+        }
+    }
 
-    $descCorta = \Illuminate\Support\Str::limit(strip_tags($producto->descripcion), 180);
-
-    // ⚠️ IMPORTANTE: tus slides del carrusel deben usar el SET completo de imágenes
-    // (principal + extras). Si existe video, no debe reemplazar imágenes extras.
-    // Esta vista controla el render usando $rutasExtras (extras) y $producto->imagen_url (principal).
+    // Array unificado para carrusel y miniaturas: [principal, extra1, extra2, ...]
+    $slides = array_filter(array_merge([$rutaPrincipal], $rutasExtras));
+    $slides = array_values($slides);
 @endphp
 
 
@@ -501,13 +525,13 @@
 
         {{-- MINIATURAS --}}
         <div class="zx-thumbs" data-carousel="#carouselProducto">
-            @foreach($thumbs as $i => $ruta)
+            @foreach($slides as $i => $ruta)
                 <button
                     type="button"
                     class="zx-thumb {{ $i === 0 ? 'active' : '' }}"
                     data-slide-to="{{ $i }}"
                 >
-                    <img src="{{ asset($ruta) }}" alt="thumb {{ $i }}">
+                    <img src="{{ asset($ruta) }}" alt="miniatura {{ $i + 1 }}">
                 </button>
             @endforeach
         </div>
@@ -517,12 +541,17 @@
             <div id="carouselProducto" class="carousel slide w-100 h-100" data-bs-ride="carousel" data-bs-interval="2500" data-bs-pause="hover" data-bs-touch="true">
                 <div class="carousel-inner h-100">
 
-                    {{-- Imagen 1: Principal --}}
-                    <div class="carousel-item active h-100">
-                        <img src="{{ asset($producto->imagen_url) }}" class="zx-main-img" alt="principal">
-                    </div>
+                    {{-- Slides de imágenes: principal + extras --}}
+                    @foreach($slides as $i => $ruta)
+                        <div class="carousel-item h-100 {{ $i === 0 ? 'active' : '' }}">
+                            <img src="{{ asset($ruta) }}"
+                                 class="zx-main-img"
+                                 alt="imagen {{ $i + 1 }}"
+                                 onerror="this.style.display='none'">
+                        </div>
+                    @endforeach
 
-                    {{-- Video (opcional) --}}
+                    {{-- Video al final --}}
                     @if(!empty($producto->video_url))
                         <div class="carousel-item h-100">
                             <video controls style="width:100%;height:100%;object-fit:contain;background:#000;" playsinline>
@@ -531,20 +560,9 @@
                         </div>
                     @endif
 
-                    {{-- Imagenes Extras cargadas dinámicamente --}}
-                    @if(!empty($rutasExtras))
-                        @foreach($rutasExtras as $rutaExtra)
-                            <div class="carousel-item h-100">
-                                <img src="{{ asset($rutaExtra) }}" class="zx-main-img" alt="extra">
-                            </div>
-                        @endforeach
-                    @endif
-
-
-
                 </div>
 
-                @if($thumbs->count() > 1)
+                @if(count($slides) > 1 || !empty($producto->video_url))
                     <button class="carousel-control-prev" type="button" data-bs-target="#carouselProducto" data-bs-slide="prev">
                         <span class="carousel-control-prev-icon"></span>
                     </button>
