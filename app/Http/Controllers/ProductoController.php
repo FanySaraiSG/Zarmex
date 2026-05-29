@@ -85,6 +85,7 @@ class ProductoController extends Controller
             'imagen_url'   => $imagenPath,
         ]);
 
+        // Subir documentos
         $this->procesarDocumentos($request, $producto);
         $producto->save();
 
@@ -100,29 +101,32 @@ class ProductoController extends Controller
             abort(404, 'Producto no encontrado');
         }
 
-        $categorias    = Categoria::all();
+        $categorias = Categoria::all();
+        $colores = Color::all(); 
+        
         $imagenesExtra = ImagenProducto::where('producto_id', $producto->id)
-            ->orderBy('orden')
+            ->orderBy('orden', 'asc')
             ->get();
 
-        return view('productos.edit', compact('producto', 'categorias', 'imagenesExtra'));
+        return view('productos.edit', compact('producto', 'categorias', 'colores', 'imagenesExtra'));
     }
 
     // Actualizar producto existente
     public function update(Request $request, $id)
     {
         $request->validate([
-            'id'           => 'required|string|max:50|unique:productos,id,' . $id . ',id',
-            'descripcion'  => 'nullable|string',
-            'precio'       => 'nullable|numeric|min:0',
-            'stock'        => 'nullable|integer|min:0',
+            'id' => 'required|string|max:50|unique:productos,id,' . $id . ',id',
+            'descripcion' => 'nullable|string',
+            'precio' => 'nullable|numeric|min:0',
+            'stock' => 'nullable|integer|min:0',
             'categoria_id' => 'nullable|exists:categorias,id_categoria',
-            'imagen_url'   => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:4096',
-            'imagenes'     => 'nullable|array',
-            'imagenes.*'   => 'image|mimes:jpg,jpeg,png,gif,webp|max:4096',
-            'doc1'         => 'nullable|file|max:10240|mimes:pdf,doc,docx,xls,xlsx',
-            'doc2'         => 'nullable|file|max:10240|mimes:pdf,doc,docx,xls,xlsx',
-            'doc3'         => 'nullable|file|max:10240|mimes:pdf,doc,docx,xls,xlsx',
+            'imagen_url' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+            'video' => 'nullable|file|mimes:mp4,mkv,x-m4v,avi,mov|max:51200', 
+            'imagenes' => 'nullable|array',
+            'imagenes.*' => 'image|mimes:jpg,jpeg,png,gif,webp|max:2048',
+            'doc1' => 'nullable|file|max:10240|mimes:pdf,doc,docx,xls,xlsx',
+            'doc2' => 'nullable|file|max:10240|mimes:pdf,doc,docx,xls,xlsx',
+            'doc3' => 'nullable|file|max:10240|mimes:pdf,doc,docx,xls,xlsx',
         ]);
 
         $producto   = Producto::findOrFail($id);
@@ -213,16 +217,19 @@ class ProductoController extends Controller
         }
 
         // ── IMÁGENES EXTRA NUEVAS (sin GD ni Imagick) ────────────────────────────
-        if ($request->hasFile('imagenes')) {
-            $ultimoOrden = (int) ImagenProducto::where('producto_id', $producto->id)->max('orden');
-            $orden       = $ultimoOrden + 1;
+        $ultimoOrden = (int) ImagenProducto::where('producto_id', $producto->id)->max('orden');
+        $orden       = $ultimoOrden + 1;
 
+        // 3. Subir nuevas imágenes a la galería auxiliar
+        $nuevasRutasGuardadas = [];
+        if ($request->hasFile('imagenes')) {
             foreach ($request->file('imagenes') as $img) {
                 $ext    = strtolower($img->getClientOriginalExtension());
                 $nombre = "extra_" . time() . "_" . uniqid() . '.' . $ext;
                 $img->move($rutaProducto, $nombre);
 
                 $idUnicoTexto = 'IMG_' . time() . '_' . strtoupper(Str::random(5));
+                $rutaFinalDb = "images/productos/{$producto->id}/{$nombre}";
 
                 ImagenProducto::create([
                     'id'          => $idUnicoTexto,
@@ -231,11 +238,46 @@ class ProductoController extends Controller
                     'orden'       => $orden,
                 ]);
 
-                $orden++;
+                $nuevasRutasGuardadas[] = $idUnicoTexto;
             }
         }
 
-        // ── DOCUMENTOS ───────────────────────────────────────────────────────────
+        // 4. Reordenar galería según la sincronización de tu front
+        if ($request->filled('orden_imagenes')) {
+            $ordenMapeo = json_decode($request->input('orden_imagenes'), true);
+            if (is_array($ordenMapeo)) {
+                $contadorOrden = 0;
+                $indiceNuevas = 0;
+
+                foreach ($ordenMapeo as $idData) {
+                    if (strpos($idData, 'existente-') === 0) {
+                        $idDb = str_replace('existente-', '', $idData);
+                        ImagenProducto::where('id', $idDb)->update(['orden' => $contadorOrden]);
+                        $contadorOrden++;
+                    } elseif (strpos($idData, 'nueva-') === 0) {
+                        if (isset($nuevasRutasGuardadas[$indiceNuevas])) {
+                            $idNuevaCreada = $nuevasRutasGuardadas[$indiceNuevas];
+                            ImagenProducto::where('id', $idNuevaCreada)->update(['orden' => $contadorOrden]);
+                            $indiceNuevas++;
+                            $contadorOrden++;
+                        }
+                    }
+                }
+            }
+        }
+
+        // 5. Procesar Video Promocional Local
+        if ($request->hasFile('video')) {
+            if (!empty($producto->video_url) && file_exists(public_path($producto->video_url))) {
+                @unlink(public_path($producto->video_url));
+            }
+
+            $nombreVideo = 'video_' . time() . '.mp4';
+            $request->file('video')->move($rutaProducto, $nombreVideo);
+            $producto->video_url = "images/productos/{$producto->id}/{$nombreVideo}";
+        }
+
+        // 6. Eliminar documentos técnicos
         foreach (['doc1', 'doc2', 'doc3'] as $campo) {
             $columna = $campo . '_url';
             if ($request->has('eliminar_' . $campo) && !empty($producto->$columna)) {
@@ -246,6 +288,7 @@ class ProductoController extends Controller
             }
         }
 
+        // 7. Guardar nuevos documentos cargados
         $this->procesarDocumentos($request, $producto);
 
         // ── VIDEO PROMOCIONAL ────────────────────────────────────────────────────
@@ -316,6 +359,10 @@ class ProductoController extends Controller
             @unlink(public_path($producto->imagen_url));
         }
 
+        if ($producto->video_url && file_exists(public_path($producto->video_url))) {
+            @unlink(public_path($producto->video_url));
+        }
+
         foreach (['doc1_url', 'doc2_url', 'doc3_url'] as $col) {
             if (!empty($producto->$col) && file_exists(public_path($producto->$col))) {
                 @unlink(public_path($producto->$col));
@@ -348,6 +395,7 @@ class ProductoController extends Controller
         return redirect()->back()->with('success', 'Video actualizado correctamente.');
     }
 
+    // Eliminación asíncrona del video
     public function destroyVideo($id)
     {
         $producto = Producto::findOrFail($id);
@@ -363,7 +411,7 @@ class ProductoController extends Controller
     }
 
     /* ==========================================================================
-       MÉTODOS PRIVADOS
+       MÉTODOS PRIVADOS DE OPTIMIZACIÓN Y SISTEMA DE ARCHIVOS
        ========================================================================== */
 
     private function procesarDocumentos(Request $request, $producto)

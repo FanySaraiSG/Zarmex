@@ -11,20 +11,12 @@ class ImagenProducto extends Model
 
     protected $table = 'imagenes_productos';
 
-    // 💡 CORREGIDO: Ajustado a lo que muestra tu phpMyAdmin
-    protected $primaryKey = 'id'; 
-    public $incrementing = "true"; 
-    protected $keyType = 'int';
+    public $incrementing = false;
 
-    public $timestamps = true;
-
-    protected $casts = [
-        'id'          => 'string',
-        'producto_id' => 'string',
-    ];
+    protected $keyType = 'string';
 
     protected $fillable = [
-        'id', // Permitimos llenarlo manualmente
+        'id',
         'producto_id',
         'ruta',
         'orden',
@@ -32,6 +24,6 @@ class ImagenProducto extends Model
 
     public function producto()
     {
-        return $this->belongsTo(Producto::class, 'producto_id', 'id');
+        return $this->belongsTo(Producto::class, 'producto_id');
     }
 }

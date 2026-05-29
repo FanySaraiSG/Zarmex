@@ -4,28 +4,24 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-class ImagenProducto extends Model
+return new class extends Migration
 {
-    use HasFactory;
-
-    protected $table = 'imagenes_productos'; // Nombre de la tabla
-
-    // IMPORTANTE: Indica que el ID no es autoincremental
-    public $incrementing = false;
-
-    // IMPORTANTE: Indica que el tipo de la llave primaria es un string
-    protected $keyType = 'string';
-
-    protected $fillable = [
-        'id', 
-        'producto_id', 
-        'ruta'
-    ];
-
-    // Relación con el producto
-    public function producto()
+    public function up(): void
     {
-        return $this->belongsTo(Producto::class, 'producto_id');
+        Schema::create('imagenes_productos', function (Blueprint $table) {
+            $table->string('id')->primary(); // Como tu ID es un string no autoincremental
+            $table->string('producto_id');   // ID del producto relacionado
+            $table->string('ruta');          // Ruta de la imagen
+            $table->timestamps();
+        });
     }
-}
+
+    public function down(): void
+    {
+        Schema::dropIfExists('imagenes_productos');
+    }
+};
