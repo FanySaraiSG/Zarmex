@@ -59,10 +59,11 @@
                             <textarea id="descripcion" name="descripcion" rows="3"></textarea>
                         </div>
 
+                        OPCIONAL
                         <div class="form-group">
                             <label for="precio">Precio:</label>
                             <input type="number" step="0.01" id="precio" name="precio" required>
-                        </div>
+                        </div>}
 
                         <div class="form-group">
                             <label for="stock">Stock:</label>

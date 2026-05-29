@@ -25,7 +25,7 @@
         #carouselBanner .carousel-inner, 
         #carouselBanner .carousel-item {
             height: 600px !important; /* ← ¡AQUÍ! Cambia este valor para modificar la altura real del carrusel */
-            min-height: 600px !important;
+            min-height: 700px !important;
         }
 
         /* 2. Forzamos a que la imagen cubra TODO el contenedor sin dejar espacios vacíos */

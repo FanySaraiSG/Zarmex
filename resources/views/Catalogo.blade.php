@@ -14,7 +14,7 @@
             --zx-dark: #234d50;
             --zx-whatsapp: #59b568;
             --zx-mint: #c4e6d8;
-            --zx-modal-bg: #ffffff;
+            --zx-modal-bg: #1e7070;
         }
 
         /* --- CUADRÍCULA DE 4 COLUMNAS EXACTAS (Alineado Verde) --- */
@@ -40,7 +40,7 @@
 
         /* --- TARJETA OPTIMIZADA (Área Roja Cubierta) --- */
         .card2 {
-            background: #fff; 
+            background: #eaf1f7; 
             border-radius: 20px; 
             border: 1px solid #eee; 
             box-shadow: 0 10px 25px rgba(0,0,0,0.12); 
@@ -84,7 +84,7 @@
         .modal-content { 
             background: var(--zx-modal-bg) !important;
             border-radius: 25px !important; 
-            border: 1px solid rgba(35, 77, 80, 0.12); 
+            border: 1px solid rgba(15, 39, 68, 0.20); 
             display: flex; 
             flex-direction: column; 
             overflow: hidden; 
@@ -99,7 +99,7 @@
             right: 20px;
             width: 120px;
             height: 120px;
-            background-image: radial-gradient(rgba(35, 77, 80, 0.15) 1.5px, transparent 1.5px);
+            background-image: radial-gradient(rgba(201, 168, 76, 0.25) 1.5px, transparent 1.5px);
             background-size: 12px 12px;
             pointer-events: none;
             z-index: 1;
@@ -114,7 +114,7 @@
         /* Línea Decorativa Superior */
         .title-separator {
             height: 3px;
-            background: linear-gradient(90deg, var(--zx-dark) 0%, rgba(35, 77, 80, 0.4) 50%, transparent 100%);
+            background: linear-gradient(90deg, #c9a84c 0%, rgba(201, 168, 76, 0.4) 50%, transparent 100%);
             border-radius: 2px;
             margin-top: 10px;
             margin-bottom: 25px;
@@ -141,7 +141,7 @@
         .info-label { 
             font-size: 0.78rem; 
             font-weight: 800; 
-            color: var(--zx-dark); 
+            color: #c9a84c; 
             text-transform: uppercase; 
             margin-bottom: 6px; 
             letter-spacing: 1.2px; 
@@ -169,16 +169,16 @@
             display: inline-flex; 
             align-items: center; 
             padding: 8px 14px; 
-            background: #f8f9fa;
-            border: 1px solid rgba(35, 77, 80, 0.15); 
+            background: #165858;
+            border: 1px solid rgba(201, 168, 76, 0.40); 
             border-radius: 8px; 
             text-decoration: none; 
-            color: var(--zx-dark); 
+            color: #c9a84c; 
             font-size: 0.8rem; 
             font-weight: 600;
             transition: 0.2s;
         }
-        .btn-document-inline:hover { background: #ffffff; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.05); color: var(--zx-dark); }
+        .btn-document-inline:hover { background: #234d50; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.05); color: var(--zx-dark); }
         
         .btn-zx-whatsapp { 
             background-color: var(--zx-whatsapp) !important; 
@@ -328,14 +328,14 @@
                             
                             <div class="dots-pattern"></div>
                             
-                            <div class="modal-header border-0 pb-0 justify-content-end" style="background: transparent; z-index: 5;">
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            <div class="modal-header border-0 pb-0 justify-content-end" style="background: #165858; z-index: 5; border-radius: 25px 25px 0 0;">
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                             </div>
                             
-                            <div class="modal-body pt-0">
+                            <div class="modal-body pt-0" style="background: #1e7070;">
                                 <div class="row">
                                     <div class="col-12">
-                                        <h2 class="fw-bold m-0" style="color: var(--zx-dark); font-size: 1.7rem; letter-spacing: -0.5px;">
+                                        <h2 class="fw-bold m-0" style="color: #c9a84c; font-size: 1.7rem; letter-spacing: -0.5px;">
                                             {{ $producto->nombre }}
                                         </h2>
                                         <div class="title-separator"></div>
@@ -418,7 +418,7 @@
                                         <div>
                                             <div class="info-block">
                                                 <span class="info-label">Descripción del Equipo</span>
-                                                <p style="font-size: 0.92rem; color: #444; text-align: justify; margin: 0; line-height: 1.45;">{{ $producto->descripcion }}</p>
+                                                <p style="font-size: 0.92rem; color: #d4e8e0; text-align: justify; margin: 0; line-height: 1.45;">{{ $producto->descripcion }}</p>
                                             </div>
 
                                             <div class="info-block">
