@@ -18,10 +18,14 @@ class Producto extends Model
         'id',
         'nombre',
         'descripcion',
-        'precio',
-        'stock',
+        //'precio',
+        //'stock',
         'categoria_id',
         'imagen_url',
+        'video_url',   // ✅ Agregado para permitir la subida de videos directos
+        'doc1_url',    // ✅ Agregado para el documento 1 (Manual)
+        'doc2_url',    // ✅ Agregado para el documento 2 (Ficha)
+        'doc3_url',    // ✅ Agregado para el documento 3 (Extra)
         'fecha_creacion'
     ];
 

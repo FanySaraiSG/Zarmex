@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edición de Producto - Panel Zarmex</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
@@ -16,66 +17,139 @@
             --bg-gray: #9ddabb;
         }
 
-        body { background-color: var(--bg-gray); font-family: 'Segoe UI', sans-serif; }
+        body { 
+            background-color: var(--bg-gray); 
+            font-family: 'Segoe UI', sans-serif; 
+        }
         
         .edit-card {
-            width: 100%; max-width: 1000px; background: #fff;
-            border-radius: 20px; border-top: 10px solid var(--primary-green);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1); padding: 40px;
+            width: 100%; 
+            max-width: 1000px; 
+            background: #fff;
+            border-radius: 20px; 
+            border-top: 10px solid var(--primary-green);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1); 
+            padding: 40px;
             margin: 40px auto;
         }
 
-        /* Tabs Verdes */
-        .nav-pills-custom { background-color: var(--light-green); border-radius: 15px; padding: 6px; }
-        .nav-pills-custom .nav-link { color: var(--medium-green); font-weight: 600; border-radius: 12px; border: none; }
+        .nav-pills-custom { 
+            background-color: var(--light-green); 
+            border-radius: 15px; 
+            padding: 6px; 
+        }
+        .nav-pills-custom .nav-link { 
+            color: var(--medium-green); 
+            font-weight: 600; 
+            border-radius: 12px; 
+            border: none; 
+        }
         .nav-pills-custom .nav-link.active {
-            background-color: var(--primary-green) !important; color: white !important;
+            background-color: var(--primary-green) !important; 
+            color: white !important;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
-        /* Zona de Carga Masiva Unificada */
         .upload-area {
-            border: 2px dashed var(--accent-green); background: #fafafa;
-            border-radius: 15px; padding: 40px; text-align: center;
-            cursor: pointer; transition: 0.3s; margin-bottom: 25px;
+            border: 2px dashed var(--accent-green); 
+            background: #fafafa;
+            border-radius: 15px; 
+            padding: 40px; 
+            text-align: center;
+            cursor: pointer; 
+            transition: 0.3s; 
+            margin-bottom: 25px;
         }
-        .upload-area:hover { background: var(--light-green); border-color: var(--primary-green); }
+        .upload-area:hover { 
+            background: var(--light-green); 
+            border-color: var(--primary-green); 
+        }
 
-        /* Contenedor de Previsualización Dinámica */
-        .gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .gallery-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); 
+            gap: 20px; 
+        }
         .img-slot {
-            aspect-ratio: 1; border: 1px solid #e0e0e0;
-            border-radius: 12px; position: relative; overflow: hidden;
-            background: #fff; display: flex; align-items: center; justify-content: center;
-            cursor: grab; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            max-width: 150px;
+            aspect-ratio: 1; 
+            border: 1px solid #e0e0e0;
+            border-radius: 12px; 
+            position: relative; 
+            overflow: hidden;
+            background: #fff; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            cursor: grab; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            width: 100%;
         }
-
         .img-slot:active { cursor: grabbing; }
         .img-slot img { width: 100%; height: 100%; object-fit: cover; }
         
-        /* Botón para remover imágenes individuales */
         .remove-btn {
-            position: absolute; top: 8px; right: 8px;
-            background: rgba(220, 53, 69, 0.9); color: white;
-            border: none; border-radius: 50%; width: 28px; height: 28px;
-            font-size: 14px; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; z-index: 10;
+            position: absolute; 
+            top: 8px; 
+            right: 8px;
+            background: rgba(220, 53, 69, 0.9); 
+            color: white;
+            border: none; 
+            border-radius: 50%; 
+            width: 28px; 
+            height: 28px;
+            font-size: 14px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            cursor: pointer; 
+            z-index: 10;
+            transition: background 0.2s;
+        }
+        .remove-btn:hover { background: rgba(200, 35, 50, 1); }
+
+        .doc-box { 
+            border: 1px solid #e0e0e0; 
+            border-radius: 12px; 
+            padding: 20px; 
+            margin-bottom: 20px; 
+            transition: 0.3s; 
+        }
+        .doc-box:hover { 
+            border-color: var(--primary-green); 
+            background: rgba(216, 243, 220, 0.3); 
         }
 
-        /* Video Preview */
-        #video-preview-container video { width: 35%; border-radius: 50px; background: #000; margin-top: 10px; }
-
-
-        /* Documentos */
-        .doc-box { border: 1px solid #e0e0e0; border-radius: 12px; padding: 20px; margin-bottom: 20px; transition: 0.3s; }
-        .doc-box:hover { border-color: var(--primary-green); background: var(--bg-gray); }
-
-        .btn-save { background-color: var(--primary-green); color: white; border: none; padding: 15px 40px; border-radius: 12px; font-weight: bold; }
-        .btn-back { background-color: #6c757d; color: white; border: none; padding: 12px 25px; border-radius: 12px; text-decoration: none; display: inline-flex; align-items: center; }
+        .btn-save { 
+            background-color: var(--primary-green); 
+            color: white; 
+            border: none; 
+            padding: 15px 40px; 
+            border-radius: 12px; 
+            font-weight: bold; 
+            transition: 0.3s;
+        }
+        .btn-save:hover { background-color: var(--medium-green); color: white; }
+        
+        .btn-back { 
+            background-color: #6c757d; 
+            color: white; 
+            border: none; 
+            padding: 12px 25px; 
+            border-radius: 12px; 
+            text-decoration: none; 
+            display: inline-flex; 
+            align-items: center; 
+            transition: 0.3s;
+        }
         .btn-back:hover { background-color: #5a6268; color: white; }
         
-        .btn-next-tab { background-color: var(--medium-green); color: white; border-radius: 10px; font-weight: 600; }
+        .btn-next-tab { 
+            background-color: var(--medium-green); 
+            color: white; 
+            border-radius: 10px; 
+            font-weight: 600; 
+            transition: 0.3s;
+        }
         .btn-next-tab:hover { background-color: var(--primary-green); color: white; }
     </style>
 </head>
@@ -115,13 +189,20 @@
             <input type="hidden" name="imagenes_eliminadas" id="imagenes_eliminadas" value="[]">
 
             <ul class="nav nav-pills nav-justified nav-pills-custom mb-4" id="productTabs" role="tablist">
-                <li class="nav-item"><button class="nav-link active" id="tab-info-btn" data-bs-toggle="tab" data-bs-target="#tab-info" type="button" role="tab">1. Información Del Producto</button></li>
-                <li class="nav-item"><button class="nav-link" id="tab-media-btn" data-bs-toggle="tab" data-bs-target="#tab-media" type="button" role="tab">2. Multimedia (Imágenes y Video)</button></li>
-                <li class="nav-item"><button class="nav-link" id="tab-docs-btn" data-bs-toggle="tab" data-bs-target="#tab-docs" type="button" role="tab">3. Documentos</button></li>
+                <li class="nav-item">
+                    <button class="nav-link active" id="tab-info-btn" data-bs-toggle="tab" data-bs-target="#tab-info" type="button" role="tab">1. Información</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="tab-media-btn" data-bs-toggle="tab" data-bs-target="#tab-media" type="button" role="tab">2. Multimedia</button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="tab-docs-btn" data-bs-toggle="tab" data-bs-target="#tab-docs" type="button" role="tab">3. Documentos</button>
+                </li>
             </ul>
 
             <div class="tab-content">
                 
+                {{-- PESTAÑA 1: INFORMACIÓN --}}
                 <div class="tab-pane fade show active" id="tab-info" role="tabpanel">
                     <div class="row align-items-start">
                         <div class="col-md-8 mb-3">
@@ -136,28 +217,29 @@
                         </div>
 
                         <div class="col-md-4 mb-3">
-                            <label for="id" class="form-label fw-bold">ID</label>
-                            <input type="text" name="id" id="id" class="form-control" value="{{ old('id', $producto->id) }}">
-                            <small class="text-muted">Modifica este código solo si es estrictamente necesario.</small>
+                            <label for="id" class="form-label fw-bold">ID del Producto</label>
+                            <input type="text" name="id" id="id" class="form-control bg-light" value="{{ old('id', $producto->id) }}" readonly>
+                            <small class="text-danger fw-bold">El código identificador no es modificable.</small>
                         </div>
 
                         <div class="col-md-12 mb-4">
-
-                            <label class="form-label fw-bold text-muted small">NUEVA DESCRIPCIÓN DEL ADMINISTRADOR</label>
-                            <textarea name="descripcion" class="form-control" rows="6" placeholder="Escriba aquí la descripción...">{{ old('descripcion', $producto->descripcion) }}</textarea>
-
+                            <label class="form-label fw-bold text-muted small">DESCRIPCIÓN DEL ADMINISTRADOR</label>
+                            <textarea name="descripcion" class="form-control" rows="6" placeholder="Escriba la descripción aquí...">{{ old('descripcion', $producto->descripcion) }}</textarea>
                         </div>
                     </div>
 
                     <div class="d-flex justify-content-end">
-                        <button type="button" class="btn btn-next-tab px-4 py-2" onclick="cambiarPestaña('#tab-media-btn')">Siguiente Pestaña <i class="bi bi-arrow-right ms-1"></i></button>
+                        <button type="button" class="btn btn-next-tab px-4 py-2" onclick="cambiarPestaña('#tab-media-btn')">Siguiente <i class="bi bi-arrow-right ms-1"></i></button>
                     </div>
-                </div> <div class="tab-pane fade" id="tab-media" role="tabpanel">
-                    <label class="form-label fw-bold mb-2">GALERÍA DE IMÁGENES</label>
+                </div> 
+
+                {{-- PESTAÑA 2: MULTIMEDIA --}}
+                <div class="tab-pane fade" id="tab-media" role="tabpanel">
+                    <label class="form-label fw-bold mb-2">GALERÍA DE IMÁGENES (Arrastra para reordenar)</label>
                     
                     <div class="upload-area" onclick="document.getElementById('mass-image-input').click()">
                         <i class="bi bi-images fs-1 text-muted"></i>
-                        <p class="mb-0 fw-bold text-muted mt-2">Haz clic aquí para seleccionar o arrastrar tus imágenes (Máx. 6)</p>
+                        <p class="mb-0 fw-bold text-muted mt-2">Haz clic aquí para cargar imágenes auxiliares (Máx. 6)</p>
                         <input type="file" id="mass-image-input" name="imagenes[]" class="d-none" accept="image/*" multiple>
                     </div>
 
@@ -165,7 +247,7 @@
                         @foreach($imagenesExtra as $img)
                             <div class="img-slot" data-id="existente-{{ $img->id }}">
                                 <button type="button" class="remove-btn" onclick="eliminarImagenSlot(this, '{{ $img->id }}')">✕</button>
-                                <img src="{{ asset($img->ruta) }}" alt="Producto">
+                                <img src="{{ asset($img->ruta) }}?v={{ $img->updated_at ? $img->updated_at->timestamp : time() }}" alt="Producto">
                             </div>
                         @endforeach
                     </div>
@@ -174,28 +256,28 @@
                     <div class="d-flex gap-3 align-items-start mb-3">
                         <div style="flex: 1;">
                             <input type="file" name="video" id="video-input" class="form-control" accept="video/mp4,video/mkv,video/x-m4v,video/*" onchange="previewVideo(this)">
-                            <div class="form-text">Se reemplaza el video anterior (si subes uno nuevo).</div>
+                            <div class="form-text">Subir un archivo nuevo reemplazará el video anterior automáticamente.</div>
                         </div>
                         @if(!empty($producto->video_url))
-                            <button type="button" class="btn btn-outline-danger btn-sm mt-2" onclick="borrarVideoActual({{ $producto->id }})">Borrar video actual</button>
+                            <button type="button" class="btn btn-outline-danger btn-sm mt-1" onclick="borrarVideoActual({{ $producto->id }})">Eliminar Video Actual</button>
                         @endif
                     </div>
                     
                     <div id="video-preview-container" class="mt-2 mb-4" style="{{ $producto->video_url ? '' : 'display:none;' }}">
-
-                        <p class="small text-muted mb-1">Vista previa del video seleccionado:</p>
-                        <video id="video-tag" controls style="width: 100%; border-radius: 12px; background: #000;">
+                        <p class="small text-muted mb-1">Previsualización del video:</p>
+                        <video id="video-tag" controls style="max-width: 400px; width: 100%; border-radius: 12px; background: #000;">
                             <source src="{{ $producto->video_url ? asset($producto->video_url) : '' }}" id="video-source">
-                            Tu navegador no soporta carga de videos.
+                            Tu navegador no soporta la reproducción de video.
                         </video>
                     </div>
 
                     <div class="d-flex justify-content-between">
-                        <button type="button" class="btn btn-outline-secondary btn-next-tab bg-white text-secondary px-4 py-2" onclick="cambiarPestaña('#tab-info-btn')"><i class="bi bi-arrow-left me-1"></i> Anterior</button>
-                        <button type="button" class="btn btn-next-tab px-4 py-2" onclick="cambiarPestaña('#tab-docs-btn')">Siguiente Pestaña <i class="bi bi-arrow-right ms-1"></i></button>
+                        <button type="button" class="btn btn-outline-secondary bg-white text-secondary px-4 py-2" onclick="cambiarPestaña('#tab-info-btn')"><i class="bi bi-arrow-left me-1"></i> Anterior</button>
+                        <button type="button" class="btn btn-next-tab px-4 py-2" onclick="cambiarPestaña('#tab-docs-btn')">Siguiente <i class="bi bi-arrow-right ms-1"></i></button>
                     </div>
                 </div>
 
+                {{-- PESTAÑA 3: DOCUMENTOS --}}
                 <div class="tab-pane fade" id="tab-docs" role="tabpanel">
                     @php 
                         $fields = [
@@ -207,38 +289,37 @@
 
                     @foreach($fields as $key => $data)
                     <div class="doc-box">
-                        <div class="d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
                             <div class="d-flex align-items-center">
                                 <i class="bi {{$data['icon']}} fs-3 me-3" style="color: var(--primary-green);"></i>
                                 <div>
                                     <h6 class="mb-0 fw-bold">{{$data['label']}}</h6>
                                     @if($data['path'])
-                                        <a href="{{ asset($data['path']) }}" target="_blank" class="small text-success">
-                                            <i class="bi bi-eye"></i> Ver archivo anterior
+                                        <a href="{{ asset($data['path']) }}" target="_blank" class="small text-success text-decoration-none">
+                                            <i class="bi bi-eye"></i> Examinar documento actual
                                         </a>
                                     @endif
                                     <div id="new-{{$key}}" class="small text-primary fw-bold mt-1" style="display:none;"></div>
                                 </div>
                             </div>
-                            <label class="btn btn-sm btn-outline-success">
-                                <input type="file" name="{{$key}}" class="d-none" onchange="previewDoc(this, 'new-{{$key}}')">
-                                <i class="bi bi-upload"></i> Nuevo Archivo
+                            <label class="btn btn-sm btn-outline-success m-0">
+                                <input type="file" name="{{$key}}" class="d-none" accept=".pdf,.doc,.docx" onchange="previewDoc(this, 'new-{{$key}}')">
+                                <i class="bi bi-upload"></i> Subir Archivo
                             </label>
                         </div>
                     </div>
                     @endforeach
 
                     <div class="d-flex justify-content-start mt-4">
-                        <button type="button" class="btn btn-outline-secondary btn-next-tab bg-white text-secondary px-4 py-2" onclick="cambiarPestaña('#tab-media-btn')"><i class="bi bi-arrow-left me-1"></i> Anterior</button>
+                        <button type="button" class="btn btn-outline-secondary bg-white text-secondary px-4 py-2" onclick="cambiarPestaña('#tab-media-btn')"><i class="bi bi-arrow-left me-1"></i> Anterior</button>
                     </div>
                 </div>
             </div>
 
             <div class="d-flex justify-content-between align-items-center mt-5 border-top pt-4">
                 <span class="text-muted fw-bold" id="tabIndicator">Pestaña 1 de 3</span>
-                
                 <button type="submit" id="btn-global-submit" class="btn btn-save px-5 py-2 fs-5 shadow-sm d-none">
-                    <i class="bi bi-check-circle me-2"></i> Guardar Todos los Cambios
+                    <i class="bi bi-check-circle me-2"></i> Guardar Cambios
                 </button>
             </div>
         </form>
@@ -264,12 +345,12 @@
             const espaciosDisponibles = 6 - imagenesActuales;
             const filesToProcess = Array.from(this.files).slice(0, espaciosDisponibles);
 
-            filesToProcess.forEach((file) => {
+            filesToProcess.forEach((file, index) => {
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const slot = document.createElement('div');
                     slot.classList.add('img-slot');
-                    slot.setAttribute('data-id', `nueva-${file.name}`);
+                    slot.setAttribute('data-id', `nueva-${index}-${Date.now()}`);
                     
                     slot.innerHTML = `
                         <button type="button" class="remove-btn" onclick="eliminarImagenSlot(this)">✕</button>
@@ -323,11 +404,10 @@
         .catch(() => alert('Error al borrar el video.'));
     }
 
-
     function previewDoc(input, displayId) {
         const display = document.getElementById(displayId);
         if (input.files && input.files[0]) {
-            display.innerText = "📄 Nuevo: " + input.files[0].name;
+            display.innerText = "📄 Cargado: " + input.files[0].name;
             display.style.display = 'block';
         }
     }
@@ -351,7 +431,6 @@
     document.querySelectorAll('button[data-bs-toggle="tab"]').forEach((btn, idx) => {
         btn.addEventListener('shown.bs.tab', () => {
             document.getElementById('tabIndicator').innerText = `Pestaña ${idx + 1} de 3`;
-            
             if (idx === 2) {
                 btnGlobalSubmit.classList.remove('d-none');
             } else {
@@ -360,7 +439,7 @@
         });
     });
 
-    document.getElementById('product-form').addEventListener('submit', function(e) {
+    document.getElementById('product-form').addEventListener('submit', function() {
         actualizarOrdenFormulario();
     });
 </script>

@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,177 +8,449 @@
     <link rel="stylesheet" href="{{ asset('css/catalogo.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     
     <style>
         :root { 
-            --zx-dark: #234d50;       /* Verde oscuro corporativo */
-            --zx-whatsapp: #59b568;   /* Verde WhatsApp */
-            --zx-mint: #c4e6d8;       /* Verde menta de las tarjetas */
-            --zx-modal-bg: #e2f3ec;   /* NUEVO: Verde claro pastel para el contenedor del modal */
+            --zx-dark: #234d50;
+            --zx-whatsapp: #59b568;
+            --zx-mint: #c4e6d8;
+            --zx-modal-bg: #ffffff;
         }
 
-        /* Estructura de Cuadrícula y Tarjetas */
+        /* --- CUADRÍCULA DE 4 COLUMNAS EXACTAS (Alineado Verde) --- */
         .products-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 40px; width: 90%; max-width: 1500px; margin: 120px auto 0 auto; padding: 20px 0;          
+            grid-template-columns: repeat(1, minmax(0, 1fr));
+            gap: 15px; /* Separación reducida para que quepan 4 perfectamente */
+            width: 100%;
+            max-width: 1440px; 
+            margin: 120px auto 0 auto; 
+            padding: 20px 20px; 
         }
-        .card2 {
-            background: #fff; border-radius: 20px; border: 1px solid #eee; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15); transition: all 0.3s ease;
-            display: flex; flex-direction: column; height: 100%; width: 100%; overflow: hidden; 
-        }
-        .card2:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.25); }
-        .card2 img { width: 100%; height: 250px; object-fit: contain; padding: 20px; background: var(--zx-mint); box-sizing: border-box; }
 
-        /* Modales Generales */
+        @media (min-width: 576px) {
+            .products-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+
+        @media (min-width: 992px) {
+            .products-grid { 
+                grid-template-columns: repeat(4, minmax(0, 1fr)); /* 4 Columnas fijas sin desborde */
+            }
+        }
+
+        /* --- TARJETA OPTIMIZADA (Área Roja Cubierta) --- */
+        .card2 {
+            background: #fff; 
+            border-radius: 20px; 
+            border: 1px solid #eee; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.12); 
+            transition: all 0.3s ease;
+            display: flex; 
+            flex-direction: column; 
+            height: 100%;
+            min-height: 400px; /* Cajas ligeramente más compactas y estilizadas */
+            overflow: hidden; 
+        }
+        .card2:hover { 
+            transform: translateY(-8px); 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2); 
+        }
+        
+        /* Contenedor de la imagen para garantizar proporciones perfectas */
+        .card2-img-container {
+            width: 100%;
+            height: 250px; /* Altura fija para mantener simetría entre todas las tarjetas */
+            overflow: hidden;
+            background: var(--zx-mint);
+            position: relative;
+        }
+        
+        /* Cambiado para CUBRIR completamente el recuadro rojo sin deformarse */
+        .card2-img-container img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; /* Llena todo el espacio de borde a borde */
+            padding: 0 !important; /* Eliminamos el espacio que causaba el recuadro interno */
+            transition: transform 0.5s ease;
+        }
+        .card2:hover .card2-img-container img {
+            transform: scale(1.04); /* Efecto sutil al pasar el mouse */
+        }
+
         .modal { z-index: 99999 !important; }
         .modal-backdrop { z-index: 99990 !important; }
         
-        /* MODIFICADO: El contenedor que antes era blanco ahora es verde claro pastel */
+        /* Contenedor Modal de Alto Fijo Tipo Quiosco */
         .modal-content { 
             background: var(--zx-modal-bg) !important;
             border-radius: 25px !important; 
-            border: 1px solid rgba(35, 77, 80, 0.15); 
-            max-height: 85vh; 
+            border: 1px solid rgba(35, 77, 80, 0.12); 
             display: flex; 
             flex-direction: column; 
             overflow: hidden; 
-            width: 100%; 
+            max-height: 92vh;
+            position: relative;
         }
         
-        .modal-body { overflow-y: auto; overflow-x: hidden; padding: 25px !important; }
-        .modal-body .row { margin: 0; align-items: center; }
+        /* Patrón geométrico de fondo */
+        .dots-pattern {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 120px;
+            height: 120px;
+            background-image: radial-gradient(rgba(35, 77, 80, 0.15) 1.5px, transparent 1.5px);
+            background-size: 12px 12px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .modal-body { 
+            padding: 35px 40px !important; 
+            overflow: hidden;
+            z-index: 2;
+        }
         
-        .info-label { font-size: 0.7rem; font-weight: 800; color: var(--zx-dark); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; display: block; opacity: 0.9; }
+        /* Línea Decorativa Superior */
+        .title-separator {
+            height: 3px;
+            background: linear-gradient(90deg, var(--zx-dark) 0%, rgba(35, 77, 80, 0.4) 50%, transparent 100%);
+            border-radius: 2px;
+            margin-top: 10px;
+            margin-bottom: 25px;
+            width: 100%;
+        }
+
+        /* Detalles e Indicadores Laterales */
+        .info-block {
+            position: relative;
+            padding-left: 15px;
+            margin-bottom: 22px;
+        }
+        .info-block::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 2px;
+            bottom: 2px;
+            width: 3px;
+            background: var(--zx-mint);
+            border-radius: 2px;
+        }
+
+        .info-label { 
+            font-size: 0.78rem; 
+            font-weight: 800; 
+            color: var(--zx-dark); 
+            text-transform: uppercase; 
+            margin-bottom: 6px; 
+            letter-spacing: 1.2px; 
+            display: block; 
+        }
         
         .carousel-control-prev-icon, .carousel-control-next-icon { 
             filter: invert(24%) sepia(21%) saturate(1145%) hue-rotate(134deg) brightness(91%) contrast(88%); 
         }
 
-        /* Componentes del Modal: Botones y Círculos */
         .color-circle {
-            width: 24px; height: 24px; border-radius: 50%; border: 2px solid #fff;   
-            box-shadow: 0 0 0 1px #ddd; display: inline-block; margin-right: 5px; cursor: pointer; transition: all 0.2s;
+            width: 25px; 
+            height: 25px; 
+            border-radius: 50%; 
+            border: 2px solid #fff;   
+            box-shadow: 0 0 0 1px #ddd; 
+            display: inline-block; 
+            margin-right: 7px; 
+            cursor: pointer; 
+            transition: all 0.2s ease;
         }
-        .color-circle:hover { transform: scale(1.2); }
-        .color-circle.selected { transform: scale(1.15); box-shadow: 0 0 0 2px var(--zx-dark); }
+        .color-circle:hover, .color-circle.selected { transform: scale(1.2); box-shadow: 0 0 0 2px var(--zx-dark); }
 
-        /* Los botones de documentos ahora usan un fondo blanco semitransparente que resalta sobre el fondo verde */
         .btn-document-inline {
-            display: inline-flex; align-items: center; padding: 12px; background: rgba(255, 255, 255, 0.7);
-            border: 1px solid rgba(35, 77, 80, 0.15); border-radius: 8px; text-decoration: none; color: var(--zx-dark); font-size: 0.75rem; transition: 0.2s;
+            display: inline-flex; 
+            align-items: center; 
+            padding: 8px 14px; 
+            background: #f8f9fa;
+            border: 1px solid rgba(35, 77, 80, 0.15); 
+            border-radius: 8px; 
+            text-decoration: none; 
+            color: var(--zx-dark); 
+            font-size: 0.8rem; 
+            font-weight: 600;
+            transition: 0.2s;
         }
-        .btn-document-inline:hover { background: #ffffff; transform: translateY(-2px); color: var(--zx-dark); }
+        .btn-document-inline:hover { background: #ffffff; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.05); color: var(--zx-dark); }
         
-        .btn-zx-whatsapp { background-color: var(--zx-whatsapp) !important; color: white !important; border-radius: 12px; padding: 12px 25px; font-weight: 700; border: none; }
-        .border-top { border-top: 1px solid rgba(35, 77, 80, 0.2) !important; }
-
-        .btn-close { transition: all 0.2s ease-in-out; opacity: 0.7; }
-        .btn-close:hover { transform: scale(1.15); opacity: 1; filter: drop-shadow(0 0 8px rgba(35, 77, 80, 0.6)); }
-
-        /* Contenedores de Zoom */
-        .img-zoom-container { position: relative; display: inline-block; width: 100%; }
-        .btn-zoom-overlay {
-            position: absolute; bottom: 10px; right: 10px; background: rgba(35, 77, 80, 0.85); 
-            color: white; border: none; width: 36px; height: 36px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; font-size: 0.9rem;
-            transition: all 0.2s ease-in-out; box-shadow: 0 4px 8px rgba(0,0,0,0.2); cursor: pointer; z-index: 10;
+        .btn-zx-whatsapp { 
+            background-color: var(--zx-whatsapp) !important; 
+            color: white !important; 
+            border-radius: 14px; 
+            padding: 14px 25px; 
+            font-weight: 700; 
+            border: none; 
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(89, 181, 104, 0.3);
         }
-        .btn-zoom-overlay:hover { background: var(--zx-dark); transform: scale(1.1); color: white; }
+        .btn-zx-whatsapp:hover { opacity: 0.95; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(89, 181, 104, 0.4); }
 
-        /* Visor de Zoom Interno (Modal Global) */
-        .zoom-modal .modal-content { background: rgba(0, 0, 0, 0.9) !important; max-height: 90vh; border-radius: 15px !important; border: none !important; }
-        .zoom-img-wrapper { position: relative; overflow: hidden; cursor: zoom-in; display: flex; align-items: center; justify-content: center; max-height: 70vh; border-radius: 10px; background: #fff; }
-        .zoom-img-wrapper img { transition: transform 0.1s ease-out; max-height: 70vh; object-fit: contain; width: 100%; pointer-events: none; }
+        .img-zoom-container { position: relative; display: inline-block; width: 100%; }
+        
+        .btn-zoom-overlay {
+            position: absolute; 
+            bottom: 12px; 
+            right: 12px; 
+            background: rgba(35, 77, 80, 0.85); 
+            color: white; 
+            border: none; 
+            width: 36px; 
+            height: 36px; 
+            border-radius: 50%;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            transition: 0.2s; 
+            z-index: 10;
+        }
+        .btn-zoom-overlay:hover { background: var(--zx-dark); transform: scale(1.1); }
+
+        .zoom-modal .modal-content { background: rgba(0, 0, 0, 0.9) !important; border: none !important; max-height: none; }
+        .zoom-img-wrapper { position: relative; overflow: hidden; cursor: zoom-in; background: #fff; border-radius: 10px; }
+        .zoom-img-wrapper img { transition: transform 0.1s ease-out; width: 100%; max-height: 70vh; object-fit: contain; }
         .zoom-img-wrapper:hover img { transform: scale(2); cursor: zoom-out; }
+
+        /* --- LAYOUT MULTIMEDIA IZQUIERDO --- */
+        .multimedia-layout {
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 15px;
+        }
+        @media (min-width: 768px) {
+            .multimedia-layout { flex-direction: row; }
+        }
+
+        .thumbnails-sidebar {
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+            overflow-x: auto;
+            align-content: flex-start;
+            scrollbar-width: none; 
+        }
+        .thumbnails-sidebar::-webkit-scrollbar { display: none; } 
+
+        @media (min-width: 768px) {
+            .thumbnails-sidebar {
+                flex-direction: column;
+                overflow-x: visible;
+                overflow-y: auto;
+                max-height: 360px;
+                width: 62px;
+                flex-shrink: 0;
+            }
+        }
+
+        .btn-thumbnail {
+            width: 56px;
+            height: 56px;
+            flex-shrink: 0;
+            padding: 0;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #fff;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+        .btn-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .btn-thumbnail:hover {
+            border-color: rgba(35, 77, 80, 0.4);
+            transform: scale(1.03);
+        }
+        .btn-thumbnail.active {
+            border-color: var(--zx-dark) !important;
+            box-shadow: 0 0 0 2px rgba(35, 77, 80, 0.2);
+            transform: scale(1.05);
+        }
+        .btn-thumbnail-video { background: #111; position: relative; }
+        .video-thumb-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.45);
+        }
+
+        .carousel-fixed-size {
+            max-width: 380px;
+            width: 100%;
+            margin: 0 auto;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+        }
     </style>
 </head>
-
 <body class="antialiased">
-    @include('.header')
+    @include('header')
 
-    <main>
+    <main class="container-fluid">
         <div class="products-grid">
             @foreach($productos as $producto)
+                
+                {{-- TARJETA INDIVIDUAL DE PRODUCTO --}}
                 <div class="card2">
-                    <img src="{{ asset($producto->imagen_url ?? 'images/productos/default.png') }}" alt="{{ $producto->nombre }}">
-                    <div class="card-content" style="padding: 20px; text-align: center;">
-                        <h3 style="color: var(--zx-dark); font-weight: 800; font-size: 1.3rem;">{{ $producto->id }}</h3>
-                        <button type="button" class="vermas-btn" style="background: var(--zx-dark); color: white; border: none; padding: 10px; border-radius: 10px; width: 100%;" data-bs-toggle="modal" data-bs-target="#modalProd{{ $producto->id }}">Ver Detalles</button>
+                    
+                    {{-- Contenedor especial para cubrir el área roja perfectamente --}}
+                    <div class="card2-img-container">
+                        @if($producto->imagenes && $producto->imagenes->count() > 0)
+                            <img src="{{ asset($producto->imagenes->first()->ruta) }}" alt="{{ $producto->nombre }}">
+                        @else
+                            <img src="{{ asset('images/productos/default.png') }}" alt="{{ $producto->nombre }}">
+                        @endif
+                    </div>
+                    
+                    <div class="card-content" style="padding: 15px; text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between;">
+                        <h3 style="color: var(--zx-dark); font-weight: 800; font-size: 1rem; margin-bottom: 12px; letter-spacing: -0.3px;">
+                             {{ $producto->id }}
+                        </h3>
+                        <button type="button" style="background: var(--zx-dark); color: white; border: none; padding: 10px; border-radius: 10px; width: 100%; font-weight: 600; font-size: 0.9rem;" data-bs-toggle="modal" data-bs-target="#modalProd{{ $producto->id }}">
+                            Ver Detalles
+                        </button>
                     </div>
                 </div>
 
-                <div class="modal fade" id="modalProd{{ $producto->id }}" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog modal-lg modal-dialog-centered" style="max-width: 900px;">
+                {{-- MODAL DETALLADO DE PRODUCTO --}}
+                <div class="modal fade product-modal-sync" id="modalProd{{ $producto->id }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog modal-xl modal-dialog-centered">
                         <div class="modal-content shadow-lg">
-                            <div class="modal-header border-0 pb-0">
-                                <h5 class="fw-bold m-0" style="color: var(--zx-dark);">{{ $producto->nombre }}</h5>
+                            
+                            <div class="dots-pattern"></div>
+                            
+                            <div class="modal-header border-0 pb-0 justify-content-end" style="background: transparent; z-index: 5;">
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                             </div>
-                            <div class="modal-body">
-                                <div class="row g-3">
-                                    <div class="col-md-5">
-                                        <div id="carouselProd{{ $producto->id }}" class="carousel slide rounded-4 p-2 mb-3" style="background-color: rgba(255, 255, 255, 0.6); border: 1px solid rgba(35, 77, 80, 0.1);" data-bs-ride="false">
-                                            <div class="carousel-inner text-center">
-                                                <div class="carousel-item active">
-                                                    <div class="img-zoom-container">
-                                                        <img src="{{ asset($producto->imagen_url) }}" class="img-fluid d-block mx-auto" style="max-height: 250px; object-fit: contain;">
-                                                        <button type="button" class="btn-zoom-overlay" onclick="openZoomModal('{{ asset($producto->imagen_url) }}', '{{ $producto->nombre }}')"><i class="fas fa-search-plus"></i></button>
-                                                    </div>
-                                                </div>
-                                                @foreach(['img2_url', 'img3_url', 'img4_url', 'img5_url', 'img6_url'] as $imgCampo)
-                                                    @if(!empty($producto->$imgCampo))
-                                                    <div class="carousel-item">
-                                                        <div class="img-zoom-container">
-                                                            <img src="{{ asset($producto->$imgCampo) }}" class="img-fluid d-block mx-auto" style="max-height: 250px; object-fit: contain;">
-                                                            <button type="button" class="btn-zoom-overlay" onclick="openZoomModal('{{ asset($producto->$imgCampo) }}', '{{ $producto->nombre }}')"><i class="fas fa-search-plus"></i></button>
-                                                        </div>
-                                                    </div>
-                                                    @endif
-                                                @endforeach
+                            
+                            <div class="modal-body pt-0">
+                                <div class="row">
+                                    <div class="col-12">
+                                        <h2 class="fw-bold m-0" style="color: var(--zx-dark); font-size: 1.7rem; letter-spacing: -0.5px;">
+                                            {{ $producto->nombre }}
+                                        </h2>
+                                        <div class="title-separator"></div>
+                                    </div>
+                                </div>
+
+                                <div class="row g-4 align-items-center">
+                                    {{-- COLUMNA MULTIMEDIA --}}
+                                    <div class="col-md-6">
+                                        <div class="multimedia-layout justify-content-center align-items-center">
+                                            
+                                            <div class="thumbnails-sidebar" id="thumbBar{{ $producto->id }}">
+                                                @if($producto->imagenes && $producto->imagenes->count() > 0)
+                                                    @foreach($producto->imagenes as $index => $img)
+                                                        <button type="button" data-bs-target="#carouselProd{{ $producto->id }}" data-bs-slide-to="{{ $index }}" class="btn-thumbnail {{ $loop->first ? 'active' : '' }}">
+                                                            <img src="{{ asset($img->ruta) }}">
+                                                        </button>
+                                                    @endforeach
+                                                @else
+                                                    <button type="button" data-bs-target="#carouselProd{{ $producto->id }}" data-bs-slide-to="0" class="btn-thumbnail active">
+                                                        <img src="{{ asset('images/productos/default.png') }}">
+                                                    </button>
+                                                @endif
+
                                                 @if(!empty($producto->video_url))
-                                                <div class="carousel-item">
-                                                    <div class="ratio ratio-16x9 d-block mx-auto" style="max-height: 250px;">
-                                                        <video controls style="max-height: 250px; width: 100%; border-radius: 10px;"><source src="{{ asset($producto->video_url) }}" type="video/mp4"></video>
-                                                    </div>
-                                                </div>
+                                                    <button type="button" data-bs-target="#carouselProd{{ $producto->id }}" data-bs-slide-to="{{ $producto->imagenes->count() }}" class="btn-thumbnail btn-thumbnail-video">
+                                                        <div class="video-thumb-overlay">
+                                                            <i class="fas fa-play text-white small"></i>
+                                                        </div>
+                                                    </button>
                                                 @endif
                                             </div>
-                                            <button class="carousel-control-prev" type="button" data-bs-target="#carouselProd{{ $producto->id }}" data-bs-slide="prev"><span class="carousel-control-prev-icon" aria-hidden="true"></span></button>
-                                            <button class="carousel-control-next" type="button" data-bs-target="#carouselProd{{ $producto->id }}" data-bs-slide="next"><span class="carousel-control-next-icon" aria-hidden="true"></span></button>
+
+                                            <div id="carouselProd{{ $producto->id }}" class="carousel slide rounded-4 p-1 bg-light border carousel-fixed-size" data-bs-ride="false">
+                                                <div class="carousel-inner w-100">
+                                                    
+                                                    @if($producto->imagenes && $producto->imagenes->count() > 0)
+                                                        @foreach($producto->imagenes as $img)
+                                                            <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
+                                                                <div class="img-zoom-container" style="aspect-ratio: 1 / 1; width: 100%;">
+                                                                    <img src="{{ asset($img->ruta) }}" class="img-fluid d-block mx-auto rounded-4" style="height: 100%; width: 100%; object-fit: cover;">
+                                                                    <button type="button" class="btn-zoom-overlay" onclick="openZoomModal('{{ asset($img->ruta) }}', '{{ $producto->nombre }}')">
+                                                                        <i class="fas fa-search-plus"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        @endforeach
+                                                    @else
+                                                        <div class="carousel-item active">
+                                                            <div class="img-zoom-container" style="aspect-ratio: 1 / 1; width: 100%;">
+                                                                    <img src="{{ asset('images/productos/default.png') }}" class="img-fluid d-block mx-auto rounded-4" style="height: 100%; width: 100%; object-fit: cover;">
+                                                            </div>
+                                                        </div>
+                                                    @endif
+
+                                                    @if(!empty($producto->video_url))
+                                                        <div class="carousel-item {{ ($producto->imagenes->count() == 0) ? 'active' : '' }}">
+                                                            <div style="aspect-ratio: 1 / 1; width: 100%; background:#000;" class="rounded-4 overflow-hidden">
+                                                                <video controls style="height: 100%; width: 100%; object-fit: cover;">
+                                                                    <source src="{{ asset($producto->video_url) }}" type="video/mp4">
+                                                                </video>
+                                                            </div>
+                                                        </div>
+                                                    @endif
+                                                    
+                                                </div>
+                                                <button class="carousel-control-prev" type="button" data-bs-target="#carouselProd{{ $producto->id }}" data-bs-slide="prev">
+                                                    <span class="carousel-control-prev-icon"></span>
+                                                </button>
+                                                <button class="carousel-control-next" type="button" data-bs-target="#carouselProd{{ $producto->id }}" data-bs-slide="next">
+                                                    <span class="carousel-control-next-icon"></span>
+                                                </button>
+                                            </div>
+
                                         </div>
                                     </div>
 
-                                    <div class="col-md-7 d-flex flex-column justify-content-between">
+                                    {{-- COLUMNA DETALLES --}}
+                                    <div class="col-md-6 d-flex flex-column justify-content-between" style="min-height: 380px;">
                                         <div>
-                                            <span class="info-label">Descripción del Equipo</span>
-                                            <p style="font-size: 0.9rem; color: #333; text-align: justify; line-height: 1.5;">{{ $producto->descripcion }}</p>
-
-                                            <span class="info-label">Colores Disponibles</span>
-                                            <div class="mb-4 color-selector-group">
-                                                <span class="color-circle" style="background-color: #000000;" title="Negro"></span>
-                                                <span class="color-circle" style="background-color: #234d50;" title="Verde Zarmex"></span>
-                                                <span class="color-circle" style="background-color: #ffffff;" title="Blanco"></span>
-                                                <span class="color-circle" style="background-color: #3d6ee8;" title="Azul"></span>
-                                                <span class="color-circle" style="background-color: #e63946;" title="Rojo"></span>
-                                                <span class="color-circle" style="background-color: #f4a261;" title="Naranja"></span>
-                                                <span class="color-circle" style="background-color: #2a9d8f;" title="Turquesa"></span>
-                                                <span class="color-circle" style="background-color: #6a4c93;" title="Morado"></span>
-                                                <span class="color-circle" style="background-color: #c7c7c7;" title="Gris"></span>
-                                                <span class="color-circle" style="background-color: #d4af37;" title="Dorado"></span>
+                                            <div class="info-block">
+                                                <span class="info-label">Descripción del Equipo</span>
+                                                <p style="font-size: 0.92rem; color: #444; text-align: justify; margin: 0; line-height: 1.45;">{{ $producto->descripcion }}</p>
                                             </div>
 
-                                            <span class="info-label">Documentos Disponibles</span>
-                                            <div class="d-flex flex-wrap gap-2 mb-3">
-                                                @if($producto->doc1_url)<a href="{{ asset($producto->doc1_url) }}" target="_blank" class="btn-document-inline"><i class="far fa-file-pdf text-danger me-1"></i> Manual</a>@endif
-                                                @if($producto->doc2_url)<a href="{{ asset($producto->doc2_url) }}" target="_blank" class="btn-document-inline"><i class="far fa-file-pdf text-primary me-1"></i> Ficha</a>@endif
-                                                @if($producto->doc3_url)<a href="{{ asset($producto->doc3_url) }}" target="_blank" class="btn-document-inline"><i class="far fa-file-pdf text-primary me-1"></i> Garantía</a>@endif
+                                            <div class="info-block">
+                                                <span class="info-label">Colores Disponibles</span>
+                                                <div class="color-selector-group">
+                                                    <span class="color-circle" style="background-color: #000;" title="Negro"></span>
+                                                    <span class="color-circle" style="background-color: #234d50;" title="Verde Zarmex"></span>
+                                                    <span class="color-circle" style="background-color: #fff;" title="Blanco"></span>
+                                                    <span class="color-circle" style="background-color: #3d6ee8;" title="Azul"></span>
+                                                </div>
+                                            </div>
+
+                                            <div class="info-block">
+                                                <span class="info-label">Documentación Oficial</span>
+                                                <div class="d-flex flex-wrap gap-2">
+                                                    @if($producto->doc1_url)
+                                                        <a href="{{ asset($producto->doc1_url) }}" target="_blank" class="btn-document-inline"><i class="far fa-file-pdf text-danger me-1"></i> Garantía</a>
+                                                    @endif
+                                                    @if($producto->doc2_url)
+                                                        <a href="{{ asset($producto->doc2_url) }}" target="_blank" class="btn-document-inline"><i class="far fa-file-pdf text-primary me-1"></i> Manual</a>
+                                                    @endif
+                                                    @if($producto->doc3_url)
+                                                        <a href="{{ asset($producto->doc3_url) }}" target="_blank" class="btn-document-inline"><i class="far fa-file-pdf text-success me-1"></i> Ficha Técnica</a>
+                                                    @endif
+                                                </div>
                                             </div>
                                         </div>
-                                        <div class="d-flex justify-content-center align-items-center mt-4 pt-3 border-top">
-                                            <a href="https://wa.me/525581366555?text=Hola,%20me%20interesa%20obtener%20más%20información%20del%20producto:%20{{ $producto->nombre }}" target="_blank" class="btn btn-zx-whatsapp w-100 text-center"><i class="fab fa-whatsapp me-2"></i> WhatsApp</a>
+
+                                        <div class="pt-3">
+                                            <a href="https://wa.me/525581366555?text=Hola,%20me%20interesa%20obtener%20más%20información%20del%20producto:%20{{ urlencode($producto->nombre) }}" target="_blank" class="btn btn-zx-whatsapp w-100 text-center text-decoration-none d-block">
+                                                <i class="fab fa-whatsapp me-2"></i> Consultar por WhatsApp
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
@@ -191,40 +462,61 @@
         </div>
     </main>
 
+    {{-- MODAL DE ZOOM --}}
     <div class="modal fade zoom-modal" id="globalZoomModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-md modal-dialog-centered">
-            <div class="modal-content shadow-lg p-3">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span id="zoomModalTitle" class="text-white fw-bold" style="font-size: 0.95rem;"></span>
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content p-2 shadow-lg">
+                <div class="d-flex justify-content-between align-items-center mb-2 px-2">
+                    <span id="zoomModalTitle" class="text-white fw-bold small"></span>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-0">
-                    <div class="zoom-img-wrapper" id="zoomWrapper"><img id="zoomModalImg" src=""></div>
+                    <div class="zoom-img-wrapper" id="zoomWrapper">
+                        <img id="zoomModalImg" src="">
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         let bootstrapZoomModal;
-
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             bootstrapZoomModal = new bootstrap.Modal(document.getElementById('globalZoomModal'));
             const wrapper = document.getElementById('zoomWrapper');
             const img = document.getElementById('zoomModalImg');
 
-            wrapper.addEventListener('mousemove', function(e) {
+            wrapper.addEventListener('mousemove', function (e) {
                 const rect = wrapper.getBoundingClientRect();
-                img.style.transformOrigin = `${e.clientX - rect.left}px ${e.clientY - rect.top}px`;
+                wrapper.querySelector('img').style.transformOrigin = `${e.clientX - rect.left}px ${e.clientY - rect.top}px`;
             });
-            wrapper.addEventListener('mouseleave', () => img.style.transformOrigin = 'center center');
+            wrapper.addEventListener('mouseleave', () => { img.style.transformOrigin = 'center center'; });
 
-            document.addEventListener('click', function(e) {
+            document.addEventListener('click', function (e) {
                 if (e.target.classList.contains('color-circle')) {
                     const group = e.target.closest('.color-selector-group');
                     group.querySelectorAll('.color-circle').forEach(c => c.classList.remove('selected'));
                     e.target.classList.add('selected');
                 }
+            });
+
+            const carousels = document.querySelectorAll('.carousel');
+            carousels.forEach(carousel => {
+                carousel.addEventListener('slide.bs.carousel', function (e) {
+                    const prodId = carousel.id.replace('carouselProd', '');
+                    const thumbBar = document.getElementById(`thumbBar${prodId}`);
+                    if (thumbBar) {
+                        const thumbnails = thumbBar.querySelectorAll('.btn-thumbnail');
+                        thumbnails.forEach(t => t.classList.remove('active'));
+                        
+                        const nextActiveThumb = thumbnails[e.to];
+                        if (nextActiveThumb) {
+                            nextActiveThumb.classList.add('active');
+                            nextActiveThumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+                        }
+                    }
+                });
             });
         });
 
@@ -234,7 +526,6 @@
             bootstrapZoomModal.show();
         }
     </script>
-
     @include('footer')
 </body>
 </html>
