@@ -201,7 +201,6 @@ class ProductoController extends Controller
                 }
             }
         }
-
         // 3. Subir nuevas imágenes a la galería auxiliar
         $nuevasRutasGuardadas = [];
         if ($request->hasFile('imagenes')) {
