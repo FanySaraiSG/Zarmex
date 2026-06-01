@@ -302,12 +302,12 @@
                 {{-- TARJETA INDIVIDUAL DE PRODUCTO --}}
                 <div class="card2">
                     
-                    {{-- Contenedor especial para cubrir el área roja perfectamente --}}
+                    {{-- Contenedor especial para cubrir el área de la imagen --}}
                     <div class="card2-img-container">
                         @if($producto->imagenes && $producto->imagenes->count() > 0)
                             <img src="{{ asset($producto->imagenes->first()->ruta) }}" alt="{{ $producto->nombre }}">
                         @else
-                            <img src="{{ asset('images/productos/default.png') }}" alt="{{ $producto->nombre }}">
+                            <img src="{{ asset('images/default.png') }}" alt="{{ $producto->nombre }}">
                         @endif
                     </div>
                     
@@ -356,7 +356,7 @@
                                                     @endforeach
                                                 @else
                                                     <button type="button" data-bs-target="#carouselProd{{ $producto->id }}" data-bs-slide-to="0" class="btn-thumbnail active">
-                                                        <img src="{{ asset('images/productos/default.png') }}">
+                                                        <img src="{{ asset('images/default.png') }}">
                                                     </button>
                                                 @endif
 
@@ -386,7 +386,7 @@
                                                     @else
                                                         <div class="carousel-item active">
                                                             <div class="img-zoom-container" style="aspect-ratio: 1 / 1; width: 100%;">
-                                                                    <img src="{{ asset('images/productos/default.png') }}" class="img-fluid d-block mx-auto rounded-4" style="height: 100%; width: 100%; object-fit: cover;">
+                                                                <img src="{{ asset('images/default.png') }}" class="img-fluid d-block mx-auto rounded-4" style="height: 100%; width: 100%; object-fit: cover;">
                                                             </div>
                                                         </div>
                                                     @endif

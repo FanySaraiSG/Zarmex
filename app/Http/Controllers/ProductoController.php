@@ -37,227 +37,204 @@ class ProductoController extends Controller
         return view('productos.create', compact('categorias'));
     }
 
+    // API ENDPOINT: Obtiene el siguiente número consecutivo
+    // CORRECCIÓN: Asegúrate de que esta ruta maneje strings con guiones
+    public function obtenerSiguienteNumeroBase($categoriaId)
+    {
+        // Se usa rawurldecode por si el ID llega codificado desde el fetch
+        $categoriaId = urldecode($categoriaId);
+
+        $ultimoProducto = Producto::where('categoria_id', $categoriaId)
+            ->orderBy('id', 'desc')
+            ->first();
+
+        if (!$ultimoProducto) {
+            return response()->json(['siguiente_numero' => '001']);
+        }
+
+        $partes = explode('-', $ultimoProducto->id);
+        $ultimoNumero = intval(end($partes)); 
+        $siguiente = str_pad($ultimoNumero + 1, 3, '0', STR_PAD_LEFT);
+        
+        return response()->json(['siguiente_numero' => $siguiente]);
+    }
+
     // Guardar nuevo producto
     public function store(Request $request)
     {
         $request->validate([
             'id'           => 'required|unique:productos,id',
             'descripcion'  => 'nullable|string',
-            'precio'       => 'nullable|numeric|min:0',
-            'stock'        => 'nullable|integer|min:0',
             'categoria_id' => 'required|exists:categorias,id_categoria',
-            'imagen_url'   => 'required|image|mimes:jpg,jpeg,png,webp|max:4096',
+            'video'        => 'nullable|file|mimes:mp4,mkv,avi,mov|max:51200',
+            'imagenes'     => 'required|array|min:1',
+            'imagenes.*'   => 'image|mimes:jpg,jpeg,png,webp|max:4096',
             'doc1'         => 'nullable|file|max:10240|mimes:pdf,doc,docx,xls,xlsx',
             'doc2'         => 'nullable|file|max:10240|mimes:pdf,doc,docx,xls,xlsx',
             'doc3'         => 'nullable|file|max:10240|mimes:pdf,doc,docx,xls,xlsx',
         ]);
 
-        $idProducto   = $request->input('id');
-        $nombreAuto   = 'Producto ' . $idProducto;
+        $idProducto = $request->input('id');
+        $nombreAuto = 'Producto ' . $idProducto;
 
-        // Crear carpeta física del producto
         $rutaProducto = public_path("images/productos/{$idProducto}");
         if (!file_exists($rutaProducto)) {
             mkdir($rutaProducto, 0755, true);
         }
 
-        // Guardar imagen principal sin necesitar GD ni Imagick
-        $imagenPath = null;
-        if ($request->hasFile('imagen_url')) {
-            // Borrar imagen anterior si existe
-            foreach (glob($rutaProducto . "/principal.*") as $archivo) {
-                @unlink($archivo);
+        $imagenesCargadas = $request->file('imagenes');
+        $temporalMapeo = [];
+
+        if (!empty($imagenesCargadas)) {
+            foreach ($imagenesCargadas as $indice => $img) {
+                $ext = strtolower($img->getClientOriginalExtension());
+                $nombreArchivo = "img_" . time() . "_" . uniqid() . '.' . $ext;
+                $img->move($rutaProducto, $nombreArchivo);
+
+                $rutaFinalDb = "images/productos/{$idProducto}/{$nombreArchivo}";
+                $temporalMapeo["nueva-{$indice}"] = $rutaFinalDb;
             }
-            $ext        = strtolower($request->file('imagen_url')->getClientOriginalExtension());
-            $nombreImg  = 'principal.' . $ext;
-            $imagenPath = "images/productos/{$idProducto}/{$nombreImg}";
-            $request->file('imagen_url')->move($rutaProducto, $nombreImg);
         }
 
-        // Crear el registro en la BD
         $producto = Producto::create([
             'id'           => $idProducto,
             'nombre'       => $nombreAuto,
             'descripcion'  => $request->descripcion,
-            'precio'       => $request->precio,
-            'stock'        => $request->stock,
             'categoria_id' => $request->categoria_id,
-            'imagen_url'   => $imagenPath,
+            'precio'       => 0,
+            'imagen_url'   => null,
         ]);
 
-        // Subir documentos
+        $imagenPrincipalDb = null;
+
+        if ($request->filled('orden_imagenes')) {
+            $ordenMapeo = json_decode($request->input('orden_imagenes'), true);
+            if (is_array($ordenMapeo)) {
+                $contadorOrden = 1;
+                foreach ($ordenMapeo as $idTemporalFront) {
+                    if (isset($temporalMapeo[$idTemporalFront])) {
+                        $rutaImagen = $temporalMapeo[$idTemporalFront];
+                        $idUnicoBd = 'IMG_' . time() . '_' . strtoupper(Str::random(5));
+                        if ($contadorOrden === 1) $imagenPrincipalDb = $rutaImagen;
+
+                        ImagenProducto::create([
+                            'id'          => $idUnicoBd,
+                            'producto_id' => $producto->id,
+                            'ruta'        => $rutaImagen,
+                            'orden'       => $contadorOrden,
+                        ]);
+                        $contadorOrden++;
+                    }
+                }
+            }
+        }
+
+        if (empty($imagenPrincipalDb)) $imagenPrincipalDb = reset($temporalMapeo);
+        $producto->imagen_url = $imagenPrincipalDb;
+
+        if ($request->hasFile('video')) {
+            $nombreVideo = 'video_' . time() . '.mp4';
+            $request->file('video')->move($rutaProducto, $nombreVideo);
+            $producto->video_url = "images/productos/{$producto->id}/{$nombreVideo}";
+        }
+
         $this->procesarDocumentos($request, $producto);
         $producto->save();
 
         return redirect()->route('productos.index')->with('success', 'Producto creado correctamente.');
     }
 
-    // Formulario de edición
     public function edit($id)
     {
         $producto = Producto::find($id);
-
-        if (!$producto) {
-            abort(404, 'Producto no encontrado');
-        }
+        if (!$producto) abort(404, 'Producto no encontrado');
 
         $categorias = Categoria::all();
         $colores = Color::all(); 
-        
-        $imagenesExtra = ImagenProducto::where('producto_id', $producto->id)
-            ->orderBy('orden', 'asc')
-            ->get();
+        $imagenesExtra = ImagenProducto::where('producto_id', $producto->id)->orderBy('orden', 'asc')->get();
 
         return view('productos.edit', compact('producto', 'categorias', 'colores', 'imagenesExtra'));
     }
 
-    // Actualizar producto existente
     public function update(Request $request, $id)
     {
         $request->validate([
-            'id' => 'required|string|max:50|unique:productos,id,' . $id . ',id',
-            'descripcion' => 'nullable|string',
-            'precio' => 'nullable|numeric|min:0',
-            'stock' => 'nullable|integer|min:0',
+            'id'           => 'required|string|max:50|unique:productos,id,' . $id . ',id',
+            'descripcion'  => 'nullable|string',
             'categoria_id' => 'nullable|exists:categorias,id_categoria',
-            'imagen_url' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:2048',
-            'video' => 'nullable|file|mimes:mp4,mkv,x-m4v,avi,mov|max:51200', 
-            'imagenes' => 'nullable|array',
-            'imagenes.*' => 'image|mimes:jpg,jpeg,png,gif,webp|max:2048',
-            'doc1' => 'nullable|file|max:10240|mimes:pdf,doc,docx,xls,xlsx',
-            'doc2' => 'nullable|file|max:10240|mimes:pdf,doc,docx,xls,xlsx',
-            'doc3' => 'nullable|file|max:10240|mimes:pdf,doc,docx,xls,xlsx',
+            'video'        => 'nullable|file|mimes:mp4,mkv,avi,mov|max:51200', 
+            'imagenes'     => 'nullable|array',
+            'imagenes.*'   => 'image|mimes:jpg,jpeg,png,webp|max:4096',
+            'doc1'         => 'nullable|file|max:10240|mimes:pdf,doc,docx,xls,xlsx',
+            'doc2'         => 'nullable|file|max:10240|mimes:pdf,doc,docx,xls,xlsx',
+            'doc3'         => 'nullable|file|max:10240|mimes:pdf,doc,docx,xls,xlsx',
         ]);
 
         $producto   = Producto::findOrFail($id);
         $idAnterior = $producto->id;
         $nuevoId    = $request->input('id');
 
-        // ── CAMBIO DE ID (compatible con PostgreSQL) ─────────────────────────────
         if ($idAnterior !== $nuevoId) {
             DB::beginTransaction();
             try {
-                // Actualizar hijos antes que el padre para respetar FK
-                DB::table('imagenes_productos')
-                    ->where('producto_id', $idAnterior)
-                    ->update(['producto_id' => $nuevoId]);
-
-                DB::table('productos')
-                    ->where('id', $idAnterior)
-                    ->update(['id' => $nuevoId]);
-
+                DB::table('imagenes_productos')->where('producto_id', $idAnterior)->update(['producto_id' => $nuevoId]);
+                DB::table('productos')->where('id', $idAnterior)->update(['id' => $nuevoId]);
                 DB::commit();
             } catch (\Exception $e) {
                 DB::rollBack();
                 return back()->withErrors(['error' => 'Error al actualizar el ID: ' . $e->getMessage()]);
             }
-
             $this->renombrarCarpetasFisicas($idAnterior, $nuevoId);
             $this->actualizarRutasEnBaseDatos($idAnterior, $nuevoId);
-
             $producto = Producto::findOrFail($nuevoId);
         }
 
-        // ── DATOS BÁSICOS ────────────────────────────────────────────────────────
-        $datos = $request->except([
-            'imagen_url', 'imagenes', 'id', 'nombre',
-            'doc1', 'doc2', 'doc3',
-            'imagenes_eliminadas', 'orden_imagenes',
-            'video',   // el video se procesa manualmente más abajo
-            '_method', '_token',
-        ]);
+        $datos = $request->except(['imagen_url', 'imagenes', 'id', 'nombre', 'doc1', 'doc2', 'doc3', 'imagenes_eliminadas', 'orden_imagenes', 'video', '_method', '_token']);
         $producto->update($datos);
 
         $rutaProducto = public_path("images/productos/{$producto->id}");
-        if (!file_exists($rutaProducto)) {
-            mkdir($rutaProducto, 0755, true);
-        }
+        if (!file_exists($rutaProducto)) mkdir($rutaProducto, 0755, true);
 
-        // ── IMAGEN PRINCIPAL (sin GD ni Imagick) ─────────────────────────────────
-        if ($request->hasFile('imagen_url')) {
-            foreach (glob($rutaProducto . "/principal.*") as $archivo) {
-                @unlink($archivo);
-            }
-            $ext          = strtolower($request->file('imagen_url')->getClientOriginalExtension());
-            $nombreImagen = 'principal.' . $ext;
-            $request->file('imagen_url')->move($rutaProducto, $nombreImagen);
-            $producto->imagen_url = "images/productos/{$producto->id}/{$nombreImagen}";
-        }
-
-        // ── GUARDAR NUEVO ORDEN DE IMÁGENES EXISTENTES ──────────────────────────
-        // orden_imagenes llega como JSON: ["existente-ID1","existente-ID2",...]
-        // Actualizamos la columna "orden" de cada registro en la BD.
-        $ordenJson = $request->input('orden_imagenes', '[]');
-        $ordenIds  = json_decode($ordenJson, true) ?? [];
-
-        foreach ($ordenIds as $posicion => $slotId) {
-            // Solo procesamos los slots que ya estaban en la BD (prefijo "existente-")
-            if (str_starts_with($slotId, 'existente-')) {
-                $idLimpio = str_replace('existente-', '', $slotId);
-                ImagenProducto::where('id', $idLimpio)
-                    ->where('producto_id', $producto->id)
-                    ->update(['orden' => $posicion + 1]);
-            }
-        }
-<<<<<<< HEAD
-=======
-
-        // ── ELIMINAR IMÁGENES EXTRA MARCADAS POR EL USUARIO ─────────────────────
         $eliminadasJson = $request->input('imagenes_eliminadas', '[]');
         $idsEliminar    = json_decode($eliminadasJson, true) ?? [];
 
         foreach ($idsEliminar as $imgId) {
             $idLimpio     = str_replace('existente-', '', $imgId);
             $imgExistente = ImagenProducto::find($idLimpio);
-
             if ($imgExistente && $imgExistente->producto_id == $producto->id) {
-                if (file_exists(public_path($imgExistente->ruta))) {
-                    @unlink(public_path($imgExistente->ruta));
-                }
+                if (file_exists(public_path($imgExistente->ruta))) @unlink(public_path($imgExistente->ruta));
                 $imgExistente->delete();
             }
         }
 
-        // ── IMÁGENES EXTRA NUEVAS (sin GD ni Imagick) ────────────────────────────
-        $ultimoOrden = (int) ImagenProducto::where('producto_id', $producto->id)->max('orden');
-        $orden       = $ultimoOrden + 1;
-
->>>>>>> 2f2b68704d9142102fced4c6d1f1f3eed6dd046f
-        // 3. Subir nuevas imágenes a la galería auxiliar
         $nuevasRutasGuardadas = [];
         if ($request->hasFile('imagenes')) {
             foreach ($request->file('imagenes') as $img) {
                 $ext    = strtolower($img->getClientOriginalExtension());
                 $nombre = "extra_" . time() . "_" . uniqid() . '.' . $ext;
                 $img->move($rutaProducto, $nombre);
-
                 $idUnicoTexto = 'IMG_' . time() . '_' . strtoupper(Str::random(5));
-                $rutaFinalDb = "images/productos/{$producto->id}/{$nombre}";
-
                 ImagenProducto::create([
                     'id'          => $idUnicoTexto,
                     'producto_id' => (string) $producto->id,
                     'ruta'        => "images/productos/{$producto->id}/{$nombre}",
-                    'orden'       => $orden,
+                    'orden'       => 999,
                 ]);
-
                 $nuevasRutasGuardadas[] = $idUnicoTexto;
             }
         }
 
-        // 4. Reordenar galería según la sincronización de tu front
         if ($request->filled('orden_imagenes')) {
             $ordenMapeo = json_decode($request->input('orden_imagenes'), true);
             if (is_array($ordenMapeo)) {
-                $contadorOrden = 0;
+                $contadorOrden = 1;
                 $indiceNuevas = 0;
-
                 foreach ($ordenMapeo as $idData) {
-                    if (strpos($idData, 'existente-') === 0) {
+                    if (str_starts_with($idData, 'existente-')) {
                         $idDb = str_replace('existente-', '', $idData);
-                        ImagenProducto::where('id', $idDb)->update(['orden' => $contadorOrden]);
+                        ImagenProducto::where('id', $idDb)->where('producto_id', $producto->id)->update(['orden' => $contadorOrden]);
                         $contadorOrden++;
-                    } elseif (strpos($idData, 'nueva-') === 0) {
+                    } elseif (str_starts_with($idData, 'nueva-')) {
                         if (isset($nuevasRutasGuardadas[$indiceNuevas])) {
                             $idNuevaCreada = $nuevasRutasGuardadas[$indiceNuevas];
                             ImagenProducto::where('id', $idNuevaCreada)->update(['orden' => $contadorOrden]);
@@ -269,58 +246,34 @@ class ProductoController extends Controller
             }
         }
 
-        // 5. Procesar Video Promocional Local
-        if ($request->hasFile('video')) {
-            if (!empty($producto->video_url) && file_exists(public_path($producto->video_url))) {
-                @unlink(public_path($producto->video_url));
-            }
+        $imagenPrincipalActualizada = ImagenProducto::where('producto_id', $producto->id)->orderBy('orden', 'asc')->first();
+        if ($imagenPrincipalActualizada) $producto->imagen_url = $imagenPrincipalActualizada->ruta;
 
+        if ($request->hasFile('video')) {
+            if (!empty($producto->video_url) && file_exists(public_path($producto->video_url))) @unlink(public_path($producto->video_url));
             $nombreVideo = 'video_' . time() . '.mp4';
             $request->file('video')->move($rutaProducto, $nombreVideo);
             $producto->video_url = "images/productos/{$producto->id}/{$nombreVideo}";
         }
 
-        // 6. Eliminar documentos técnicos
         foreach (['doc1', 'doc2', 'doc3'] as $campo) {
             $columna = $campo . '_url';
             if ($request->has('eliminar_' . $campo) && !empty($producto->$columna)) {
-                if (file_exists(public_path($producto->$columna))) {
-                    @unlink(public_path($producto->$columna));
-                }
+                if (file_exists(public_path($producto->$columna))) @unlink(public_path($producto->$columna));
                 $producto->$columna = null;
             }
         }
 
-        // 7. Guardar nuevos documentos cargados
         $this->procesarDocumentos($request, $producto);
-
-        // ── VIDEO PROMOCIONAL ────────────────────────────────────────────────────
-        // CORRECCIÓN: el input name="video" vive dentro del formulario principal,
-        // por lo que debe procesarse aquí en update(), no en updateVideo().
-        if ($request->hasFile('video')) {
-            // Validar que sea un video MP4
-            $request->validate(['video' => 'file|mimes:mp4|max:51200']);
-
-            // Borrar video anterior si existe
-            if (!empty($producto->video_url) && file_exists(public_path($producto->video_url))) {
-                @unlink(public_path($producto->video_url));
-            }
-
-            $nombreVideo         = 'video_' . time() . '.mp4';
-            $request->file('video')->move($rutaProducto, $nombreVideo);
-            $producto->video_url = "images/productos/{$producto->id}/{$nombreVideo}";
-        }
-
         $producto->save();
 
-        return redirect()->route('productos.edit', $producto->id)
-            ->with('success_edit', 'Producto actualizado correctamente.');
+        return redirect()->route('productos.edit', $producto->id)->with('success_edit', 'Producto actualizado.');
     }
 
-    // Catálogo público por categoría
+    //catalogo publico por categoria
     public function mostrarProductosPorCategoria($id_categoria)
     {
-        $productos       = Producto::query()->where('categoria_id', $id_categoria)->paginate(8);
+        $productos       = Producto::with('imagenes')->where('categoria_id', $id_categoria)->paginate(8);
         $categorias      = Categoria::all();
         $categoriaNombre = DB::table('categorias')->where('id_categoria', $id_categoria)->value('nombre');
 
@@ -328,15 +281,11 @@ class ProductoController extends Controller
     }
 
     // Vista pública "Ver más"
-    // CORRECCIÓN: el ID del producto es un STRING (ej: "ZAR-CQP-001"), no un int.
-    // El type hint "int $id" hacía que PHP lo convierta a 0 y el producto encontrado
-    // nunca coincidía con los producto_id de imagenes_productos.
     public function verMas($id)
     {
         $producto        = Producto::findOrFail($id);
         $nombreCategoria = DB::table('categorias')->where('id_categoria', $producto->categoria_id)->value('nombre');
 
-        // Traemos los objetos completos; la vista los usa directamente con $img->ruta
         $imagenes = DB::table('imagenes_productos')
             ->where('producto_id', $producto->id)
             ->orderBy('orden')
@@ -376,7 +325,7 @@ class ProductoController extends Controller
         return redirect()->route('productos.index')->with('success', 'Producto eliminado correctamente.');
     }
 
-    // Gestionar Video promocional
+    // Gestionar Video de respaldo
     public function updateVideo(Request $request, $id)
     {
         $request->validate(['video' => 'required|file|mimes:mp4|max:51200']);
@@ -458,6 +407,7 @@ class ProductoController extends Controller
             ->where('id', $nuevoId)
             ->update([
                 'imagen_url' => DB::raw("REPLACE(imagen_url, 'images/productos/{$idAnterior}/', 'images/productos/{$nuevoId}/')"),
+                'video_url'  => DB::raw("REPLACE(video_url,  'images/productos/{$idAnterior}/', 'images/productos/{$nuevoId}/')"),
                 'doc1_url'   => DB::raw("REPLACE(doc1_url,   'docs/productos/{$idAnterior}/',   'docs/productos/{$nuevoId}/')"),
                 'doc2_url'   => DB::raw("REPLACE(doc2_url,   'docs/productos/{$idAnterior}/',   'docs/productos/{$nuevoId}/')"),
                 'doc3_url'   => DB::raw("REPLACE(doc3_url,   'docs/productos/{$idAnterior}/',   'docs/productos/{$nuevoId}/')")

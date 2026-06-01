@@ -495,9 +495,9 @@
                 <button type="button" class="zx-thumb {{ $i === 0 ? 'active' : '' }}" data-slide-to="{{ $i }}">
                     @if($item['tipo'] === 'video')
                         <div class="video-indicator"><i class="fas fa-play"></i></div>
-                        <img src="{{ asset(ltrim(str_replace('public/', '', $producto->imagen_url), '/')) }}?v={{ time() }}" alt="Miniatura Video">
+                        <img src="{{ asset('storage/' . ltrim(str_replace('public/', '', $producto->imagen_url), '/')) }}?v={{ time() }}" alt="Miniatura Video">
                     @else
-                        <img src="{{ asset($item['ruta']) }}?v={{ time() }}" alt="Miniatura {{ $i }}">
+                        <img src="{{ asset('storage/' . $item['ruta']) }}?v={{ time() }}" alt="Miniatura {{ $i }}">
                     @endif
                 </button>
             @endforeach
@@ -513,12 +513,12 @@
                             @if($item['tipo'] === 'video')
                                 <div class="video-wrapper-carousel">
                                     <video controls style="width:100%; height:100%; object-fit:contain;" playsinline class="promo-video-player" preload="metadata">
-                                        <source src="{{ asset($item['ruta']) }}" type="video/mp4">
+                                        <source src="{{ asset('storage/' . $item['ruta']) }}" type="video/mp4">
                                         Tu navegador no soporta el reproductor de video.
                                     </video>
                                 </div>
                             @else
-                                <img src="{{ asset($item['ruta']) }}?v={{ time() }}" class="zx-main-img" alt="Slide {{ $i }}">
+                                <img src="{{ asset('storage/' . $item['ruta']) }}?v={{ time() }}" class="zx-main-img" alt="Slide {{ $i }}">
                             @endif
                         </div>
                     @endforeach

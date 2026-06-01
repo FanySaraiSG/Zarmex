@@ -1,303 +1,349 @@
 <x-app-layout>
 @auth('employee')
 
-<div class="container mt-4">
-    <div class="crud-box">
+<div class="zx-wrapper">
 
-        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-            <a class="btn btn-back" href="{{ route('admin.dashboard') }}">← Regresar</a>
-            <a class="btn btn-add" href="{{ route('productos.create') }}">+ Añadir Producto</a>
+    {{-- HEADER --}}
+    <div class="zx-header">
+        <a class="btn-back" href="{{ route('admin.dashboard') }}">← Regresar</a>
+
+        <div class="zx-header-center">
+            <h1 class="zx-title">{{ $categoriaNombre }}</h1>
+            <p class="zx-subtitle">Administra y organiza tus productos por categoría</p>
         </div>
 
-        <h2 class="crud-title">
-            {{ $categoriaNombre }}
-        </h2>
-
-        <div class="table-responsive">
-            <table class="table table-striped table-bordered text-center align-middle">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>ID</th>
-                        <th>Descripción</th>
-                        <th>Precio</th>
-                        <th>Stock</th>
-                        <th>Categoría</th>
-                        <th>Imagen</th>
-                        <th>Fecha</th>
-                        <th>Garantía</th>
-                        <th>Manual</th>
-                        <th>Ficha Técnica</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    @foreach ($productos as $producto)
-                    <tr>
-                        <td>{{ $loop->iteration }}</td>
-                        <td>{{ $producto->id }}</td>
-
-                        <td style="max-width: 220px;">
-                            {{ Str::limit($producto->descripcion, 80) }}
-                        </td>
-
-                        <td>${{ number_format($producto->precio, 2) }}</td>
-
-                        <td>{{ $producto->stock }}</td>
-
-                        <td>
-                            {{ $producto->categoria->nombre ?? 'Sin categoría' }}
-                        </td>
-
-                        <td>
-                            @if($producto->imagen_url)
-                                <img src="{{ asset($producto->imagen_url) }}"
-                                     width="56"
-                                     style="border-radius:10px; border:1px solid #c7cdcf; background:#fff; padding:3px;">
-                            @else
-                                —
-                            @endif
-                        </td>
-
-                        <td>
-                            {{ $producto->created_at ? $producto->created_at->format('Y-m-d H:i') : '—' }}
-                        </td>
-
-                        <td>
-                            @if($producto->doc1_url)
-                                <a class="btn btn-doc btn-sm"
-                                   href="{{ asset($producto->doc1_url) }}"
-                                   target="_blank">
-                                   Ver
-                                </a>
-                            @else
-                                —
-                            @endif
-                        </td>
-
-                        <td>
-                            @if($producto->doc2_url)
-                                <a class="btn btn-doc btn-sm"
-                                   href="{{ asset($producto->doc2_url) }}"
-                                   target="_blank">
-                                   Ver
-                                </a>
-                            @else
-                                —
-                            @endif
-                        </td>
-
-                        <td>
-                            @if($producto->doc3_url)
-                                <a class="btn btn-doc btn-sm"
-                                   href="{{ asset($producto->doc3_url) }}"
-                                   target="_blank">
-                                   Ver
-                                </a>
-                            @else
-                                —
-                            @endif
-                        </td>
-
-                        <td>
-                            <div class="acciones-btns">
-                                <a href="{{ route('productos.edit', $producto->id) }}"
-                                   class="btn btn-edit btn-sm">
-                                   Editar
-                                </a>
-
-                                <form action="{{ route('productos.destroy', $producto->id) }}"
-                                      method="POST">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit"
-                                            class="btn btn-delete btn-sm"
-                                            onclick="return confirm('¿Estás seguro de eliminar este producto?')">
-                                        Eliminar
-                                    </button>
-                                </form>
-                            </div>
-                        </td>
-
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-
+        <a class="btn-add" href="{{ route('productos.create') }}">+ Añadir Producto</a>
     </div>
+
+    {{-- CARDS LIST --}}
+    <div class="zx-card-list">
+        @foreach ($productos as $producto)
+        <div class="zx-card">
+
+            {{-- Ícono / Imagen --}}
+            <div class="zx-card-icon">
+                @if($producto->imagen_url)
+                    <img src="{{ asset($producto->imagen_url) }}" alt="img">
+                @else
+                    <span class="zx-icon-placeholder">📦</span>
+                @endif
+            </div>
+
+            {{-- Info principal --}}
+            <div class="zx-card-info">
+                <span class="zx-card-name">{{ Str::limit($producto->descripcion, 60) }}</span>
+                <span class="zx-card-meta">
+                    <span class="zx-badge">ID #{{ $producto->id }}</span>
+                    <span class="zx-badge">Stock: {{ $producto->stock }}</span>
+                    <span class="zx-badge">${{ number_format($producto->precio, 2) }}</span>
+                    @if($producto->categoria)
+                        <span class="zx-badge zx-badge-cat">{{ $producto->categoria->nombre }}</span>
+                    @endif
+                </span>
+            </div>
+
+            {{-- Docs --}}
+            <div class="zx-card-docs">
+                @if($producto->doc1_url)
+                    <a class="btn-doc" href="{{ asset($producto->doc1_url) }}" target="_blank">Garantía</a>
+                @endif
+                @if($producto->doc2_url)
+                    <a class="btn-doc" href="{{ asset($producto->doc2_url) }}" target="_blank">Manual</a>
+                @endif
+                @if($producto->doc3_url)
+                    <a class="btn-doc" href="{{ asset($producto->doc3_url) }}" target="_blank">Ficha</a>
+                @endif
+            </div>
+
+            {{-- Acciones --}}
+            <div class="zx-card-actions">
+                <a href="{{ route('productos.edit', $producto->id) }}" class="btn-edit">
+                    ✏️ Editar
+                </a>
+                <form action="{{ route('productos.destroy', $producto->id) }}" method="POST" style="margin:0;">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn-delete"
+                            onclick="return confirm('¿Estás seguro de eliminar este producto?')">
+                        🗑 Eliminar
+                    </button>
+                </form>
+            </div>
+
+        </div>
+        @endforeach
+    </div>
+
 </div>
 
 <style>
-:root{
-    --zx-dark: #234d50;
-    --zx-mid: #3f6f76;
-    --zx-soft: #d9d9d9;
-    --zx-border: #c7cdcf;
-    --zx-white: #ffffff;
-    --zx-blue: #3d6ee8;
-    --zx-red: #d84c4c;
-}
+/* ── Reset / Base ────────────────────────────────── */
+*{ box-sizing: border-box; }
 
 body{
-    background: #0f1720;
+    background: #f0f2f5;
+    font-family: 'Segoe UI', system-ui, sans-serif;
 }
 
-nav{
-    background-color: inherit !important;
-}
+nav{ background-color: inherit !important; }
 
 header,
 footer,
 .whatsapp,
 #whatsapp,
-.btn-whatsapp{
-    display: none !important;
+.btn-whatsapp{ display: none !important; }
+
+/* ── Wrapper ─────────────────────────────────────── */
+.zx-wrapper{
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 20px 60px;
 }
 
-.crud-box{
-    background: var(--zx-soft);
-    border-radius: 24px;
-    padding: 24px;
-    box-shadow: 0 10px 30px rgba(0,0,0,.12);
-    margin-top: 20px;
+/* ── Header ──────────────────────────────────────── */
+.zx-header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
 }
 
-.crud-title{
+.zx-header-center{
     text-align: center;
-    color: var(--zx-dark);
+    flex: 1;
+}
+
+.zx-title{
+    font-size: 26px;
     font-weight: 800;
-    margin-bottom: 22px;
+    color: #1a1a2e;
+    margin: 0 0 4px;
 }
 
-.table{
-    background-color: white !important;
-    overflow: hidden;
-    border-radius: 14px;
-    margin-bottom: 0;
+.zx-subtitle{
+    font-size: 13px;
+    color: #6b7280;
+    margin: 0;
 }
 
-.table thead th{
-    background: var(--zx-mid) !important;
-    color: white !important;
-    border-color: var(--zx-mid) !important;
-    text-align: center;
-    vertical-align: middle;
-}
-
-.table tbody td{
-    vertical-align: middle;
-    text-align: center;
-    border-color: var(--zx-border) !important;
-    background: #efefef;
-}
-
-.table-responsive{
-    border-radius: 14px;
-    overflow: hidden;
-}
-
+/* ── Back / Add buttons ──────────────────────────── */
 .btn-back{
-    background: #2f555b;
-    color: #fff;
-    border: none;
-    border-radius: 16px;
-    padding: 12px 22px;
-    font-weight: 700;
-    font-size: 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 20px;
+    border: 1.5px solid #d1d5db;
+    border-radius: 10px;
+    background: #fff;
+    color: #374151;
+    font-weight: 600;
+    font-size: 14px;
     text-decoration: none;
-    box-shadow: 0 4px 10px rgba(0,0,0,.10);
-    transition: .2s ease;
+    transition: .18s;
+    white-space: nowrap;
 }
 
 .btn-back:hover{
-    background: #24464b;
-    color: #fff;
+    background: #f9fafb;
+    border-color: #9ca3af;
+    color: #111;
     transform: translateY(-1px);
 }
 
 .btn-add{
-    background: #d5d9da;
-    color: var(--zx-dark);
-    border: 1px solid #b5bbbd;
-    border-radius: 16px;
-    padding: 12px 22px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 22px;
+    background: #1a5c38;
+    color: #fff;
+    border-radius: 10px;
     font-weight: 700;
-    font-size: 16px;
-    box-shadow: 0 4px 10px rgba(0,0,0,.08);
-    transition: .2s ease;
+    font-size: 14px;
     text-decoration: none;
+    white-space: nowrap;
+    box-shadow: 0 4px 14px rgba(26,92,56,.25);
+    transition: .18s;
 }
 
 .btn-add:hover{
-    background: #c8cdcf;
-    color: var(--zx-dark);
-    transform: translateY(-1px);
-}
-
-.btn-edit{
-    background: var(--zx-blue);
-    color: white;
-    border: none;
-    border-radius: 14px;
-    padding: 10px 18px;
-    font-weight: 700;
-    box-shadow: 0 4px 10px rgba(0,0,0,.10);
-    transition: .2s ease;
-}
-
-.btn-edit:hover{
-    background: #2f5fd3;
-    color: white;
-    transform: translateY(-1px);
-}
-
-.btn-delete{
-    background: var(--zx-red);
-    color: white;
-    border: none;
-    border-radius: 14px;
-    padding: 10px 18px;
-    font-weight: 700;
-    box-shadow: 0 4px 10px rgba(0,0,0,.10);
-    transition: .2s ease;
-}
-
-.btn-delete:hover{
-    background: #bf3f3f;
-    color: white;
-    transform: translateY(-1px);
-}
-
-.btn-doc{
-    background: var(--zx-dark);
+    background: #145030;
     color: #fff;
-    border: none;
-    border-radius: 12px;
-    padding: 8px 14px;
-    font-weight: 700;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(26,92,56,.3);
 }
 
-.btn-doc:hover{
-    background: #1c3f42;
-    color: #fff;
+/* ── Card list ───────────────────────────────────── */
+.zx-card-list{
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
 }
 
-.acciones-btns{
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    gap:8px;
+/* ── Card ────────────────────────────────────────── */
+.zx-card{
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    background: #fff;
+    border-radius: 16px;
+    padding: 16px 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    border: 1px solid #e5e7eb;
+    transition: box-shadow .18s, transform .18s;
     flex-wrap: wrap;
 }
 
-.acciones-btns form{
-    margin:0;
+.zx-card:hover{
+    box-shadow: 0 6px 20px rgba(0,0,0,.10);
+    transform: translateY(-1px);
 }
 
-td, th{
-    vertical-align: middle !important;
+/* ── Icon ────────────────────────────────────────── */
+.zx-card-icon{
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    background: #d4edda;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.zx-card-icon img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 12px;
+}
+
+.zx-icon-placeholder{
+    font-size: 24px;
+    line-height: 1;
+}
+
+/* ── Info ────────────────────────────────────────── */
+.zx-card-info{
+    flex: 1;
+    min-width: 160px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.zx-card-name{
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a1a2e;
+}
+
+.zx-card-meta{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.zx-badge{
+    font-size: 11.5px;
+    font-weight: 600;
+    background: #f3f4f6;
+    color: #4b5563;
+    border-radius: 20px;
+    padding: 3px 10px;
+}
+
+.zx-badge-cat{
+    background: #dcfce7;
+    color: #166534;
+}
+
+/* ── Docs ────────────────────────────────────────── */
+.zx-card-docs{
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.btn-doc{
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 13px;
+    border-radius: 8px;
+    border: 1.5px solid #d1d5db;
+    color: #374151;
+    background: #fff;
+    text-decoration: none;
+    transition: .15s;
+}
+
+.btn-doc:hover{
+    background: #f0fdf4;
+    border-color: #6ee7b7;
+    color: #065f46;
+}
+
+/* ── Actions ─────────────────────────────────────── */
+.zx-card-actions{
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.btn-edit{
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 18px;
+    border: 1.5px solid #3b82f6;
+    border-radius: 9px;
+    color: #3b82f6;
+    background: #fff;
+    font-weight: 700;
+    font-size: 13.5px;
+    text-decoration: none;
+    transition: .15s;
+    white-space: nowrap;
+}
+
+.btn-edit:hover{
+    background: #eff6ff;
+    color: #2563eb;
+    border-color: #2563eb;
+}
+
+.btn-delete{
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 18px;
+    border: 1.5px solid #ef4444;
+    border-radius: 9px;
+    color: #ef4444;
+    background: #fff;
+    font-weight: 700;
+    font-size: 13.5px;
+    cursor: pointer;
+    transition: .15s;
+    white-space: nowrap;
+}
+
+.btn-delete:hover{
+    background: #fef2f2;
+    color: #dc2626;
+    border-color: #dc2626;
+}
+
+/* ── Responsive ──────────────────────────────────── */
+@media (max-width: 640px){
+    .zx-header{ flex-direction: column; align-items: stretch; text-align: center; }
+    .zx-card{ gap: 12px; }
+    .zx-card-info{ width: 100%; }
 }
 </style>
 

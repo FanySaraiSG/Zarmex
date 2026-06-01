@@ -87,7 +87,7 @@
         .img-slot:active { cursor: grabbing; }
         .sortable-ghost  { opacity: 0.35; border: 2px dashed var(--primary-green) !important; }
         .sortable-chosen { box-shadow: 0 8px 20px rgba(0,0,0,.18); transform: scale(1.03); }
-        /* Indicador visual de que los slots son arrastrables */
+        
         #sortable-gallery .img-slot::after {
             content: '⠿';
             position: absolute;
@@ -121,6 +121,23 @@
         }
         .remove-btn:hover { background: rgba(200, 35, 50, 1); }
 
+        /* BADGE DINÁMICO DE IMAGEN PRINCIPAL */
+        #sortable-gallery .img-slot:first-child::before {
+            content: "Principal";
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: var(--primary-green);
+            color: white;
+            font-size: 0.65rem;
+            font-weight: 800;
+            padding: 2px 8px;
+            border-radius: 6px;
+            z-index: 5;
+            text-transform: uppercase;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
         .doc-box { 
             border: 1px solid #e0e0e0; 
             border-radius: 12px; 
@@ -134,10 +151,6 @@
         }
 
         #video-preview-container video { width: 35%; border-radius: 50px; background: #000; margin-top: 10px; }
-
-        .doc-box { border: 1px solid #e0e0e0; border-radius: 12px; padding: 20px; margin-bottom: 20px; transition: 0.3s; }
-        .doc-box:hover { border-color: var(--primary-green); background: var(--bg-gray); }
-
         .btn-save { background-color: var(--primary-green); color: white; border: none; padding: 15px 40px; border-radius: 12px; font-weight: bold; }
         .btn-back { background-color: #6c757d; color: white; border: none; padding: 12px 25px; border-radius: 12px; text-decoration: none; display: inline-flex; align-items: center; }
         .btn-back:hover { background-color: #5a6268; color: white; }
@@ -177,11 +190,6 @@
             @csrf
             @method('PUT')
 
-            {{-- 
-                CORRECCIÓN: estos dos campos hidden sincronizan con el controlador
-                el orden final de la galería y los IDs de imágenes eliminadas.
-                El JS los actualiza en cada cambio antes del submit.
-            --}}
             <input type="hidden" name="orden_imagenes"     id="orden_imagenes">
             <input type="hidden" name="imagenes_eliminadas" id="imagenes_eliminadas" value="[]">
 
@@ -196,9 +204,8 @@
                 {{-- ══════════════ TAB 1: INFORMACIÓN ══════════════ --}}
                 <div class="tab-pane fade show active" id="tab-info" role="tabpanel">
                     <div class="row align-items-start">
-
                         <div class="col-md-8 mb-3">
-                            <label for="categoria_id" class="form-label fw-bold">Categoría</label>
+                            <label class="form-label fw-bold">Categoría</label>
                             <select class="form-select" id="categoria_id" name="categoria_id">
                                 @foreach($categorias as $cat)
                                     <option value="{{ $cat->id_categoria }}" {{ $producto->categoria_id == $cat->id_categoria ? 'selected' : '' }}>
@@ -209,7 +216,7 @@
                         </div>
 
                         <div class="col-md-4 mb-3">
-                            <label for="id" class="form-label fw-bold">ID del Producto</label>
+                            <label class="form-label fw-bold">ID del Producto</label>
                             <input type="text" name="id" id="id" class="form-control bg-light" value="{{ old('id', $producto->id) }}" readonly>
                             <small class="text-danger fw-bold">El código identificador no es modificable.</small>
                         </div>
@@ -218,7 +225,6 @@
                             <label class="form-label fw-bold text-muted small">DESCRIPCIÓN</label>
                             <textarea name="descripcion" class="form-control" rows="6" placeholder="Escriba aquí la descripción...">{{ old('descripcion', $producto->descripcion) }}</textarea>
                         </div>
-
                     </div>
 
                     <div class="d-flex justify-content-end">
@@ -226,77 +232,64 @@
                     </div>
                 </div> 
 
-               {{-- PESTAÑA 2: MULTIMEDIA --}}
-<div class="tab-pane fade" id="tab-media" role="tabpanel">
+                {{-- ══════════════ TAB 2: MULTIMEDIA ══════════════ --}}
+                <div class="tab-pane fade" id="tab-media" role="tabpanel">
+                    
+                    <label class="form-label fw-bold mb-2">GALERÍA DE IMÁGENES (Máximo 6 imágenes en total)</label>
+                    
+                    {{-- Contenedor unificado de ordenamiento --}}
+                    <div class="gallery-grid mb-4" id="sortable-gallery">
+                        @if($imagenesExtra && $imagenesExtra->count() > 0)
+                            @foreach($imagenesExtra as $img)
+                                <div class="img-slot" data-id="existente-{{ $img->id }}">
+                                    <button type="button" class="remove-btn" onclick="eliminarImagenSlot(this, 'existente-{{ $img->id }}')">✕</button>
+                                    <img src="{{ asset($img->ruta) }}?v={{ $img->updated_at ? $img->updated_at->timestamp : time() }}" alt="Producto">
+                                </div>
+                            @endforeach
+                        @endif
+                    </div>
 
+                    {{-- DRAG & DROP DE IMÁGENES NUEVAS --}}
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-muted">AGREGAR IMÁGENES NUEVAS</label>
+                        <div class="upload-area" id="drop-zone" onclick="document.getElementById('mass-image-input').click()">
+                            <i class="bi bi-cloud-arrow-up fs-2 text-success mb-2 d-block"></i>
+                            <span class="fw-bold text-secondary d-block">Arrastra tus imágenes aquí</span>
+                            <span class="text-muted small">o haz clic para examinar (Máx. 6 imágenes • Hasta 2MB c/u)</span>
+                            <input type="file"
+                                   id="mass-image-input"
+                                   name="imagenes[]"
+                                   class="d-none"
+                                   accept="image/jpg,image/jpeg,image/png,image/webp,image/gif"
+                                   multiple>
+                        </div>
+                        <div class="form-text text-success" id="disponibles-text">Puedes agregar nuevas imágenes hasta completar un espacio de 6 recuadros.</div>
+                    </div>
 
+                    {{-- Video Promocional --}}
+                    <label class="form-label fw-bold">VIDEO PROMOCIONAL (Archivo Local)</label>
+                    <div class="d-flex gap-3 align-items-start mb-3">
+                        <div style="flex: 1;">
+                            <input type="file" name="video" id="video-input" class="form-control"
+                                   accept="video/mp4,video/mkv,video/x-m4v,video/*"
+                                   onchange="previewVideo(this)">
+                            <div class="form-text">Se reemplaza el video anterior automáticamente si subes uno nuevo (Máx. 50MB).</div>
+                        </div>
+                    </div>
 
-    {{-- ── Galería Extra ── --}}
-    <label class="form-label fw-bold mb-2">GALERÍA DE IMÁGENES (Arrastra para reordenar)</label>
+                    <div id="video-preview-container" class="mt-2 mb-4" style="{{ $producto->video_url ? '' : 'display:none;' }}">
+                        <p class="small text-muted mb-1">Vista previa del Video:</p>
+                        <video id="video-tag" controls style="width: 45%; border-radius: 12px; background: #000;">
+                            <source src="{{ $producto->video_url ? asset($producto->video_url) : '' }}" id="video-source">
+                            Tu navegador no soporta la reproducción de video.
+                        </video>
+                    </div>
 
-    @if($imagenesExtra->count() > 0)
-        <div class="gallery-grid mb-3" id="sortable-gallery">
-            @foreach($imagenesExtra as $img)
-                <div class="img-slot" data-id="existente-{{ $img->id }}">
-                    <button type="button" class="remove-btn"
-                            onclick="eliminarImagenSlot(this, 'existente-{{ $img->id }}')">✕</button>
-                    <img src="{{ asset($img->ruta) }}?v={{ $img->updated_at ? $img->updated_at->timestamp : time() }}" alt="Producto">
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-outline-secondary btn-next-tab bg-white text-secondary px-4 py-2" onclick="cambiarPestaña('#tab-info-btn')"><i class="bi bi-arrow-left me-1"></i> Anterior</button>
+                        <button type="button" class="btn btn-next-tab px-4 py-2" onclick="cambiarPestaña('#tab-docs-btn')">Siguiente Pestaña <i class="bi bi-arrow-right ms-1"></i></button>
+                    </div>
                 </div>
-            @endforeach
-        </div>
-    @else
-        <div class="gallery-grid mb-3" id="sortable-gallery"></div>
-    @endif
-
-    {{-- Agregar imágenes nuevas --}}
-    <div class="mb-3">
-        <label class="form-label fw-bold small text-muted">AGREGAR IMÁGENES NUEVAS</label>
-        <input type="file"
-               id="mass-image-input"
-               name="imagenes[]"
-               class="form-control"
-               accept="image/jpg,image/jpeg,image/png,image/webp,image/gif"
-               multiple
-               onchange="previsualizarNuevas(this)">
-        <div class="form-text">Puedes seleccionar varias a la vez. Formatos: jpg, png, webp.</div>
-    </div>
-
-    {{-- Previsualización de imágenes recién seleccionadas --}}
-    <div class="gallery-grid mb-4" id="preview-nuevas"></div>
-
-    {{-- ── Video Promocional ── --}}
-    <label class="form-label fw-bold">VIDEO PROMOCIONAL (Archivo Local)</label>
-    <div class="d-flex gap-3 align-items-start mb-3">
-        <div style="flex: 1;">
-            <input type="file" name="video" id="video-input" class="form-control"
-                   accept="video/mp4,video/mkv,video/x-m4v,video/*"
-                   onchange="previewVideo(this)">
-            <div class="form-text">Se reemplaza el video anterior si subes uno nuevo.</div>
-        </div>
-        @if(!empty($producto->video_url))
-            <button type="button" class="btn btn-outline-danger btn-sm mt-2"
-                    onclick="borrarVideoActual({{ $producto->id }})">
-                Borrar video actual
-            </button>
-        @endif
-    </div>
-
-    <div id="video-preview-container" class="mt-2 mb-4"
-         style="{{ $producto->video_url ? '' : 'display:none;' }}">
-        <p class="small text-muted mb-1">Vista previa:</p>
-        <video id="video-tag" controls style="width: 100%; border-radius: 12px; background: #000;">
-            <source src="{{ $producto->video_url ? asset($producto->video_url) : '' }}" id="video-source">
-            Tu navegador no soporta la reproducción de video.
-        </video>
-    </div>
-
-    <div class="d-flex justify-content-between">
-        <button type="button" class="btn btn-outline-secondary btn-next-tab bg-white text-secondary px-4 py-2"
-                onclick="cambiarPestaña('#tab-info-btn')"><i class="bi bi-arrow-left me-1"></i> Anterior</button>
-        <button type="button" class="btn btn-next-tab px-4 py-2"
-                onclick="cambiarPestaña('#tab-docs-btn')">Siguiente Pestaña <i class="bi bi-arrow-right ms-1"></i></button>
-    </div>
-</div>
 
                 {{-- ══════════════ TAB 3: DOCUMENTOS ══════════════ --}}
                 <div class="tab-pane fade" id="tab-docs" role="tabpanel">
@@ -312,13 +305,9 @@
                         @php
                             $docUrl = null;
                             if (!empty($data['path'])) {
-                                if (preg_match('#^https?://#', $data['path'])) {
-                                    $docUrl = $data['path'];
-                                } elseif (preg_match('#^/?storage/#', $data['path'])) {
-                                    $docUrl = asset($data['path']);
-                                } else {
-                                    $docUrl = Storage::url($data['path']);
-                                }
+                                if (preg_match('#^https?://#', $data['path'])) { $docUrl = $data['path']; }
+                                elseif (preg_match('#^/?storage/#', $data['path'])) { $docUrl = asset($data['path']); }
+                                else { $docUrl = Storage::url($data['path']); }
                             }
                         @endphp
                     <div class="doc-box">
@@ -344,20 +333,15 @@
                     @endforeach
 
                     <div class="d-flex justify-content-start mt-4">
-                        <button type="button"
-                                class="btn btn-outline-secondary btn-next-tab bg-white text-secondary px-4 py-2"
-                                onclick="cambiarPestaña('#tab-media-btn')">
-                            <i class="bi bi-arrow-left me-1"></i> Anterior
-                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-next-tab bg-white text-secondary px-4 py-2" onclick="cambiarPestaña('#tab-media-btn')"><i class="bi bi-arrow-left me-1"></i> Anterior</button>
                     </div>
                 </div>
 
-            </div>{{-- /tab-content --}}
+            </div>
 
             <div class="d-flex justify-content-between align-items-center mt-5 border-top pt-4">
                 <span class="text-muted fw-bold" id="tabIndicator">Pestaña 1 de 3</span>
-                <button type="submit" id="btn-global-submit"
-                        class="btn btn-save px-5 py-2 fs-5 shadow-sm d-none">
+                <button type="submit" id="btn-global-submit" class="btn btn-save px-5 py-2 fs-5 shadow-sm d-none">
                     <i class="bi bi-check-circle me-2"></i> Guardar Todos los Cambios
                 </button>
             </div>
@@ -367,46 +351,64 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    /* ════════════════════════════════════════════════════════════════════════
-       GALERÍA — lógica simplificada sin DataTransfer
-       • Las imágenes nuevas se envían con el input nativo name="imagenes[]"
-       • previsualizarNuevas() muestra previews visuales sin tocar el FileList
-       • eliminarImagenSlot() maneja solo imágenes existentes de la BD
-       ════════════════════════════════════════════════════════════════════════ */
-
     const galleryEl       = document.getElementById('sortable-gallery');
     const eliminadasInput = document.getElementById('imagenes_eliminadas');
     const btnGlobalSubmit = document.getElementById('btn-global-submit');
+    const massInput       = document.getElementById('mass-image-input');
+    const dropZone        = document.getElementById('drop-zone');
 
     let listaEliminadas = [];
 
-    // ── Preview visual de imágenes recién seleccionadas (solo cosmético) ──────
-    function previsualizarNuevas(input) {
-        const contenedor = document.getElementById('preview-nuevas');
-        contenedor.innerHTML = '';
+    // --- Drag & Drop Core Logic ---
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, (e) => e.preventDefault(), false);
+        document.body.addEventListener(eventName, (e) => e.preventDefault(), false);
+    });
 
-        if (!input.files || !input.files.length) return;
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => {
+            dropZone.style.background = 'var(--light-green)';
+            dropZone.style.borderColor = 'var(--primary-green)';
+        }, false);
+    });
 
-        Array.from(input.files).forEach((file) => {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const slot = document.createElement('div');
-                slot.classList.add('img-slot');
-                slot.style.cursor = 'default';
-                slot.innerHTML = `<img src="${e.target.result}" alt="${file.name}">
-                    <span style="position:absolute;bottom:4px;left:0;right:0;
-                        text-align:center;font-size:10px;background:rgba(0,0,0,.45);
-                        color:#fff;padding:2px 4px;">${file.name}</span>`;
-                contenedor.appendChild(slot);
-            };
-            reader.readAsDataURL(file);
-        });
-    }
-const massInput = document.getElementById('mass-image-input');
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => {
+            dropZone.style.background = '#fafafa';
+            dropZone.style.borderColor = 'var(--accent-green)';
+        }, false);
+    });
+
+    dropZone.addEventListener('drop', function(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        if (files.length > 0) {
+            massInput.files = files;
+            massInput.dispatchEvent(new Event('change'));
+        }
+    });
+
+    // Lógica para renderizar, limitar a 6 imágenes y validar peso (2MB)
     massInput.addEventListener('change', function() {
         if (this.files) {
             const imagenesActuales = galleryEl.querySelectorAll('.img-slot').length;
             const espaciosDisponibles = 6 - imagenesActuales;
+
+            if (espaciosDisponibles <= 0) {
+                alert('Ya has alcanzado el límite máximo de 6 imágenes.');
+                this.value = '';
+                return;
+            }
+
+            const MAX_IMAGE_SIZE = 2 * 1024 * 1024;
+            for (let file of this.files) {
+                if (file.size > MAX_IMAGE_SIZE) {
+                    alert(`La imagen "${file.name}" supera el límite de 2MB permitidos.`);
+                    this.value = '';
+                    return;
+                }
+            }
+
             const filesToProcess = Array.from(this.files).slice(0, espaciosDisponibles);
 
             filesToProcess.forEach((file, index) => {
@@ -414,7 +416,7 @@ const massInput = document.getElementById('mass-image-input');
                 reader.onload = function(e) {
                     const slot = document.createElement('div');
                     slot.classList.add('img-slot');
-                    slot.setAttribute('data-id', `nueva-${index}-${Date.now()}`);
+                    slot.setAttribute('data-id', `nueva-${index}`);
                     
                     slot.innerHTML = `
                         <button type="button" class="remove-btn" onclick="eliminarImagenSlot(this)">✕</button>
@@ -425,6 +427,10 @@ const massInput = document.getElementById('mass-image-input');
                 }
                 reader.readAsDataURL(file);
             });
+
+            if (this.files.length > espaciosDisponibles) {
+                alert(`Solo se agregaron ${espaciosDisponibles} imágenes para no superar el límite de 6.`);
+            }
         }
     });
 
@@ -437,14 +443,14 @@ const massInput = document.getElementById('mass-image-input');
         actualizarOrdenFormulario();
     }
 
-    // ── Orden de la galería existente ─────────────────────────────────────────
     function actualizarOrdenFormulario() {
         const slots    = galleryEl.querySelectorAll('.img-slot');
         const mapeoIds = Array.from(slots).map(slot => slot.getAttribute('data-id'));
         document.getElementById('orden_imagenes').value = JSON.stringify(mapeoIds);
+        
+        document.getElementById('disponibles-text').innerText = `Imágenes actuales: ${slots.length} de 6 espacios ocupados.`;
     }
 
-    // ── Drag & drop de reordenamiento ─────────────────────────────────────────
     Sortable.create(galleryEl, {
         animation: 150,
         ghostClass: 'sortable-ghost',
@@ -457,53 +463,43 @@ const massInput = document.getElementById('mass-image-input');
         }
     });
 
-   
-
-    /* ════════════════════════════════════════════════════════════════════════
-       VIDEO
-       ════════════════════════════════════════════════════════════════════════ */
     function previewVideo(input) {
         const container = document.getElementById('video-preview-container');
         const video     = document.getElementById('video-tag');
         const source    = document.getElementById('video-source');
+        
         if (input.files && input.files[0]) {
+            // VALIDACIÓN: 50MB máximo (50 * 1024 * 1024)
+            const MAX_VIDEO_SIZE = 50 * 1024 * 1024;
+            if (input.files[0].size > MAX_VIDEO_SIZE) {
+                alert('El video seleccionado supera el límite permitido de 50MB.');
+                input.value = '';
+                container.style.display = 'none';
+                return;
+            }
+
             source.src = URL.createObjectURL(input.files[0]);
             video.load();
             container.style.display = 'block';
         }
     }
 
-    function borrarVideoActual(productoId) {
-        if (!confirm('¿Seguro que deseas borrar el video actual?')) return;
-        fetch(`{{ url('/employees/productos') }}/${productoId}/video`, {
-            method: 'DELETE',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value,
-                'Content-Type': 'application/json',
-            }
-        })
-        .then(r => r.json())
-        .then(data => {
-            if (data && data.success) location.reload();
-            else alert('No se pudo borrar el video.');
-        })
-        .catch(() => alert('Error al borrar el video.'));
-    }
-
-    /* ════════════════════════════════════════════════════════════════════════
-       DOCUMENTOS
-       ════════════════════════════════════════════════════════════════════════ */
     function previewDoc(input, displayId) {
         const display = document.getElementById(displayId);
         if (input.files && input.files[0]) {
+            const MAX_DOC_SIZE = 5 * 1024 * 1024;
+            if (input.files[0].size > MAX_DOC_SIZE) {
+                alert('El documento seleccionado supera el límite de 5MB.');
+                input.value = '';
+                display.style.display = 'none';
+                return;
+            }
+
             display.innerText      = "📄 Nuevo: " + input.files[0].name;
             display.style.display  = 'block';
         }
     }
 
-    /* ════════════════════════════════════════════════════════════════════════
-       TABS — indicador y botón de guardar
-       ════════════════════════════════════════════════════════════════════════ */
     function cambiarPestaña(tabButtonId) {
         const triggerEl = document.querySelector(tabButtonId);
         bootstrap.Tab.getOrCreateInstance(triggerEl).show();
@@ -517,16 +513,17 @@ const massInput = document.getElementById('mass-image-input');
         });
     });
 
-    /* ════════════════════════════════════════════════════════════════════════
-       SUBMIT — asegurar que todo esté sincronizado antes de enviar
-       ════════════════════════════════════════════════════════════════════════ */
-    document.getElementById('product-form').addEventListener('submit', function () {
+    document.getElementById('product-form').addEventListener('submit', function (e) {
         actualizarOrdenFormulario();
-        eliminadasInput.value = JSON.stringify(listaEliminadas);
-        // El input name="imagenes[]" se envía nativamente, sin manipulación JS
+
+        btnGlobalSubmit.disabled = true;
+        btnGlobalSubmit.style.backgroundColor = "var(--medium-green)";
+        btnGlobalSubmit.innerHTML = `
+            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            Actualizando producto...
+        `;
     });
 
-    // Inicializar al cargar
     document.addEventListener('DOMContentLoaded', actualizarOrdenFormulario);
 </script>
 </body>
