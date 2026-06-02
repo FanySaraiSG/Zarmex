@@ -21,7 +21,7 @@
         .products-grid {
             display: grid;
             grid-template-columns: repeat(1, minmax(0, 1fr));
-            gap: 15px; /* Separación reducida para que quepan 4 perfectamente */
+            gap: 40px; /* Separación reducida para que quepan 4 perfectamente */
             width: 100%;
             max-width: 1440px; 
             margin: 120px auto 0 auto; 
@@ -47,7 +47,7 @@
             transition: all 0.3s ease;
             display: flex; 
             flex-direction: column; 
-            height: 100%;
+            height: 120%;
             min-height: 400px; /* Cajas ligeramente más compactas y estilizadas */
             overflow: hidden; 
         }

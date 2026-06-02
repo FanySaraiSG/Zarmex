@@ -12,22 +12,26 @@ use Illuminate\Support\Str;
 
 class ProductoController extends Controller
 {
-    // Listado principal
-    public function index($categoria = null)
+    // Listado principal — muestra categorías con conteo de productos
+    public function index()
+    {
+        $categorias = Categoria::withCount('productos')->get();
+
+        return view('productos.index', compact('categorias'));
+    }
+
+    // Listado de productos filtrado por categoría
+    public function porCategoria($categoria)
     {
         $categorias = Categoria::all();
 
-        if ($categoria) {
-            $categoriaNombre = DB::table('categorias')
-                ->where('id_categoria', $categoria)
-                ->value('nombre');
-            $productos = Producto::where('categoria_id', $categoria)->get();
-        } else {
-            $categoriaNombre = 'Todos los productos';
-            $productos = Producto::all();
-        }
+        $categoriaNombre = DB::table('categorias')
+            ->where('id_categoria', $categoria)
+            ->value('nombre');
 
-        return view('productos.index', compact('categoriaNombre', 'productos', 'categorias'));
+        $productos = Producto::where('categoria_id', $categoria)->get();
+
+        return view('productos.por_categoria', compact('categoriaNombre', 'productos', 'categorias'));
     }
 
     // Formulario de creación

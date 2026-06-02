@@ -9,28 +9,19 @@ use Carbon\Carbon;
 class ColorSeeder extends Seeder
 {
     public function run()
-    {
-        $colors = [
-            ['id_color' => '283032', 'nombre' => 'Azabache'],
-            ['id_color' => '4c88aa', 'nombre' => 'Rey'],
-            ['id_color' => '739f6a', 'nombre' => 'Verde Limón'],
-            ['id_color' => '7c9b93', 'nombre' => 'Gris Agua'],
-            ['id_color' => 'b84a4b', 'nombre' => 'Rojo Saf'],
-            ['id_color' => 'd9535a', 'nombre' => 'Rojo Medio'],
-            ['id_color' => 'e15570', 'nombre' => 'Magenta'],
-            ['id_color' => 'e57e44', 'nombre' => 'Mandarina'],
-            ['id_color' => 'e9b851', 'nombre' => 'Melón'],
-            ['id_color' => 'ed455c', 'nombre' => 'Bermellón'],
-            ['id_color' => 'eeb451', 'nombre' => 'Amarillo KOD'],
-        ];
+{
+    $categorias = [
+        [
+            'id_categoria' => 'ZAR-CQP', 
+            'nombre' => 'Quiropráctica', 
+            'descripcion' => 'Equipos de quiropráctica',
+            'creado_en' => now(), // Asegúrate de usar tus nombres de columna correctos
+            'actualizado_en' => now()
+        ],
+        // ... pon aquí el resto de tus categorías ...
+    ];
 
-        foreach ($colors as $color) {
-            DB::table('colors')->insert([
-                'id_color' => $color['id_color'],
-                'nombre' => $color['nombre'],
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now(),
-            ]);
-        }
-    }
+    // Si 'id_categoria' ya existe, actualiza el nombre y la descripción en vez de tronar
+    DB::table('categorias')->upsert($categorias, ['id_categoria'], ['nombre', 'descripcion', 'actualizado_en']);
+}
 }
