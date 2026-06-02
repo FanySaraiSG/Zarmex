@@ -41,11 +41,8 @@ class ProductoController extends Controller
         return view('productos.create', compact('categorias'));
     }
 
-    // API ENDPOINT: Obtiene el siguiente número consecutivo
-    // CORRECCIÓN: Asegúrate de que esta ruta maneje strings con guiones
     public function obtenerSiguienteNumeroBase($categoriaId)
     {
-        // Se usa rawurldecode por si el ID llega codificado desde el fetch
         $categoriaId = urldecode($categoriaId);
 
         $ultimoProducto = Producto::where('categoria_id', $categoriaId)
@@ -274,10 +271,10 @@ class ProductoController extends Controller
         return redirect()->route('productos.edit', $producto->id)->with('success_edit', 'Producto actualizado.');
     }
 
-    //catalogo publico por categoria
+    // Catálogo público por categoría — SIN límite de paginación
     public function mostrarProductosPorCategoria($id_categoria)
     {
-        $productos       = Producto::with('imagenes')->where('categoria_id', $id_categoria)->paginate(8);
+        $productos       = Producto::with('imagenes')->where('categoria_id', $id_categoria)->get();
         $categorias      = Categoria::all();
         $categoriaNombre = DB::table('categorias')->where('id_categoria', $id_categoria)->value('nombre');
 
@@ -329,7 +326,6 @@ class ProductoController extends Controller
         return redirect()->route('productos.index')->with('success', 'Producto eliminado correctamente.');
     }
 
-    // Gestionar Video de respaldo
     public function updateVideo(Request $request, $id)
     {
         $request->validate(['video' => 'required|file|mimes:mp4|max:51200']);
@@ -351,7 +347,6 @@ class ProductoController extends Controller
         return redirect()->back()->with('success', 'Video actualizado correctamente.');
     }
 
-    // Eliminación asíncrona del video
     public function destroyVideo($id)
     {
         $producto = Producto::findOrFail($id);
@@ -367,7 +362,7 @@ class ProductoController extends Controller
     }
 
     /* ==========================================================================
-       MÉTODOS PRIVADOS DE OPTIMIZACIÓN Y SISTEMA DE ARCHIVOS
+       MÉTODOS PRIVADOS
        ========================================================================== */
 
     private function procesarDocumentos(Request $request, $producto)

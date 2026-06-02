@@ -353,6 +353,7 @@ header, footer, .whatsapp, #whatsapp, .btn-whatsapp{ display: none !important; }
 }
 </style>
 
+@if(session('success'))sq
 <script>
 function toggleProductos(id, btn) {
     const panel = document.getElementById('panel-' + id);
