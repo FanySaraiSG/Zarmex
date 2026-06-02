@@ -347,7 +347,7 @@ footer,
 }
 </style>
 
-@if(session('success'))
+@if(session('success'))sq
 <script>
     alert("{{ session('success') }}");
 </script>

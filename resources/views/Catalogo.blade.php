@@ -12,33 +12,41 @@
     <style>
         :root { 
             --zx-dark: #234d50;
-            --zx-whatsapp: #59b568;
             --zx-mint: #c4e6d8;
-            --zx-modal-bg: #1e7070;
+            
+            /* --- COLORES CORPORATIVOS --- */
+            --zx-header-dark: #143d40;     
+            --zx-bg-soft-mint: #e0f2ed;    
+            --zx-whatsapp-btn: #53b671;    
+            --zx-text-muted: #3a6063;      
+            --zx-border-soft: #cce3de;     
         }
 
-        /* --- CUADRÍCULA DE 4 COLUMNAS EXACTAS (Alineado Verde) --- */
+        /* --- CONTENEDOR FLUIDO DE LA PÁGINA --- */
+        main.container-fluid {
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+
+        /* --- DISTRIBUCIÓN GRID PRINCIPAL --- */
         .products-grid {
-            display: grid;
-            grid-template-columns: repeat(1, minmax(0, 1fr));
-            gap: 15px; /* Separación reducida para que quepan 4 perfectamente */
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between; 
+            gap: 24px; 
             width: 100%;
-            max-width: 1440px; 
+            max-width: 100%; 
             margin: 120px auto 0 auto; 
-            padding: 20px 20px; 
+            padding: 20px 40px; 
         }
 
-        @media (min-width: 576px) {
-            .products-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-        }
+        /* --- TARJETAS DEL CATÁLOGO --- */
+        @media (min-width: 992px) { .card2 { width: calc(25% - 18px); } }
+        @media (max-width: 991px) and (min-width: 576px) { .card2 { width: calc(50% - 12px); } }
+        @media (max-width: 575px) { .card2 { width: 100%; } }
 
-        @media (min-width: 992px) {
-            .products-grid { 
-                grid-template-columns: repeat(4, minmax(0, 1fr)); /* 4 Columnas fijas sin desborde */
-            }
-        }
-
-        /* --- TARJETA OPTIMIZADA (Área Roja Cubierta) --- */
         .card2 {
             background: #eaf1f7; 
             border-radius: 20px; 
@@ -47,249 +55,289 @@
             transition: all 0.3s ease;
             display: flex; 
             flex-direction: column; 
-            height: 100%;
-            min-height: 400px; /* Cajas ligeramente más compactas y estilizadas */
+            height: auto;
+            min-height: 400px; 
             overflow: hidden; 
         }
-        .card2:hover { 
-            transform: translateY(-8px); 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2); 
-        }
         
-        /* Contenedor de la imagen para garantizar proporciones perfectas */
         .card2-img-container {
             width: 100%;
-            height: 250px; /* Altura fija para mantener simetría entre todas las tarjetas */
+            height: 250px; 
             overflow: hidden;
             background: var(--zx-mint);
             position: relative;
         }
-        
-        /* Cambiado para CUBRIR completamente el recuadro rojo sin deformarse */
         .card2-img-container img { 
             width: 100%; 
             height: 100%; 
-            object-fit: cover; /* Llena todo el espacio de borde a borde */
-            padding: 0 !important; /* Eliminamos el espacio que causaba el recuadro interno */
-            transition: transform 0.5s ease;
-        }
-        .card2:hover .card2-img-container img {
-            transform: scale(1.04); /* Efecto sutil al pasar el mouse */
+            object-fit: cover; 
         }
 
-        .modal { z-index: 99999 !important; }
-        .modal-backdrop { z-index: 99990 !important; }
-        
-        /* Contenedor Modal de Alto Fijo Tipo Quiosco */
+        /* --- MARCO DEL MODAL PRINCIPAL --- */
+        .custom-frame-modal {
+            max-width: 75% !important; 
+            width: 75% !important;
+            margin: 0 auto 0 15% !important; 
+            top: 2%; 
+        }
+
+        @media (max-width: 991px) {
+            .custom-frame-modal {
+                max-width: 90% !important;
+                width: 90% !important;
+                margin: 0 auto !important;
+            }
+        }
+
         .modal-content { 
-            background: var(--zx-modal-bg) !important;
-            border-radius: 25px !important; 
-            border: 1px solid rgba(15, 39, 68, 0.20); 
-            display: flex; 
-            flex-direction: column; 
-            overflow: hidden; 
-            max-height: 92vh;
-            position: relative;
-        }
-        
-        /* Patrón geométrico de fondo */
-        .dots-pattern {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 120px;
-            height: 120px;
-            background-image: radial-gradient(rgba(201, 168, 76, 0.25) 1.5px, transparent 1.5px);
-            background-size: 12px 12px;
-            pointer-events: none;
-            z-index: 1;
+            background: var(--zx-bg-soft-mint) !important;
+            border-radius: 24px !important; 
+            border: none !important;
+            box-shadow: 0 25px 55px rgba(20, 61, 64, 0.35) !important;
+            overflow: hidden !important; 
+            max-height: 85vh; 
+            display: flex;
+            flex-direction: column;
         }
 
-        .modal-body { 
-            padding: 35px 40px !important; 
-            overflow: hidden;
-            z-index: 2;
-        }
-        
-        /* Línea Decorativa Superior */
-        .title-separator {
-            height: 3px;
-            background: linear-gradient(90deg, #c9a84c 0%, rgba(201, 168, 76, 0.4) 50%, transparent 100%);
-            border-radius: 2px;
-            margin-top: 10px;
-            margin-bottom: 25px;
+        /* --- ENCABEZADO --- */
+        .modal-header-luxury {
+            background-color: var(--zx-header-dark) !important;
+            padding: 16px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: none;
             width: 100%;
+            flex-shrink: 0;
         }
 
-        /* Detalles e Indicadores Laterales */
-        .info-block {
-            position: relative;
-            padding-left: 15px;
-            margin-bottom: 22px;
-        }
-        .info-block::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 2px;
-            bottom: 2px;
-            width: 3px;
-            background: var(--zx-mint);
-            border-radius: 2px;
+        .product-title-luxury {
+            color: #ffffff;
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin: 0;
+            letter-spacing: -0.3px;
         }
 
-        .info-label { 
-            font-size: 0.78rem; 
-            font-weight: 800; 
-            color: #c9a84c; 
-            text-transform: uppercase; 
-            margin-bottom: 6px; 
-            letter-spacing: 1.2px; 
-            display: block; 
+        .btn-close-custom {
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.2rem;
+            transition: color 0.2s ease;
+            cursor: pointer;
+            padding: 0;
         }
-        
-        .carousel-control-prev-icon, .carousel-control-next-icon { 
-            filter: invert(24%) sepia(21%) saturate(1145%) hue-rotate(134deg) brightness(91%) contrast(88%); 
+        .btn-close-custom:hover { color: #ffffff; }
+
+        /* --- CUERPO --- */
+        .modal-body { 
+            padding: 30px !important; 
+            flex-grow: 1;
+            overflow-y: auto !important; 
+            overflow-x: hidden;
         }
 
-        .color-circle {
-            width: 25px; 
-            height: 25px; 
-            border-radius: 50%; 
-            border: 2px solid #fff;   
-            box-shadow: 0 0 0 1px #ddd; 
-            display: inline-block; 
-            margin-right: 7px; 
-            cursor: pointer; 
-            transition: all 0.2s ease;
-        }
-        .color-circle:hover, .color-circle.selected { transform: scale(1.2); box-shadow: 0 0 0 2px var(--zx-dark); }
-
-        .btn-document-inline {
-            display: inline-flex; 
-            align-items: center; 
-            padding: 8px 14px; 
-            background: #165858;
-            border: 1px solid rgba(201, 168, 76, 0.40); 
-            border-radius: 8px; 
-            text-decoration: none; 
-            color: #c9a84c; 
-            font-size: 0.8rem; 
-            font-weight: 600;
-            transition: 0.2s;
-        }
-        .btn-document-inline:hover { background: #234d50; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.05); color: var(--zx-dark); }
-        
-        .btn-zx-whatsapp { 
-            background-color: var(--zx-whatsapp) !important; 
-            color: white !important; 
-            border-radius: 14px; 
-            padding: 14px 25px; 
-            font-weight: 700; 
-            border: none; 
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 15px rgba(89, 181, 104, 0.3);
-        }
-        .btn-zx-whatsapp:hover { opacity: 0.95; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(89, 181, 104, 0.4); }
-
-        .img-zoom-container { position: relative; display: inline-block; width: 100%; }
-        
-        .btn-zoom-overlay {
-            position: absolute; 
-            bottom: 12px; 
-            right: 12px; 
-            background: rgba(35, 77, 80, 0.85); 
-            color: white; 
-            border: none; 
-            width: 36px; 
-            height: 36px; 
-            border-radius: 50%;
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            transition: 0.2s; 
-            z-index: 10;
-        }
-        .btn-zoom-overlay:hover { background: var(--zx-dark); transform: scale(1.1); }
-
-        .zoom-modal .modal-content { background: rgba(0, 0, 0, 0.9) !important; border: none !important; max-height: none; }
-        .zoom-img-wrapper { position: relative; overflow: hidden; cursor: zoom-in; background: #fff; border-radius: 10px; }
-        .zoom-img-wrapper img { transition: transform 0.1s ease-out; width: 100%; max-height: 70vh; object-fit: contain; }
-        .zoom-img-wrapper:hover img { transform: scale(2); cursor: zoom-out; }
-
-        /* --- LAYOUT MULTIMEDIA IZQUIERDO --- */
+        /* --- DISEÑO MULTIMEDIA --- */
         .multimedia-layout {
             display: flex;
             flex-direction: column-reverse;
-            gap: 15px;
+            gap: 20px;
+            width: 100%;
         }
-        @media (min-width: 768px) {
-            .multimedia-layout { flex-direction: row; }
+        @media (min-width: 768px) { 
+            .multimedia-layout { flex-direction: row; align-items: flex-start; } 
         }
 
         .thumbnails-sidebar {
             display: flex;
             flex-direction: row;
             gap: 10px;
-            overflow-x: auto;
-            align-content: flex-start;
-            scrollbar-width: none; 
+            justify-content: center;
         }
-        .thumbnails-sidebar::-webkit-scrollbar { display: none; } 
-
         @media (min-width: 768px) {
             .thumbnails-sidebar {
                 flex-direction: column;
-                overflow-x: visible;
-                overflow-y: auto;
-                max-height: 360px;
-                width: 62px;
+                width: 65px;
                 flex-shrink: 0;
             }
         }
 
         .btn-thumbnail {
-            width: 56px;
-            height: 56px;
+            width: 54px;
+            height: 54px;
             flex-shrink: 0;
             padding: 0;
-            border: 2px solid #e9ecef;
-            border-radius: 10px;
+            border: 2px solid var(--zx-border-soft);
+            border-radius: 12px;
             overflow: hidden;
             background: #fff;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
+            transition: all 0.2s ease;
         }
-        .btn-thumbnail img {
+        .btn-thumbnail img { width: 100%; height: 100%; object-fit: cover; }
+        .btn-thumbnail.active { border-color: var(--zx-header-dark) !important; transform: scale(1.05); }
+
+        /* --- CAROUSEL RECUADRO MULTIMEDIA --- */
+        .carousel-fixed-size {
+            max-width: 100%; 
             width: 100%;
-            height: 100%;
-            object-fit: cover;
+            height: 380px; 
+            background: #ffffff !important;
+            border-radius: 20px;
+            border: 1px solid var(--zx-border-soft);
+            box-shadow: 0 10px 30px rgba(20, 61, 64, 0.06);
+            overflow: hidden;
+            position: relative;
         }
-        .btn-thumbnail:hover {
-            border-color: rgba(35, 77, 80, 0.4);
-            transform: scale(1.03);
-        }
-        .btn-thumbnail.active {
-            border-color: var(--zx-dark) !important;
-            box-shadow: 0 0 0 2px rgba(35, 77, 80, 0.2);
-            transform: scale(1.05);
-        }
-        .btn-thumbnail-video { background: #111; position: relative; }
-        .video-thumb-overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0, 0, 0, 0.45);
+        
+        .carousel-fixed-size .carousel-item img {
+            height: 100%; 
+            width: 100%; 
+            object-fit: fill !important; 
+            padding: 0 !important; 
         }
 
-        .carousel-fixed-size {
-            max-width: 380px;
-            width: 100%;
-            margin: 0 auto;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+        .carousel-control-prev-icon, .carousel-control-next-icon { 
+            filter: invert(20%) sepia(15%) saturate(1400%) hue-rotate(135deg) brightness(90%) contrast(90%);
         }
+
+        /* --- BOTÓN DE LA LUPA --- */
+        .img-zoom-container { 
+            position: relative; 
+            width: 100%; 
+            height: 100%; 
+        }
+        
+        .btn-zoom-overlay {
+            position: absolute; 
+            bottom: 20px;          
+            right: 20px;           
+            background: rgba(20, 61, 64, 0.85); 
+            color: #ffffff; 
+            border: none; 
+            width: 40px; 
+            height: 40px; 
+            border-radius: 50%;
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            z-index: 99 !important; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            transition: transform 0.2s ease, background 0.2s ease;
+            cursor: pointer;
+        }
+        .btn-zoom-overlay:hover {
+            transform: scale(1.1);
+            background: rgba(20, 61, 64, 1);
+        }
+
+        /* --- MODAL OPTIMIZADO PARA ZOOM INTERACTIVO DE LUPA --- */
+        .zoom-modal .modal-dialog {
+            max-width: 650px; 
+            width: 90%;
+            margin: 30px auto;
+        }
+
+        .zoom-modal .modal-content {
+            background: var(--zx-bg-soft-mint) !important; 
+            border-radius: 20px !important;
+            border: none !important;
+            overflow: hidden !important;
+            max-height: 90vh; 
+        }
+
+        .zoom-modal-header {
+            background-color: var(--zx-header-dark);
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .zoom-modal-title {
+            color: #ffffff !important;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        /* CONTENEDOR INTELIGENTE PARA LA LUPA */
+        .zoom-img-wrapper {
+            width: 100%;
+            height: auto;
+            max-height: 70vh;
+            background: #ffffff;
+            overflow: hidden; 
+            position: relative;
+            cursor: zoom-in; /* Cursor visual de lupa */
+        }
+
+        /* Imagen base adaptable */
+        .zoom-img-wrapper img {
+            width: 100%;
+            height: auto;
+            max-height: 70vh;
+            object-fit: contain;
+            display: block;
+            transition: transform 0.1s ease-out; /* Transición suave al mover el ratón */
+            transform-origin: center center;
+        }
+
+        /* --- BLOQUES DE DETALLES --- */
+        .info-card-luxury {
+            margin-bottom: 18px;
+            padding: 4px 0 4px 12px;
+            border-left: 3px solid var(--zx-header-dark);
+        }
+
+        .info-label-luxury {
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: var(--zx-header-dark);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .color-circle {
+            width: 22px; 
+            height: 22px; 
+            border-radius: 50%; 
+            border: 2px solid #fff;   
+            box-shadow: 0 0 0 1px var(--zx-border-soft); 
+            display: inline-block; 
+            margin-right: 8px; 
+            cursor: pointer; 
+        }
+
+        .btn-document-inline {
+            display: inline-flex; 
+            align-items: center; 
+            padding: 6px 12px; 
+            background: #ffffff;
+            border: 1px solid var(--zx-border-soft); 
+            border-radius: 10px; 
+            text-decoration: none; 
+            color: var(--zx-header-dark); 
+            font-size: 0.8rem; 
+            font-weight: 700;
+        }
+
+        /* Botón de WhatsApp */
+        .btn-zx-whatsapp { 
+            background-color: var(--zx-whatsapp-btn) !important; 
+            color: white !important; 
+            border-radius: 14px; 
+            padding: 12px 20px; 
+            font-weight: 700; 
+            border: none; 
+            font-size: 1rem;
+            box-shadow: 0 6px 16px rgba(83, 182, 113, 0.2);
+            transition: all 0.2s ease;
+        }
+        .btn-zx-whatsapp:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(83, 182, 113, 0.3); }
     </style>
 </head>
 <body class="antialiased">
@@ -301,8 +349,6 @@
                 
                 {{-- TARJETA INDIVIDUAL DE PRODUCTO --}}
                 <div class="card2">
-                    
-                    {{-- Contenedor especial para cubrir el área de la imagen --}}
                     <div class="card2-img-container">
                         @if($producto->imagenes && $producto->imagenes->count() > 0)
                             <img src="{{ asset($producto->imagenes->first()->ruta) }}" alt="{{ $producto->nombre }}">
@@ -312,40 +358,35 @@
                     </div>
                     
                     <div class="card-content" style="padding: 15px; text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between;">
-                        <h3 style="color: var(--zx-dark); font-weight: 800; font-size: 1rem; margin-bottom: 12px; letter-spacing: -0.3px;">
-                             {{ $producto->id }}
+                        <h3 style="color: var(--zx-dark); font-weight: 800; font-size: 1rem; margin-bottom: 12px;">
+                             {{ $producto->nombre }}
                         </h3>
-                        <button type="button" style="background: var(--zx-dark); color: white; border: none; padding: 10px; border-radius: 10px; width: 100%; font-weight: 600; font-size: 0.9rem;" data-bs-toggle="modal" data-bs-target="#modalProd{{ $producto->id }}">
+                        <button type="button" style="background: var(--zx-dark); color: white; border: none; padding: 10px; border-radius: 10px; width: 100%; font-weight: 600;" data-bs-toggle="modal" data-bs-target="#modalProd{{ $producto->id }}">
                             Ver Detalles
                         </button>
                     </div>
                 </div>
 
-                {{-- MODAL DETALLADO DE PRODUCTO --}}
-                <div class="modal fade product-modal-sync" id="modalProd{{ $producto->id }}" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog modal-xl modal-dialog-centered">
-                        <div class="modal-content shadow-lg">
+                {{-- MODAL DETALLES DEL PRODUCTO --}}
+                <div class="modal fade" id="modalProd{{ $producto->id }}" tabindex="-1" aria-hidden="true">
+                    <div class="modal-dialog custom-frame-modal modal-dialog-centered">
+                        <div class="modal-content">
                             
-                            <div class="dots-pattern"></div>
-                            
-                            <div class="modal-header border-0 pb-0 justify-content-end" style="background: #165858; z-index: 5; border-radius: 25px 25px 0 0;">
-                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            {{-- HEADER --}}
+                            <div class="modal-header-luxury">
+                                <h2 class="product-title-luxury">
+                                    {{ $producto->nombre }}
+                                </h2>
+                                <button type="button" class="btn-close-custom" data-bs-dismiss="modal">
+                                    <i class="fas fa-times"></i>
+                                </button>
                             </div>
                             
-                            <div class="modal-body pt-0" style="background: #1e7070;">
-                                <div class="row">
-                                    <div class="col-12">
-                                        <h2 class="fw-bold m-0" style="color: #c9a84c; font-size: 1.7rem; letter-spacing: -0.5px;">
-                                            {{ $producto->nombre }}
-                                        </h2>
-                                        <div class="title-separator"></div>
-                                    </div>
-                                </div>
-
-                                <div class="row g-4 align-items-center">
-                                    {{-- COLUMNA MULTIMEDIA --}}
-                                    <div class="col-md-6">
-                                        <div class="multimedia-layout justify-content-center align-items-center">
+                            <div class="modal-body">
+                                <div class="row g-4 align-items-start">
+                                    {{-- MULTIMEDIA --}}
+                                    <div class="col-md-7">
+                                        <div class="multimedia-layout">
                                             
                                             <div class="thumbnails-sidebar" id="thumbBar{{ $producto->id }}">
                                                 @if($producto->imagenes && $producto->imagenes->count() > 0)
@@ -359,24 +400,15 @@
                                                         <img src="{{ asset('images/default.png') }}">
                                                     </button>
                                                 @endif
-
-                                                @if(!empty($producto->video_url))
-                                                    <button type="button" data-bs-target="#carouselProd{{ $producto->id }}" data-bs-slide-to="{{ $producto->imagenes->count() }}" class="btn-thumbnail btn-thumbnail-video">
-                                                        <div class="video-thumb-overlay">
-                                                            <i class="fas fa-play text-white small"></i>
-                                                        </div>
-                                                    </button>
-                                                @endif
                                             </div>
 
-                                            <div id="carouselProd{{ $producto->id }}" class="carousel slide rounded-4 p-1 bg-light border carousel-fixed-size" data-bs-ride="false">
-                                                <div class="carousel-inner w-100">
-                                                    
+                                            <div id="carouselProd{{ $producto->id }}" class="carousel slide carousel-fixed-size" data-bs-ride="false">
+                                                <div class="carousel-inner h-100 w-100">
                                                     @if($producto->imagenes && $producto->imagenes->count() > 0)
                                                         @foreach($producto->imagenes as $img)
-                                                            <div class="carousel-item {{ $loop->first ? 'active' : '' }}">
-                                                                <div class="img-zoom-container" style="aspect-ratio: 1 / 1; width: 100%;">
-                                                                    <img src="{{ asset($img->ruta) }}" class="img-fluid d-block mx-auto rounded-4" style="height: 100%; width: 100%; object-fit: cover;">
+                                                            <div class="carousel-item h-100 {{ $loop->first ? 'active' : '' }}">
+                                                                <div class="img-zoom-container">
+                                                                    <img src="{{ asset($img->ruta) }}" class="img-fluid d-block mx-auto">
                                                                     <button type="button" class="btn-zoom-overlay" onclick="openZoomModal('{{ asset($img->ruta) }}', '{{ $producto->nombre }}')">
                                                                         <i class="fas fa-search-plus"></i>
                                                                     </button>
@@ -384,23 +416,12 @@
                                                             </div>
                                                         @endforeach
                                                     @else
-                                                        <div class="carousel-item active">
-                                                            <div class="img-zoom-container" style="aspect-ratio: 1 / 1; width: 100%;">
-                                                                <img src="{{ asset('images/default.png') }}" class="img-fluid d-block mx-auto rounded-4" style="height: 100%; width: 100%; object-fit: cover;">
+                                                        <div class="carousel-item h-100 active">
+                                                            <div class="img-zoom-container">
+                                                                <img src="{{ asset('images/default.png') }}" class="img-fluid d-block mx-auto">
                                                             </div>
                                                         </div>
                                                     @endif
-
-                                                    @if(!empty($producto->video_url))
-                                                        <div class="carousel-item {{ ($producto->imagenes->count() == 0) ? 'active' : '' }}">
-                                                            <div style="aspect-ratio: 1 / 1; width: 100%; background:#000;" class="rounded-4 overflow-hidden">
-                                                                <video controls style="height: 100%; width: 100%; object-fit: cover;">
-                                                                    <source src="{{ asset($producto->video_url) }}" type="video/mp4">
-                                                                </video>
-                                                            </div>
-                                                        </div>
-                                                    @endif
-                                                    
                                                 </div>
                                                 <button class="carousel-control-prev" type="button" data-bs-target="#carouselProd{{ $producto->id }}" data-bs-slide="prev">
                                                     <span class="carousel-control-prev-icon"></span>
@@ -413,41 +434,40 @@
                                         </div>
                                     </div>
 
-                                    {{-- COLUMNA DETALLES --}}
-                                    <div class="col-md-6 d-flex flex-column justify-content-between" style="min-height: 380px;">
-                                        <div>
-                                            <div class="info-block">
-                                                <span class="info-label">Descripción del Equipo</span>
-                                                <p style="font-size: 0.92rem; color: #d4e8e0; text-align: justify; margin: 0; line-height: 1.45;">{{ $producto->descripcion }}</p>
+                                    {{-- DETALLES COLUMNA DERECHA --}}
+                                    <div class="col-md-5 d-flex flex-column justify-content-between">
+                                        <div class="ps-md-2">
+                                            <div class="info-card-luxury">
+                                                <span class="info-label-luxury">Descripción del Equipo</span>
+                                                <p style="font-size: 0.9rem; color: var(--zx-text-muted); text-align: justify; margin: 0; line-height: 1.4;">
+                                                    {{ $producto->descripcion ?? 'S/N' }}
+                                                </p>
                                             </div>
 
-                                            <div class="info-block">
-                                                <span class="info-label">Colores Disponibles</span>
-                                                <div class="color-selector-group">
+                                            <div class="info-card-luxury">
+                                                <span class="info-label-luxury">Colores Disponibles</span>
+                                                <div class="color-selector-group mt-1">
                                                     <span class="color-circle" style="background-color: #000;" title="Negro"></span>
-                                                    <span class="color-circle" style="background-color: #234d50;" title="Verde Zarmex"></span>
+                                                    <span class="color-circle" style="background-color: #143d40;" title="Verde Zarmex"></span>
                                                     <span class="color-circle" style="background-color: #fff;" title="Blanco"></span>
                                                     <span class="color-circle" style="background-color: #3d6ee8;" title="Azul"></span>
                                                 </div>
                                             </div>
 
-                                            <div class="info-block">
-                                                <span class="info-label">Documentación Oficial</span>
-                                                <div class="d-flex flex-wrap gap-2">
+                                            <div class="info-card-luxury">
+                                                <span class="info-label-luxury">Documentación Oficial</span>
+                                                <div class="d-flex flex-wrap gap-2 mt-1">
                                                     @if($producto->doc1_url)
-                                                        <a href="{{ asset($producto->doc1_url) }}" target="_blank" class="btn-document-inline"><i class="far fa-file-pdf text-danger me-1"></i> Garantía</a>
-                                                    @endif
-                                                    @if($producto->doc2_url)
-                                                        <a href="{{ asset($producto->doc2_url) }}" target="_blank" class="btn-document-inline"><i class="far fa-file-pdf text-primary me-1"></i> Manual</a>
-                                                    @endif
-                                                    @if($producto->doc3_url)
-                                                        <a href="{{ asset($producto->doc3_url) }}" target="_blank" class="btn-document-inline"><i class="far fa-file-pdf text-success me-1"></i> Ficha Técnica</a>
+                                                        <a href="{{ asset($producto->doc1_url) }}" target="_blank" class="btn-document-inline"><i class="far fa-file-pdf text-danger me-1"></i> Ficha Técnica</a>
+                                                    @else
+                                                        <span style="font-size: 0.85rem; color: var(--zx-text-muted); font-style: italic;">No hay documentos disponibles</span>
                                                     @endif
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div class="pt-3">
+                                        {{-- WHATSAPP --}}
+                                        <div class="pt-4 ps-md-2">
                                             <a href="https://wa.me/525581366555?text=Hola,%20me%20interesa%20obtener%20más%20información%20del%20producto:%20{{ urlencode($producto->nombre) }}" target="_blank" class="btn btn-zx-whatsapp w-100 text-center text-decoration-none d-block">
                                                 <i class="fab fa-whatsapp me-2"></i> Consultar por WhatsApp
                                             </a>
@@ -462,17 +482,18 @@
         </div>
     </main>
 
-    {{-- MODAL DE ZOOM --}}
+    {{-- MODAL DE ZOOM GLOBAL --}}
     <div class="modal fade zoom-modal" id="globalZoomModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content p-2 shadow-lg">
-                <div class="d-flex justify-content-between align-items-center mb-2 px-2">
-                    <span id="zoomModalTitle" class="text-white fw-bold small"></span>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            <div class="modal-content">
+                <div class="zoom-modal-header">
+                    <h5 id="zoomModalTitle" class="zoom-modal-title"></h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-0">
-                    <div class="zoom-img-wrapper" id="zoomWrapper">
-                        <img id="zoomModalImg" src="">
+                    <!-- El contenedor escucha los movimientos del ratón -->
+                    <div class="zoom-img-wrapper" id="interactiveZoomContainer">
+                        <img id="zoomModalImg" src="" alt="Vista ampliada con lupa">
                     </div>
                 </div>
             </div>
@@ -484,23 +505,7 @@
         let bootstrapZoomModal;
         document.addEventListener("DOMContentLoaded", function () {
             bootstrapZoomModal = new bootstrap.Modal(document.getElementById('globalZoomModal'));
-            const wrapper = document.getElementById('zoomWrapper');
-            const img = document.getElementById('zoomModalImg');
-
-            wrapper.addEventListener('mousemove', function (e) {
-                const rect = wrapper.getBoundingClientRect();
-                wrapper.querySelector('img').style.transformOrigin = `${e.clientX - rect.left}px ${e.clientY - rect.top}px`;
-            });
-            wrapper.addEventListener('mouseleave', () => { img.style.transformOrigin = 'center center'; });
-
-            document.addEventListener('click', function (e) {
-                if (e.target.classList.contains('color-circle')) {
-                    const group = e.target.closest('.color-selector-group');
-                    group.querySelectorAll('.color-circle').forEach(c => c.classList.remove('selected'));
-                    e.target.classList.add('selected');
-                }
-            });
-
+            
             const carousels = document.querySelectorAll('.carousel');
             carousels.forEach(carousel => {
                 carousel.addEventListener('slide.bs.carousel', function (e) {
@@ -509,19 +514,46 @@
                     if (thumbBar) {
                         const thumbnails = thumbBar.querySelectorAll('.btn-thumbnail');
                         thumbnails.forEach(t => t.classList.remove('active'));
-                        
-                        const nextActiveThumb = thumbnails[e.to];
-                        if (nextActiveThumb) {
-                            nextActiveThumb.classList.add('active');
-                            nextActiveThumb.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
-                        }
+                        if (thumbnails[e.to]) thumbnails[e.to].classList.add('active');
                     }
                 });
             });
+
+            // SCRIPT DE INTERACCIÓN DE LUPA INTELIGENTE (HOVER ZOOM)
+            const zoomContainer = document.getElementById('interactiveZoomContainer');
+            const zoomImg = document.getElementById('zoomModalImg');
+
+            if(zoomContainer && zoomImg) {
+                // Al pasar el cursor, agranda la imagen a 2.5x su tamaño nativo
+                zoomContainer.addEventListener('mousemove', function(e) {
+                    const rect = e.currentTarget.getBoundingClientRect();
+                    const x = e.clientX - rect.left; // Posición X dentro del cuadro
+                    const y = e.clientY - rect.top;  // Posición Y dentro del cuadro
+                    
+                    // Convertir la posición en porcentajes exactos
+                    const xPercent = (x / rect.width) * 100;
+                    const yPercent = (y / rect.height) * 100;
+
+                    // Mueve el centro de origen dinámicamente y aplica el zoom
+                    zoomImg.style.transformOrigin = `${xPercent}% ${yPercent}%`;
+                    zoomImg.style.transform = "scale(2.5)";
+                });
+
+                // Al sacar el ratón, regresa a su tamaño original encajado de forma perfecta
+                zoomContainer.addEventListener('mouseleave', function() {
+                    zoomImg.style.transform = "scale(1)";
+                    zoomImg.style.transformOrigin = "center center";
+                });
+            }
         });
 
         function openZoomModal(imgUrl, prodName) {
-            document.getElementById('zoomModalImg').src = imgUrl;
+            const zoomImg = document.getElementById('zoomModalImg');
+            // Resetear estados previos antes de renderizar la nueva imagen
+            zoomImg.style.transform = "scale(1)";
+            zoomImg.style.transformOrigin = "center center";
+            
+            zoomImg.src = imgUrl;
             document.getElementById('zoomModalTitle').innerText = prodName;
             bootstrapZoomModal.show();
         }
