@@ -10,12 +10,25 @@ class Color extends Model
     use HasFactory;
 
     protected $table = 'colors';
-    protected $primaryKey = 'id_color';  // Indica que la clave primaria es 'id_color'
-    public $incrementing = false;        // Indica que la clave primaria NO es un número autoincremental
-    protected $keyType = 'string';       // Especifica que la clave primaria es de tipo string
+    protected $primaryKey = 'id_color';
+    public $incrementing = false;
+    protected $keyType = 'string';
 
     protected $fillable = [
         'id_color',
         'nombre',
     ];
+
+    /**
+     * Productos que tienen este color asignado.
+     */
+    public function productos()
+    {
+        return $this->belongsToMany(
+            Producto::class,  // modelo relacionado
+            'color_producto', // tabla pivote
+            'color_id',       // FK de colors en la pivote
+            'producto_id'     // FK de productos en la pivote
+        );
+    }
 }

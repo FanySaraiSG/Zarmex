@@ -446,7 +446,7 @@
 
 <main class="zx-wrap">
 
-{{-- MENSAJE DEÉXITO (ALERTA FLASHEADA DESDE CONTROLADOR) --}}
+{{-- MENSAJE DE ÉXITO (ALERTA FLASHEADA DESDE CONTROLADOR) --}}
 @if(session('success_edit'))
     <div class="alert alert-success alert-dismissible fade show mb-4" role="alert" style="border-radius: 14px; font-weight: 600;">
         <i class="fas fa-check-circle me-2"></i> {{ session('success_edit') }}
@@ -562,15 +562,28 @@
             </div>
             <div class="zx-iva">+ IVA 16%</div>
 
+            {{-- ============================================================
+                 COLORES DINÁMICOS — administrados desde el panel de admin
+                 Se muestran los colores asignados al producto en la BD.
+                 Si no tiene ninguno asignado, la sección queda oculta.
+                 ============================================================ --}}
+            @if($colores && $colores->count() > 0)
             <div class="zx-colors">
                 <div class="zx-colors-head"><div class="left">Color:</div></div>
                 <div class="zx-color-row" id="zxColorRow">
-                    <button type="button" class="zx-color active" style="background:#1f2326;"></button>
-                    <button type="button" class="zx-color" style="background:#4f89b8;"></button>
-                    <button type="button" class="zx-color" style="background:#739f6a;"></button>
-                    <button type="button" class="zx-color" style="background:#b1544d;"></button>
+                    @foreach($colores as $loop_index => $color)
+                        @php $hex = ltrim($color->id_color, '#'); @endphp
+                        <button
+                            type="button"
+                            class="zx-color {{ $loop_index === 0 ? 'active' : '' }}"
+                            style="background:#{{ $hex }};"
+                            title="{{ $color->nombre }}"
+                            aria-label="{{ $color->nombre }}"
+                        ></button>
+                    @endforeach
                 </div>
             </div>
+            @endif
 
             <div class="docs-sm">
                 <div class="docs-title">Documentos</div>
@@ -722,4 +735,4 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 </body>
-</html
+</html>
