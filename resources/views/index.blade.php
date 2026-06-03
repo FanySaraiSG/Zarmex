@@ -714,7 +714,7 @@
 
 
 
-        <section class="testimonials py-5" id="resenasDestacadasSection" style="display: block; width: 100%; position: relative;">
+       <section class="testimonials py-5" id="resenasDestacadasSection" style="display: block; width: 100%; position: relative;">
     @php
         // 1. Ordenamos todas las reseñas por la cantidad de likes de forma descendente
         $reseñasOrdenadas = ($reseñas ?? collect())->sortByDesc(function($r) {
@@ -889,8 +889,8 @@
                     <div class="mb-3">
                         <label class="form-label font-weight-bold">Producto</label>
                         <select name="producto_id" class="form-select" id="resenaProductoSelect" required>
-                            @foreach(($topProducts ?? collect())->pluck('product')->filter() as $prod)
-                                <option value="{{ $prod->id }}">{{ $prod->nombre }}</option>
+                            @foreach($todosLosProductos ?? collect() as $prod)
+                                <option value="{{ $prod->id }}">{{ $prod->id }}</option>
                             @endforeach
                         </select>
                     </div>

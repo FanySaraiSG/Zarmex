@@ -100,9 +100,10 @@ class ProductoController extends Controller
         $producto = Producto::create([
             'id'           => $idProducto,
             'nombre'       => $nombreAuto,
-            'descripcion'  => $request->descripcion,
+            'descripcion'  => $request->descripcion ?? '',
             'categoria_id' => $request->categoria_id,
-            'precio'       => 0,
+            'precio'       => $request->input('precio', 0) ?? 0,
+            'stock'        => $request->input('stock', 0) ?? 0,
             'imagen_url'   => null,
         ]);
 

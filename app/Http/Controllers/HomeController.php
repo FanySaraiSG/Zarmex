@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Review;
 use App\Models\TopProduct;
+use App\Models\Producto;
 
 class HomeController extends Controller
 {
@@ -22,6 +23,10 @@ class HomeController extends Controller
             ->get()
             ->filter(fn ($tp) => !empty($tp->product));
 
-        return view('index', compact('reseñas', 'topProducts'));
+        $todosLosProductos = Producto::select('id', 'descripcion')
+            ->orderBy('descripcion')
+            ->get();
+
+        return view('index', compact('reseñas', 'topProducts', 'todosLosProductos'));
     }
 }
