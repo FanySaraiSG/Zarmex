@@ -309,7 +309,20 @@
             box-shadow: 0 0 0 1px var(--zx-border-soft); 
             display: inline-block; 
             margin-right: 8px; 
-            cursor: pointer; 
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, width 0.2s ease, height 0.2s ease;
+        }
+        .color-circle:hover {
+            transform: scale(1.18);
+        }
+        .color-circle.selected {
+            width: 30px;
+            height: 30px;
+            border: 2.5px solid #fff;
+            box-shadow: 0 0 0 2px var(--zx-header-dark), 0 0 10px 4px rgba(20, 61, 64, 0.4);
+            transform: scale(1.25);
+            position: relative;
+            top: -2px;
         }
 
         .btn-document-inline {
@@ -444,15 +457,22 @@
                                                 </p>
                                             </div>
 
+                                            {{-- COLORES DINÁMICOS — todos los colores globales del sistema --}}
+                                            @if(isset($colores) && $colores->count() > 0)
                                             <div class="info-card-luxury">
                                                 <span class="info-label-luxury">Colores Disponibles</span>
                                                 <div class="color-selector-group mt-1">
-                                                    <span class="color-circle" style="background-color: #000;" title="Negro"></span>
-                                                    <span class="color-circle" style="background-color: #143d40;" title="Verde Zarmex"></span>
-                                                    <span class="color-circle" style="background-color: #fff;" title="Blanco"></span>
-                                                    <span class="color-circle" style="background-color: #3d6ee8;" title="Azul"></span>
+                                                    @foreach($colores as $color)
+                                                        @php $hex = ltrim($color->id_color, '#'); @endphp
+                                                        <span
+                                                            class="color-circle"
+                                                            style="background-color: #{{ $hex }};"
+                                                            title="{{ $color->nombre }}"
+                                                        ></span>
+                                                    @endforeach
                                                 </div>
                                             </div>
+                                            @endif
 
                                             <div class="info-card-luxury">
                                                 <span class="info-label-luxury">Documentación Oficial</span>
@@ -544,6 +564,17 @@
                     zoomImg.style.transform = "scale(1)";
                     zoomImg.style.transformOrigin = "center center";
                 });
+            }
+        });
+
+        // Selección de colores — toggle con efecto visual
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('color-circle')) {
+                const grupo = e.target.closest('.color-selector-group');
+                if (!grupo) return;
+                const yaSeleccionado = e.target.classList.contains('selected');
+                grupo.querySelectorAll('.color-circle').forEach(c => c.classList.remove('selected'));
+                if (!yaSeleccionado) e.target.classList.add('selected');
             }
         });
 

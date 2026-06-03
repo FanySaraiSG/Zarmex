@@ -58,4 +58,19 @@ class Producto extends Model
     {
         return $this->hasOne(Medida::class, 'producto_id', 'id');
     }
+
+    /**
+     * Colores disponibles para este producto.
+     * Administrados desde el panel de administración.
+     * Tabla pivote: color_producto (producto_id, color_id → id_color de colors)
+     */
+    public function colores()
+    {
+        return $this->belongsToMany(
+            Color::class,     // modelo App\Models\Color
+            'color_producto', // tabla pivote
+            'producto_id',    // FK de productos en la pivote
+            'color_id'        // FK de colors en la pivote (apunta a id_color)
+        );
+    }
 }

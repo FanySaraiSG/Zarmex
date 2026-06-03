@@ -192,6 +192,7 @@ class ProductoController extends Controller
         }
 
         $datos = $request->except(['imagen_url', 'imagenes', 'id', 'nombre', 'doc1', 'doc2', 'doc3', 'imagenes_eliminadas', 'orden_imagenes', 'video', '_method', '_token']);
+
         $producto->update($datos);
 
         $rutaProducto = public_path("images/productos/{$producto->id}");
@@ -272,17 +273,22 @@ class ProductoController extends Controller
         return redirect()->route('productos.edit', $producto->id)->with('success_edit', 'Producto actualizado.');
     }
 
-    // Catálogo público por categoría — SIN límite de paginación
+    // =========================================================================
+    // Catálogo público por categoría — carga colores de cada producto
+    // =========================================================================
     public function mostrarProductosPorCategoria($id_categoria)
     {
-        $productos       = Producto::with('imagenes')->where('categoria_id', $id_categoria)->get();
+        $productos       = Producto::with(['imagenes', 'colores'])->where('categoria_id', $id_categoria)->get();
         $categorias      = Categoria::all();
         $categoriaNombre = DB::table('categorias')->where('id_categoria', $id_categoria)->value('nombre');
+        $colores         = Color::all();
 
-        return view('catalogo', compact('productos', 'categorias', 'categoriaNombre'));
+        return view('catalogo', compact('productos', 'categorias', 'categoriaNombre', 'colores'));
     }
 
-    // Vista pública "Ver más"
+    // =========================================================================
+    // Vista pública "Ver más" — carga los colores del producto
+    // =========================================================================
     public function verMas($id)
     {
         $producto        = Producto::findOrFail($id);
@@ -295,7 +301,10 @@ class ProductoController extends Controller
 
         $descCorta = \Illuminate\Support\Str::limit(strip_tags($producto->descripcion ?? ''), 180);
 
-        return view('vermas', compact('producto', 'nombreCategoria', 'imagenes', 'descCorta'));
+        // Todos los colores globales registrados en el sistema
+        $colores = Color::all();
+
+        return view('vermas', compact('producto', 'nombreCategoria', 'imagenes', 'descCorta', 'colores'));
     }
 
     // Eliminar producto
