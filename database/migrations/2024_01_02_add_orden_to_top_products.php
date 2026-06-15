@@ -13,11 +13,11 @@ return new class extends Migration
      */
     public function up(): void
     {
+    if (Schema::hasTable('top_products') && !Schema::hasColumn('top_products', 'orden')) {
         Schema::table('top_products', function (Blueprint $table) {
-            if (!Schema::hasColumn('top_products', 'orden')) {
                 $table->integer('orden')->default(0)->after('id');
-            }
         });
+    }
     }
 
     public function down(): void
