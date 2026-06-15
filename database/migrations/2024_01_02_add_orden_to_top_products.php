@@ -12,13 +12,13 @@ return new class extends Migration
      * (ya estará en la migración original).
      */
     public function up(): void
-    {
+{
     if (Schema::hasTable('top_products') && !Schema::hasColumn('top_products', 'orden')) {
         Schema::table('top_products', function (Blueprint $table) {
-                $table->integer('orden')->default(0)->after('id');
+            $table->integer('orden')->default(0)->after('id');
         });
     }
-    }
+}
 
     public function down(): void
     {
