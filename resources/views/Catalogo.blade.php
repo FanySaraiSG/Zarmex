@@ -372,7 +372,7 @@
                     
                     <div class="card-content" style="padding: 15px; text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between;">
                         <h3 style="color: var(--zx-dark); font-weight: 800; font-size: 1rem; margin-bottom: 12px;">
-                             {{ $producto->nombre }}
+                             {{ $producto->id }}
                         </h3>
                         <button type="button" style="background: var(--zx-dark); color: white; border: none; padding: 10px; border-radius: 10px; width: 100%; font-weight: 600;" data-bs-toggle="modal" data-bs-target="#modalProd{{ $producto->id }}">
                             Ver Detalles
@@ -478,8 +478,15 @@
                                                 <span class="info-label-luxury">Documentación Oficial</span>
                                                 <div class="d-flex flex-wrap gap-2 mt-1">
                                                     @if($producto->doc1_url)
-                                                        <a href="{{ asset($producto->doc1_url) }}" target="_blank" class="btn-document-inline"><i class="far fa-file-pdf text-danger me-1"></i> Ficha Técnica</a>
-                                                    @else
+                                                        <a href="{{ asset($producto->doc1_url) }}" target="_blank" class="btn-document-inline"><i class="far fa-file-pdf text-danger me-1"></i> Garantía</a>
+                                                    @endif
+                                                    @if($producto->doc2_url)
+                                                        <a href="{{ asset($producto->doc2_url) }}" target="_blank" class="btn-document-inline"><i class="far fa-file-pdf text-danger me-1"></i> Manual de Usuario</a>
+                                                    @endif
+                                                    @if($producto->doc3_url)
+                                                        <a href="{{ asset($producto->doc3_url) }}" target="_blank" class="btn-document-inline"><i class="far fa-file-pdf text-danger me-1"></i> Ficha Técnica</a>
+                                                    @endif
+                                                    @if(!$producto->doc1_url && !$producto->doc2_url && !$producto->doc3_url)
                                                         <span style="font-size: 0.85rem; color: var(--zx-text-muted); font-style: italic;">No hay documentos disponibles</span>
                                                     @endif
                                                 </div>

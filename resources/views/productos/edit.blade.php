@@ -307,7 +307,7 @@
                             if (!empty($data['path'])) {
                                 if (preg_match('#^https?://#', $data['path'])) { $docUrl = $data['path']; }
                                 elseif (preg_match('#^/?storage/#', $data['path'])) { $docUrl = asset($data['path']); }
-                                else { $docUrl = Storage::url($data['path']); }
+                                else { $docUrl = asset($data['path']); }
                             }
                         @endphp
                     <div class="doc-box">

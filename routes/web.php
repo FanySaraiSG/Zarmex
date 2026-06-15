@@ -19,6 +19,8 @@ use App\Http\Controllers\BusquedaController;
 use App\Http\Controllers\SolicitudController;
 use App\Http\Controllers\AdminLogoController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\PromotionController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -67,7 +69,33 @@ Route::prefix('employees')->group(function () {
         Route::resource('employees', EmployeesController::class);
         Route::resource('categorias', CategoriaController::class);
         Route::resource('colors', ColorController::class);
+
+        // ==========================================================
+        // RUTAS PRODUCTOS DESTACADOS
+        // ==========================================================
+        Route::get('top-products/gestionar', function () {
+            $topProducts = \App\Models\TopProduct::all();
+            return view('top_products.gestionar', compact('topProducts'));
+        })->name('top-products.gestionar');
+
+        Route::post('top-products/reorder', [TopProductController::class, 'reorder'])->name('top-products.reorder');
+        Route::post('top-products/rename-section', [TopProductController::class, 'renameSection'])->name('top-products.rename-section');
+        Route::get('top-products/check-section/{section}', [TopProductController::class, 'checkSectionProducts'])->name('top-products.check-section');
+        Route::delete('top-products/section/{section}', [TopProductController::class, 'destroySection'])->name('top-products.destroy-section');
+
         Route::resource('top-products', TopProductController::class)->only(['index', 'store', 'update', 'destroy']);
+        // ==========================================================
+
+        // ==========================================================
+        // PROMOCIONES — usa POST simple, sin method spoofing
+        // ==========================================================
+        Route::get('promotions/gestionar', function () {
+            $promotions = \App\Models\Promotion::take(4)->get();
+            return view('promotions.gestionar', compact('promotions'));
+        })->name('promotions.gestionar');
+
+        Route::match(['POST', 'PUT'], 'promociones/{id}', [PromotionController::class, 'update'])->name('promociones.update');
+        // ==========================================================
 
         Route::get('/productos', [ProductoController::class, 'index'])->name('productos.index');
         Route::get('/productos/create', [ProductoController::class, 'create'])->name('productos.create');
@@ -111,8 +139,9 @@ Route::prefix('employees')->group(function () {
         Route::delete('/reviews/{id}', [ReviewController::class, 'destroy'])->name('admin.reviews.destroy');
         Route::patch('/reviews/{id}/estado', [ReviewController::class, 'estado'])->name('admin.reviews.estado');
 
-        // CORRECCIÓN: Usamos .* para aceptar guiones y caracteres especiales en el ID
         Route::get('/productos/obtener-siguiente-base/{categoriaId}', [ProductoController::class, 'obtenerSiguienteNumeroBase'])
             ->where('categoriaId', '.*');
+        // (rutas eliminadas) promos: se unifican en promociones.update
+        
     });
 });

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\TopProduct;
@@ -7,6 +8,17 @@ use Illuminate\Http\Request;
 
 class TopProductController extends Controller
 {
+    /**
+     * Palabras reservadas que no pueden usarse como nombre de sección.
+     * "todos" es el comodín del filtro del carrusel público.
+     */
+    private const SECCIONES_RESERVADAS = ['todos'];
+
+    private function esSectionReservada(string $section): bool
+    {
+        return in_array(strtolower(trim($section)), self::SECCIONES_RESERVADAS, true);
+    }
+
     public function index()
     {
         $topProducts = TopProduct::with('product')
@@ -22,19 +34,24 @@ class TopProductController extends Controller
     {
         $request->validate([
             'product_id' => 'nullable|exists:productos,id',
-            'section' => 'required|string|in:todos,novedades,populares',
+            'section'    => 'required|string|max:100',
         ]);
 
+        if ($this->esSectionReservada($request->section)) {
+            return response()->json([
+                'success' => false,
+                'message' => '"' . $request->section . '" es una palabra reservada y no puede usarse como nombre de sección.',
+            ], 422);
+        }
+
         $productId = $request->product_id ?: null;
-        
-        // Si se crea sin producto (desde el botón +Agregar), asignamos un producto por defecto
-        // para que el carrusel/home lo muestre.
+
         if (empty($productId)) {
             $defaultProductId = Producto::query()->value('id');
             if (!$defaultProductId) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'No existen productos en la base de datos. Crea un producto primero.'
+                    'message' => 'No existen productos en la base de datos. Crea un producto primero.',
                 ], 422);
             }
             $productId = $defaultProductId;
@@ -42,7 +59,7 @@ class TopProductController extends Controller
 
         $topProduct = TopProduct::create([
             'product_id' => $productId,
-            'section' => $request->section,
+            'section'    => strtolower(trim($request->section)),
         ]);
 
         $topProduct->refresh();
@@ -50,7 +67,7 @@ class TopProductController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Registro creado correctamente',
-            'data' => $topProduct,
+            'data'    => $topProduct,
         ]);
     }
 
@@ -58,18 +75,25 @@ class TopProductController extends Controller
     {
         $request->validate([
             'product_id' => 'nullable|exists:productos,id',
-            'section' => 'required|string|in:todos,novedades,populares',
+            'section'    => 'required|string|max:100',
         ]);
+
+        if ($this->esSectionReservada($request->section)) {
+            return response()->json([
+                'success' => false,
+                'message' => '"' . $request->section . '" es una palabra reservada y no puede usarse como nombre de sección.',
+            ], 422);
+        }
 
         $topProduct = TopProduct::findOrFail($id);
         $topProduct->product_id = $request->product_id ?: null;
-        $topProduct->section = $request->section;
+        $topProduct->section    = strtolower(trim($request->section));
         $topProduct->save();
 
         return response()->json([
             'success' => true,
             'message' => 'Producto actualizado correctamente',
-            'data' => $topProduct
+            'data'    => $topProduct,
         ]);
     }
 
@@ -86,12 +110,76 @@ class TopProductController extends Controller
 
     public function showTopProducts()
     {
-        // Obtener los 5 productos más vendidos
         $topProducts = TopProduct::with('product')->take(5)->get();
-
-        // Pasar los productos a la vista
         return view('admin.reviews.index', compact('topProducts'));
     }
 
-}
+    public function reorder(Request $request)
+    {
+        $request->validate([
+            'orden'   => 'required|array',
+            'orden.*' => 'integer|exists:top_products,id',
+        ]);
 
+        foreach ($request->orden as $posicion => $id) {
+            TopProduct::where('id', $id)->update(['orden' => $posicion]);
+        }
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * Actualiza el nombre de una sección en cascada en la base de datos.
+     */
+    public function renameSection(Request $request)
+    {
+        $request->validate([
+            'old_section' => 'required|string',
+            'new_section' => 'required|string|max:100',
+        ]);
+
+        if ($this->esSectionReservada($request->new_section)) {
+            return response()->json([
+                'success' => false,
+                'message' => '"' . $request->new_section . '" es una palabra reservada y no puede usarse como nombre de sección.',
+            ], 422);
+        }
+
+        $oldSection = $request->old_section;
+        $newSection = strtolower(trim($request->new_section));
+
+        $afectados = TopProduct::where('section', $oldSection)
+            ->update(['section' => $newSection]);
+
+        return response()->json([
+            'success' => true,
+            'message' => "Se actualizó la sección a '{$newSection}'. {$afectados} productos modificados.",
+        ]);
+    }
+
+    /**
+     * Verifica cuántos productos pertenecen a una sección antes de proceder a borrarla.
+     */
+    public function checkSectionProducts(string $section)
+    {
+        $count = TopProduct::where('section', $section)->count();
+
+        return response()->json([
+            'success' => true,
+            'count'   => $count,
+        ]);
+    }
+
+    /**
+     * Elimina una sección completa (remueve todos los registros asociados).
+     */
+    public function destroySection(string $section)
+    {
+        TopProduct::where('section', $section)->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => "La sección '{$section}' fue eliminada correctamente.",
+        ]);
+    }
+}

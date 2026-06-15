@@ -13,7 +13,7 @@ class Imagen extends Model
 
     protected $primaryKey = 'id'; // Clave primaria
 
-    protected $fillable = ['nombre', 'imagen_url', 'seccion']; // Campos permitidos para inserción masiva
+    protected $fillable = ['nombre', 'imagen_url', 'seccion', 'link_url'];
 
     public $timestamps = true; // Activa 'created_at' y 'updated_at'
 }

@@ -44,6 +44,42 @@
                 min-height: 380px !important;
             }
         }
+        /* ✅ Badge "Ver más" en banners con link */
+        .banner-link-hint {
+            position: absolute;
+            bottom: 18px;
+            right: 22px;
+            background: rgba(0, 0, 0, 0.55);
+            color: #fedc97;
+            font-size: 0.82rem;
+            font-weight: 700;
+            padding: 6px 16px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            backdrop-filter: blur(4px);
+            pointer-events: none;
+            transition: background 0.2s ease;
+            z-index: 20;
+        }
+        .carousel-item a:hover .banner-link-hint {
+            background: rgba(40, 102, 110, 0.88);
+        }
+        /* El <a> ocupa todo el slide y queda clicable */
+        .carousel-item { position: relative; }
+        .carousel-item > a {
+            display: block;
+            position: relative;
+            z-index: 15;
+            cursor: pointer;
+        }
+        /* Botones prev/next por encima del enlace */
+        #carouselBanner .carousel-control-prev,
+        #carouselBanner .carousel-control-next {
+            z-index: 30;
+        }
+
         .whatsapp-float {
             position: fixed;
             bottom: 25px;
@@ -435,16 +471,34 @@
                     @foreach($bannerImages as $index => $image)
                         @php
                             $extension = strtolower(pathinfo($image->imagen_url, PATHINFO_EXTENSION));
+                            $esVideo   = in_array($extension, ['mp4','webm','ogg','mov','avi']);
                         @endphp
 
                         <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
-                            @if(in_array($extension, ['mp4','webm','ogg','mov','avi']))
-                                <video class="banner-video banner-media" autoplay muted loop playsinline>
-                                    <source src="{{ asset($image->imagen_url) }}" type="video/{{ $extension === 'mov' ? 'mp4' : $extension }}">
-                                    Tu navegador no soporta video HTML5
-                                </video>
+                            @if($image->link_url)
+                                {{-- ✅ Recurso CLICKEABLE con redirección --}}
+                                <a href="{{ $image->link_url }}" target="_blank" rel="noopener noreferrer" style="display:block; position:relative;">
+                                    @if($esVideo)
+                                        <video class="banner-video banner-media" autoplay muted loop playsinline>
+                                            <source src="{{ asset($image->imagen_url) }}" type="video/{{ $extension === 'mov' ? 'mp4' : $extension }}">
+                                        </video>
+                                    @else
+                                        <img src="{{ asset($image->imagen_url) }}" class="banner-media" alt="Banner">
+                                    @endif
+                                    <span class="banner-link-hint">
+                                        <i class="fas fa-external-link-alt"></i> Ver más
+                                    </span>
+                                </a>
                             @else
-                                <img src="{{ asset($image->imagen_url) }}" class="banner-media" alt="Banner">
+                                {{-- Recurso normal sin redirección --}}
+                                @if($esVideo)
+                                    <video class="banner-video banner-media" autoplay muted loop playsinline>
+                                        <source src="{{ asset($image->imagen_url) }}" type="video/{{ $extension === 'mov' ? 'mp4' : $extension }}">
+                                        Tu navegador no soporta video HTML5
+                                    </video>
+                                @else
+                                    <img src="{{ asset($image->imagen_url) }}" class="banner-media" alt="Banner">
+                                @endif
                             @endif
                         </div>
                     @endforeach
@@ -468,22 +522,39 @@
             <h2 class="text-center zx-title-playfair" style="color:#28666e; font-size:2em; margin-top: -40px; margin-bottom: 20px;">PRODUCTOS DESTACADOS</h2>
 
             <div class="best-sellers-wrap">
+
+                @php
+                    // Secciones únicas reales desde la BD, en el orden en que aparecen
+                    $seccionesCarrusel = ($topProducts ?? collect())
+                        ->pluck('section')
+                        ->filter()
+                        ->unique()
+                        ->reject(fn($s) => strtolower($s) === 'todos')
+                        ->values();
+                @endphp
+
+                {{-- Botón "Todos" siempre visible; los demás solo si hay secciones en la BD --}}
+                @if(($topProducts ?? collect())->count() > 0)
                 <div class="best-section-actions" aria-label="Secciones de productos destacados">
-                    <button type="button" class="best-section-action-btn active" onclick="filterPasarela('todos')">Todos</button>
-                    <button type="button" class="best-section-action-btn" onclick="filterPasarela('novedades')">Novedades</button>
-                    <button type="button" class="best-section-action-btn" onclick="filterPasarela('populares')">Populares</button>
+                    <button type="button" class="best-section-action-btn active" data-filter="todos">Todos</button>
+                    @foreach($seccionesCarrusel as $seccion)
+                        <button type="button" class="best-section-action-btn" data-filter="{{ $seccion }}">
+                            {{ ucfirst($seccion) }}
+                        </button>
+                    @endforeach
                 </div>
+                @endif
 
                 @if(($topProducts ?? collect())->count() === 0)
                     <div style="text-align:center; color:#666; padding: 24px;">No hay productos destacados disponibles.</div>
                 @else
-                    
+
                     {{-- PASARELA CON DESPLAZAMIENTO CENTRADO --}}
                     <div class="custom-carousel-container">
                         <div class="custom-carousel-track" id="pasarelaTrack">
                             @foreach($topProducts as $topProduct)
                                 @if($topProduct->product)
-                                    <div class="custom-carousel-item" data-section="{{ $topProduct->section ?? 'todos' }}">
+                                    <div class="custom-carousel-item" data-section="{{ $topProduct->section ?? '' }}">
                                         <div class="best-card">
                                             <img src="{{ $topProduct->product->imagen_url ?? asset('Imagenes/84493-4540581.jpg') }}" alt="{{ $topProduct->product->nombre ?? 'Producto' }}">
                                             <h3>{{ Str::afterLast($topProduct->product->nombre, ' ') }}</h3>
@@ -555,37 +626,38 @@
                 let currentIndex = 0;
                 let visibleItems = [];
 
-                function initPasarela() {
-                    const allItems = Array.from(document.querySelectorAll('.custom-carousel-item'));
-                    const activeBtn = document.querySelector('.best-section-action-btn.active');
-                    const section = activeBtn ? activeBtn.textContent.trim().toLowerCase() : 'todos';
-                    
-                    visibleItems = allItems.filter(item => {
-                        if (section === 'todos') {
-                            item.style.display = 'flex';
-                            return true;
-                        } else {
-                            const match = item.getAttribute('data-section') === section;
-                            item.style.display = match ? 'flex' : 'none';
-                            return match;
-                        }
+                // Delegación de eventos en los botones de sección (sustituye los onclick inline)
+                document.addEventListener('DOMContentLoaded', () => {
+                    document.querySelectorAll('.best-section-action-btn').forEach(btn => {
+                        btn.addEventListener('click', function () {
+                            document.querySelectorAll('.best-section-action-btn')
+                                    .forEach(b => b.classList.remove('active'));
+                            this.classList.add('active');
+                            initPasarela();
+                        });
                     });
 
-                    // Por defecto, empezamos centrando la primera tarjeta ([0])
+                    initPasarela();
+                });
+
+                function initPasarela() {
+                    const allItems  = Array.from(document.querySelectorAll('.custom-carousel-item'));
+                    const activeBtn = document.querySelector('.best-section-action-btn.active');
+                    // data-filter="todos" significa mostrar todo; cualquier otro valor filtra por sección exacta
+                    const filtro    = activeBtn ? activeBtn.dataset.filter : 'todos';
+
+                    visibleItems = allItems.filter(item => {
+                        const mostrar = filtro === 'todos' || item.dataset.section === filtro;
+                        item.style.display = mostrar ? 'flex' : 'none';
+                        return mostrar;
+                    });
+
                     currentIndex = 0;
                     actualizarPasarela();
                 }
 
-                function filterPasarela(section) {
-                    document.querySelectorAll('.best-section-action-btn').forEach(btn => btn.classList.remove('active'));
-                    event.target.classList.add('active');
-                    initPasarela();
-                }
-
                 function moverPasarela(direccion) {
                     if (visibleItems.length === 0) return;
-                    
-                    // Rotación cíclica infinita de uno en uno
                     currentIndex = (currentIndex + direccion + visibleItems.length) % visibleItems.length;
                     actualizarPasarela();
                 }
@@ -595,47 +667,36 @@
                     if (!track || visibleItems.length === 0) return;
 
                     const isMobile = window.innerWidth < 768;
-                    
-                    // 1. Limpiar la clase center de todos los elementos
-                    visibleItems.forEach(item => item.classList.remove('center'));
 
-                    // 2. Aplicar la clase center a la tarjeta que le toca estar en medio
+                    visibleItems.forEach(item => item.classList.remove('center'));
                     if (visibleItems[currentIndex]) {
                         visibleItems[currentIndex].classList.add('center');
                     }
 
-                    // 3. NUEVO CÁLCULO DE ALINEACIÓN: Centrado Dinámico Exacto
                     let targetDesplazamiento = 0;
-
                     if (isMobile) {
                         targetDesplazamiento = -currentIndex * 100;
                     } else {
-                        // El truco es restar el ancho acumulado de los elementos anteriores (-currentIndex * 33.33%)
-                        // Y sumarle un desfase positivo estático de un tercio (33.33%) para empujar la tarjeta activa justo al CENTRO exacto de la vista
                         targetDesplazamiento = -(currentIndex * 33.333333) + 33.333333;
                     }
 
                     track.style.transform = `translateX(${targetDesplazamiento}%)`;
                 }
 
-                document.addEventListener('DOMContentLoaded', initPasarela);
                 window.addEventListener('resize', actualizarPasarela);
 
-                // movimiento automático cada 4.5 segundos
-                let autoPlayInterval = setInterval(() => {
-                moverPasarela(1); // Mueve a la siguiente tarjeta
-                }, 4500);
+                // Autoplay — se pausa al pasar el cursor
+                let autoPlayInterval = setInterval(() => moverPasarela(1), 4500);
 
                 const container = document.querySelector('.custom-carousel-container');
-                  if (container) {
-                  container.addEventListener('mouseenter', () => clearInterval(autoPlayInterval));
-                 container.addEventListener('mouseleave', () => {
-                 autoPlayInterval = setInterval(() => { moverPasarela(1); }, 3500);
-                });
-}
+                if (container) {
+                    container.addEventListener('mouseenter', () => clearInterval(autoPlayInterval));
+                    container.addEventListener('mouseleave', () => {
+                        autoPlayInterval = setInterval(() => moverPasarela(1), 3500);
+                    });
+                }
 
-
-                /* CÓDIGO EXISTENTE DE CONTROL DE MODAL */
+                /* ── MODAL DE DETALLE ── */
                 let pmSlides = [], pmCur = 0, pmNombreActual = '';
 
                 function abrirProdModalDesdeBtn(btn) {
@@ -647,23 +708,23 @@
                 }
 
                 function abrirProdModal(nombre, desc, imgPrincipal, colores) {
-                    const partes = nombre.split(' ');
+                    const partes     = nombre.split(' ');
                     const soloCodigo = partes[partes.length - 1];
-                    
+
                     pmNombreActual = soloCodigo;
                     document.getElementById('pm-nombre').textContent = soloCodigo;
-                    document.getElementById('pm-desc').textContent = desc;
+                    document.getElementById('pm-desc').textContent   = desc;
 
                     const cw = document.getElementById('pm-colors');
                     cw.innerHTML = '';
                     document.getElementById('pm-color-name').textContent = 'Selecciona un color';
-                    
+
                     if (colores && typeof colores === 'object') {
                         Object.entries(colores).forEach(([hex, nombre_color]) => {
                             const sw = document.createElement('div');
-                            sw.className = 'prod-color-swatch';
+                            sw.className      = 'prod-color-swatch';
                             sw.style.background = hex;
-                            sw.title = nombre_color;
+                            sw.title          = nombre_color;
                             sw.onclick = () => {
                                 document.querySelectorAll('.prod-color-swatch').forEach(s => s.classList.remove('selected'));
                                 sw.classList.add('selected');
@@ -674,7 +735,7 @@
                     }
 
                     pmSlides = [{ type: 'img', src: imgPrincipal, label: 'Imagen 1' }];
-                    pmCur = 0;
+                    pmCur    = 0;
                     pmRenderTrack();
                     pmRenderDots();
 
@@ -686,26 +747,27 @@
                 }
 
                 function pmRenderTrack() {
-                    const track = document.getElementById('pm-track');
-                    track.innerHTML = `<div class="prod-carousel-slide"><img src="${pmSlides[0].src}"></div>`;
+                    document.getElementById('pm-track').innerHTML =
+                        `<div class="prod-carousel-slide"><img src="${pmSlides[0].src}"></div>`;
                 }
 
                 function pmRenderDots() {
-                    const dots = document.getElementById('pm-dots');
-                    dots.innerHTML = '<div class="prod-dot active"></div>';
+                    document.getElementById('pm-dots').innerHTML = '<div class="prod-dot active"></div>';
                 }
 
                 function pmMover(dir) {}
 
                 function abrirWhatsapp() {
                     const colorSeleccionado = document.getElementById('pm-color-name').textContent;
-                    const textoColor = colorSeleccionado !== 'Selecciona un color' ? ` en color ${colorSeleccionado}` : '';
-                    const mensaje = encodeURIComponent(`Hola Zarmex, me interesa obtener más información del producto destacado: ${pmNombreActual}${textoColor}`);
+                    const textoColor = colorSeleccionado !== 'Selecciona un color'
+                        ? ` en color ${colorSeleccionado}` : '';
+                    const mensaje = encodeURIComponent(
+                        `Hola Zarmex, me interesa obtener más información del producto destacado: ${pmNombreActual}${textoColor}`
+                    );
                     window.open(`https://wa.me/525581366555?text=${mensaje}`, '_blank');
                 }
             </script>
         </section>
-
 
 {{-- Seccion de reseñas  --}}
 
@@ -1185,6 +1247,151 @@
     <div style="clear: both;"></div>
 </section>
 
+{{-- ===================== SECCIÓN PROMOCIONES ===================== --}}
+@php
+    $promociones = \App\Models\Promotion::orderBy('id')->take(4)->get();
+@endphp
+
+@if($promociones->isNotEmpty())
+<section class="zx-promos-section">
+    <div class="zx-promos-inner">
+        <h2 class="zx-promos-title zx-title-playfair">
+            <i class="fas fa-percent zx-promos-icon"></i> Promociones
+        </h2>
+        <p class="zx-promos-sub">Descubre nuestras ofertas especiales</p>
+
+        <div class="zx-promos-grid">
+            @foreach($promociones as $promo)
+            <div class="zx-promo-card">
+                <div class="zx-promo-img-wrap">
+                    <img
+                        src="{{ $promo->imagen_url ? asset($promo->imagen_url) : asset('imagenes/promo-placeholder.png') }}"
+                        alt="{{ $promo->nombre ?? 'Promoción' }}"
+                        loading="lazy">
+                    <div class="zx-promo-badge">PROMO</div>
+                </div>
+                <div class="zx-promo-body">
+                    <p class="zx-promo-name">{{ $promo->nombre ?? 'Promoción especial' }}</p>
+                </div>
+            </div>
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
+
+<style>
+    /* ===================== SECCIÓN PROMOCIONES ===================== */
+    .zx-promos-section {
+        background: linear-gradient(135deg, #f3f8f8 0%, #e8f2f3 100%);
+        padding: 56px 16px 60px;
+        border-top: 3px solid rgba(40,102,110,0.12);
+    }
+
+    .zx-promos-inner {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .zx-promos-title {
+        text-align: center;
+        color: #28666e;
+        font-size: 2em;
+        margin-bottom: 6px;
+    }
+
+    .zx-promos-icon {
+        color: #fedc97;
+        background: #28666e;
+        padding: 8px 11px;
+        border-radius: 50%;
+        font-size: 0.65em;
+        vertical-align: middle;
+        margin-right: 4px;
+    }
+
+    .zx-promos-sub {
+        text-align: center;
+        color: #7a9ea1;
+        font-size: 0.97rem;
+        margin-bottom: 36px;
+        letter-spacing: .4px;
+    }
+
+    /* Grid de 4 tarjetas */
+    .zx-promos-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 24px;
+    }
+    @media (max-width: 1024px) { .zx-promos-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 560px)  { .zx-promos-grid { grid-template-columns: 1fr; gap: 16px; } }
+
+    /* Tarjeta */
+    .zx-promo-card {
+        background: #ffffff;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 6px 20px rgba(40,102,110,0.1);
+        border: 1px solid rgba(40,102,110,0.1);
+        transition: transform .25s ease, box-shadow .25s ease;
+        display: flex;
+        flex-direction: column;
+    }
+    .zx-promo-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 16px 36px rgba(40,102,110,0.18);
+    }
+
+    /* Imagen */
+    .zx-promo-img-wrap {
+        position: relative;
+        height: 200px;
+        background: #f4f8f9;
+        overflow: hidden;
+    }
+    .zx-promo-img-wrap img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform .4s ease;
+    }
+    .zx-promo-card:hover .zx-promo-img-wrap img { transform: scale(1.04); }
+
+    /* Badge */
+    .zx-promo-badge {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        background: #fedc97;
+        color: #28666e;
+        font-size: 0.68rem;
+        font-weight: 900;
+        letter-spacing: 1.2px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    /* Nombre */
+    .zx-promo-body {
+        padding: 16px 18px 18px;
+        flex-grow: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #28666e;
+    }
+    .zx-promo-name {
+        color: #fedc97;
+        font-weight: 800;
+        font-size: 1rem;
+        text-align: center;
+        margin: 0;
+        line-height: 1.4;
+    }
+</style>
+
 {{-- INCLUSIÓN DEL FOOTER --}}
 @include('footer')
 
@@ -1202,7 +1409,8 @@
 
         const bsCarousel = bootstrap.Carousel.getOrCreateInstance(banner, {
             interval: 5000,
-            ride: true
+            ride: true,
+            touch: false  // Desactivamos touch para que no consuma los clics en enlaces
         });
 
         function pauseAllVideos() {
@@ -1228,6 +1436,17 @@
         banner.addEventListener('slide.bs.carousel', () => pauseAllVideos());
         banner.addEventListener('slid.bs.carousel', () => handleActiveSlide());
         handleActiveSlide();
+
+        // ✅ Abrir el enlace del banner sin que Bootstrap lo intercepte
+        banner.addEventListener('click', (e) => {
+            // Buscar si el clic ocurrió dentro de un <a> de banner
+            const link = e.target.closest('.carousel-item > a[href]');
+            if (link) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                window.open(link.href, '_blank', 'noopener,noreferrer');
+            }
+        }, true); // true = fase de captura, antes de que Bootstrap lo vea
     });
 </script>
 </body>

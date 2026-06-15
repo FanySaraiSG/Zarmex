@@ -15,7 +15,9 @@ class ProductoController extends Controller
     // Listado principal — muestra categorías con conteo de productos
     public function index()
     {
-        $categorias = Categoria::withCount('productos')->get();
+        $categorias = Categoria::withCount('productos')
+                        ->with('productos')
+                        ->get();
 
         return view('productos.index', compact('categorias'));
     }
@@ -191,9 +193,11 @@ class ProductoController extends Controller
             $producto = Producto::findOrFail($nuevoId);
         }
 
-        $datos = $request->except(['imagen_url', 'imagenes', 'id', 'nombre', 'doc1', 'doc2', 'doc3', 'imagenes_eliminadas', 'orden_imagenes', 'video', '_method', '_token']);
-
-        $producto->update($datos);
+        // Solo actualizamos los campos de texto editables.
+        // NO usar except() aquí — pisaría doc1_url/doc2_url/doc3_url con null
+        // antes de que procesarDocumentos() los pueda guardar correctamente.
+        $datos = $request->only(['descripcion', 'categoria_id']);
+        $producto->fill($datos);
 
         $rutaProducto = public_path("images/productos/{$producto->id}");
         if (!file_exists($rutaProducto)) mkdir($rutaProducto, 0755, true);

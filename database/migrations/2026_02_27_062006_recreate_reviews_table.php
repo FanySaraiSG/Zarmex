@@ -17,7 +17,7 @@ return new class extends Migration
         $table->id();
         $table->unsignedBigInteger('producto_id');
         $table->string('guest_nombre', 60)->nullable();
-        $table->string('guest_email', 120)->nullable();
+        $table->string('guest_email', 120)->nullable(); 
         $table->unsignedTinyInteger('calificacion'); // 1-5
         $table->text('descripcion');
         $table->enum('estatus', ['pendiente', 'aprobado', 'oculto'])->default('pendiente');

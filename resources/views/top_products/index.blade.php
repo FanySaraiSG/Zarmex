@@ -5,419 +5,456 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-
-<title>Control de Productos - Destacados Claros</title>
-
+<title>Productos Destacados</title>
 <style>
 :root {
-    /* Paleta de Verdes Claros Armoniosos */
-    --bg-light-green: #f2f9f6;    /* Fondo general */
-    --panel-white: #ffffff;        /* Fondo del contenedor principal */
-    --table-header-green: #e1f2eb;/* Fondo del encabezado */
-    --table-hover-green: #f0f7f4; /* Fondo al pasar el cursor*/
-    --mint-accent: #22c55e;       /* Color de éxito y acento */
-    --forest-text: #164e35;       /* Texto principal  */
-    --muted-green: #60a582;       /* Texto secundario y bordes suaves */
-    --border-light: #d1e7dd;      /* Líneas divisorias de la tabla */
+    --panel-white:        #ffffff;
+    --table-header-green: #e6f4ea;
+    --table-hover-green:  #f1f9f5;
+    --mint-accent:        #198754;
+    --forest-text:        #0f4c3a;
+    --border-light:       #dee2e6;
 }
 
 body {
-    background-color: var(--bg-light-green);
+    background: linear-gradient(135deg, #a7f3d0 0%, #86efac 100%);
     font-family: 'Segoe UI', system-ui, sans-serif;
     color: var(--forest-text);
+    min-height: 100vh;
 }
 
-/* Contenedor del Panel */
+header, footer, .whatsapp, #whatsapp { display: none !important; }
+
 .panel-box {
     background: var(--panel-white);
     border: 1px solid var(--border-light);
-    border-radius: 14px;
-    padding: 24px;
-    box-shadow: 0 10px 25px rgba(22, 78, 53, 0.05);
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
 }
 
-.panel-title {
-    font-size: 1.6rem;
-    font-weight: 700;
+.panel-title { font-size: 1.75rem; font-weight: 700; color: var(--forest-text); }
+
+/* Sección tabs */
+.section-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+
+.section-tab {
+    padding: 8px 20px;
+    border-radius: 50px;
+    border: 1px solid #198754;
+    background: transparent;
     color: var(--forest-text);
-    letter-spacing: -0.01em;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9rem;
 }
+.section-tab:hover   { background: #e6f4ea; }
+.section-tab.active  { background: #198754; color: #fff; border-color: #198754; }
 
-/* TABLA EN LÍNEA VERDE CLARA */
-.green-table-responsive {
-    border-radius: 10px;
-    overflow: hidden;
-    border: 1px solid var(--border-light);
-}
+/* Tabla */
+.green-table-responsive { border-radius: 10px; overflow: hidden; border: 1px solid var(--border-light); }
 
-.table-green {
-    margin-bottom: 0;
-    background-color: var(--panel-white);
-    color: var(--forest-text);
-    vertical-align: middle;
-}
+.table-green { margin-bottom: 0; background-color: var(--panel-white) !important; color: var(--forest-text); vertical-align: middle; }
 
-/* Encabezado de la tabla */
 .table-green thead th {
-    background-color: var(--table-header-green);
+    background-color: var(--table-header-green) !important;
     color: var(--forest-text);
     font-weight: 600;
     text-transform: uppercase;
     font-size: 0.75rem;
     letter-spacing: 0.06em;
     padding: 14px 16px;
-    border-bottom: 2px solid var(--border-light);
-}
-
-/* Filas de la tabla */
-.table-green tbody tr {
     border-bottom: 1px solid var(--border-light);
-    background-color: var(--panel-white);
-    transition: background-color 0.2s ease;
 }
 
-/* Efecto hover interactivo en verde suave */
-.table-green tbody tr:hover {
-    background-color: var(--table-hover-green) !important;
-}
+.table-green tbody tr { border-bottom: 1px solid var(--border-light); background-color: var(--panel-white) !important; transition: background-color 0.2s; }
+.table-green tbody tr:hover { background-color: var(--table-hover-green) !important; }
+.table-green tbody td { padding: 12px 16px; color: var(--forest-text); background-color: transparent !important; }
 
-.table-green tbody td {
-    padding: 12px 16px;
-    color: var(--forest-text);
-    background-color: transparent !important;
-}
+.product-thumb { width: 48px; height: 48px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-light); }
+.product-thumb-placeholder { width: 48px; height: 48px; border-radius: 8px; background: #e6f4ea; display:flex; align-items:center; justify-content:center; color:#adb5bd; font-size: 1.2rem; }
 
-/* Inputs / Selectores Claros */
-.table-select {
-    background-color: #ffffff;
-    color: var(--forest-text);
-    border: 1px solid var(--muted-green);
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    width: 100%;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
+/* Botones */
+.btn-mint { background-color: #198754; color: #fff; font-weight: 500; border-radius: 6px; padding: 8px 16px; border: none; white-space: nowrap; transition: all 0.2s; }
+.btn-mint:hover { background-color: #146c43; color: white; }
 
-.table-select:focus {
-    border-color: var(--mint-accent);
-    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
-    outline: none;
-}
+.btn-outline-green { background: transparent; color: var(--forest-text); border: 1px solid #198754; border-radius: 6px; font-weight: 500; padding: 8px 16px; transition: all 0.2s; }
+.btn-outline-green:hover { background: #e6f4ea; color: var(--forest-text); }
 
-/* Botones en tonos Verdes */
-.btn-mint {
-    background-color: #25a266;
-    color: #ffffff;
-    font-weight: 600;
-    border-radius: 6px;
-    padding: 8px 18px;
-    border: none;
-    transition: all 0.2s ease;
-}
+.btn-table-delete { background: transparent; color: #dc2626; border: 1px solid #fecaca; padding: 6px 12px; border-radius: 6px; transition: all 0.2s; }
+.btn-table-delete:hover { background: #dc2626; color: white; }
 
-.btn-mint:hover {
-    background-color: #1b744a;
-    color: white;
-}
-
-.btn-outline-green {
-    background-color: transparent;
-    color: var(--forest-text);
-    border: 1px solid var(--muted-green);
-    border-radius: 6px;
-    font-weight: 600;
-}
-
-.btn-outline-green:hover {
-    background-color: var(--table-header-green);
-    color: var(--forest-text);
-}
-
-.btn-table-delete {
-    background-color: transparent;
-    color: #dc2626;
-    border: 1px solid rgba(239, 68, 68, 0.2);
-    padding: 6px 10px;
-    border-radius: 6px;
-    transition: all 0.2s;
-}
-
-.btn-table-delete:hover {
-    background-color: #dc2626;
-    color: white;
-    border-color: #dc2626;
-}
-
-header, footer, .whatsapp, #whatsapp {
-    display: none !important;
-}
-
-/* Toast Notificación Flotante Clara */
-.toast-green-sync {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    background-color: #ffffff;
-    color: var(--forest-text);
-    border: 1px solid var(--mint-accent);
-    padding: 12px 24px;
+/* Buscador de productos */
+.search-wrap { position: relative; }
+.search-results {
+    position: absolute;
+    top: 100%;
+    left: 0; right: 0;
+    background: #fff;
+    border: 1px solid var(--border-light);
     border-radius: 8px;
-    font-weight: 600;
-    font-size: 0.95rem;
-    box-shadow: 0 8px 24px rgba(22, 78, 53, 0.1);
-    z-index: 9999;
-    opacity: 0;
-    transform: translateY(10px);
-    transition: all 0.3s ease;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    z-index: 999;
+    max-height: 280px;
+    overflow-y: auto;
+    display: none;
+}
+.search-result-item {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
+    padding: 10px 14px;
+    cursor: pointer;
+    transition: background 0.15s;
+    border-bottom: 1px solid #f0f0f0;
 }
+.search-result-item:last-child { border-bottom: none; }
+.search-result-item:hover { background: var(--table-hover-green); }
+.search-result-item img { width: 36px; height: 36px; object-fit: cover; border-radius: 6px; }
+.search-result-item .item-name { font-size: 0.9rem; font-weight: 500; color: var(--forest-text); }
 
-.toast-green-sync.show {
-    opacity: 1;
-    transform: translateY(0);
+.table-input { background: #fff; color: var(--forest-text); border: 1px solid #ced4da; padding: 8px 12px; border-radius: 6px; font-size: 0.9rem; transition: all 0.2s; }
+.table-input:focus { border-color: var(--mint-accent); box-shadow: 0 0 0 3px rgba(25,135,84,0.15); outline: none; }
+
+/* Estado vacío */
+.empty-state { text-align: center; padding: 40px 16px; color: #6c757d; }
+
+/* Toast */
+.toast-green-sync {
+    position: fixed; bottom: 24px; right: 24px;
+    background: #fff; color: var(--forest-text); border: 1px solid var(--mint-accent);
+    padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 0.95rem;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.1); z-index: 9999;
+    opacity: 0; transform: translateY(10px); transition: all 0.3s;
+    display: flex; align-items: center; gap: 10px; pointer-events: none;
 }
+.toast-green-sync.show { opacity: 1; transform: translateY(0); }
+
+.badge-section { background: #e6f4ea; color: #198754; padding: 3px 10px; border-radius: 50px; font-size: 0.78rem; font-weight: 600; }
 </style>
 </head>
 
 <body>
 
+@php
+    $secciones      = $topProducts->pluck('section')->filter()->unique()->reject(fn($s) => strtolower($s) === 'todos')->values();
+    $allProducts    = $products; // colección Producto::all() del controller
+    $topProductsArr = $topProducts; // registros TopProduct con ->product
+@endphp
+
 <div class="container my-5">
     <div class="panel-box">
 
-        <!-- ENCABEZADO DE HERRAMIENTAS -->
-        <div class="row align-items-center mb-4 g-3">
-            <div class="col-sm-4 order-2 order-sm-1">
-                <a class="btn btn-outline-green" href="{{ route('admin.dashboard') }}">
-                    <i class="bi bi-arrow-left-short"></i> Volver al Menú
+        {{-- Cabecera --}}
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4">
+            <h2 class="panel-title mb-0">
+                <i class="bi bi-star-fill me-2" style="color:#198754; font-size:1.4rem;"></i>
+                Productos Destacados
+            </h2>
+            <a href="{{ route('top-products.gestionar') }}" class="btn btn-outline-green">
+                <i class="bi bi-sliders"></i> Gestionar secciones
+            </a>
+        </div>
+
+        @if($secciones->isEmpty())
+            {{-- Sin secciones --}}
+            <div class="empty-state">
+                <i class="bi bi-folder2-open" style="font-size:2.5rem; display:block; margin-bottom:12px; color:#adb5bd;"></i>
+                <p class="mb-3">Aún no hay secciones creadas.</p>
+                <a href="{{ route('top-products.gestionar') }}" class="btn btn-mint">
+                    <i class="bi bi-plus-lg"></i> Crear primera sección
                 </a>
             </div>
-            <div class="col-sm-4 text-sm-center order-1 order-sm-2">
-                <h2 class="panel-title mb-0">Productos Destacados</h2>
-            </div>
-            <div class="col-sm-4 text-sm-end order-3 order-sm-3">
-                <div class="d-inline-flex gap-2 justify-content-sm-end w-100">
-                    
-                    <!-- Filtro maestro integrado -->
-                    <select class="table-select" id="newBestSection" style="max-width: 170px;">
-                        <option value="todos"> Ver Todo</option>
-                        <option value="novedades"> Novedades</option>
-                        <option value="populares"> Populares</option>
-                    </select>
+        @else
 
-                    <button type="button" class="btn btn-mint" id="btnAddTopProduct">
-                        <i class="bi bi-plus-lg"></i> Agregar
+            {{-- Tabs de sección --}}
+            <div class="section-tabs" id="sectionTabs">
+                @foreach($secciones as $i => $sec)
+                    <button class="section-tab {{ $i === 0 ? 'active' : '' }}"
+                            data-section="{{ $sec }}">
+                        {{ ucfirst($sec) }}
                     </button>
+                @endforeach
+            </div>
+
+            {{-- Nombre sección activa + buscador --}}
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-3">
+                <div>
+                    <span class="fw-semibold" style="font-size:1.05rem;">
+                        Productos en: <span id="labelSeccionActiva" class="badge-section">{{ ucfirst($secciones->first()) }}</span>
+                    </span>
+                    <span class="text-muted small ms-2" id="contadorProductos"></span>
+                </div>
+
+                {{-- Buscador para agregar productos --}}
+                <div class="search-wrap" style="min-width: 300px;">
+                    <div class="d-flex gap-2">
+                        <input type="text"
+                               id="buscarProducto"
+                               class="table-input w-100"
+                               placeholder="Buscar producto para agregar...">
+                    </div>
+                    <div class="search-results" id="searchResults"></div>
                 </div>
             </div>
-        </div>
 
-        @if (session('success'))
-            <div class="alert alert-success border-0 mb-4" style="background-color: var(--table-header-green); color: var(--forest-text);">
-                {{ session('success') }}
+            {{-- Tabla de productos asignados --}}
+            <div class="green-table-responsive table-responsive">
+                <table class="table table-green">
+                    <thead>
+                        <tr>
+                            <th style="width:6%">#</th>
+                            <th style="width:8%">Imagen</th>
+                            <th style="width:52%">Nombre del producto</th>
+                            <th style="width:20%">Secciones</th>
+                            <th style="width:14%" class="text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productosTableBody"></tbody>
+                </table>
             </div>
+
         @endif
-
-        <!-- TABLA COMPACTA CLARA -->
-        <div class="green-table-responsive table-responsive">
-            <table class="table table-green">
-                <thead>
-                    <tr>
-                        <th style="width: 70px;" class="text-center">Posición</th>
-                        <th>Producto</th>
-                        <th style="width: 240px;">Sección del Sitio</th>
-                        <th style="width: 90px;" class="text-center">Remover</th>
-                    </tr>
-                </thead>
-
-                <tbody id="topProductsTbody">
-                    @foreach ($topProducts as $topProduct)
-                    <tr data-top-product-id="{{ $topProduct->id }}" class="table-row-item">
-                        
-                        <!-- Posición secuencial -->
-                        <td class="text-center fw-bold" style="color: #1b744a;">
-                            #{{ $loop->iteration }}
-                        </td>
-
-                        <!-- Selector Producto -->
-                        <td>
-                            <select class="table-select auto-submit" data-id="{{ $topProduct->id }}">
-                                <option value="">— Ningún producto seleccionado —</option>
-                                @foreach ($products as $product)
-                                <option value="{{ $product->id }}" {{ $topProduct->product_id == $product->id ? 'selected' : '' }}>
-                                    ID: {{ $product->id }} — {{ $product->name ?? 'Producto ' }}
-                                </option>
-                                @endforeach
-                            </select>
-                        </td>
-
-                        <!-- Selector Sección -->
-                        <td>
-                            <select class="table-select auto-submit auto-submit-section" data-id="{{ $topProduct->id }}">
-                                <option value="todos" {{ ($topProduct->section ?? 'todos') === 'todos' ? 'selected' : '' }}> Todos</option>
-                                <option value="novedades" {{ ($topProduct->section ?? 'todos') === 'novedades' ? 'selected' : '' }}> Novedades</option>
-                                <option value="populares" {{ ($topProduct->section ?? 'todos') === 'populares' ? 'selected' : '' }}> Populares</option>
-                            </select>
-                        </td>
-
-                        <!-- Botón Eliminar Fila -->
-                        <td class="text-center">
-                            <button type="button" class="btn btn-table-delete btn-delete" title="Quitar fila">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </td>
-
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
 
     </div>
 </div>
 
+@if(!$secciones->isEmpty())
+
+@php
+    $jsAllProducts = $allProducts->map(fn($p) => [
+        'id'         => $p->id,
+        'nombre'     => $p->nombre,
+        'imagen_url' => $p->imagen_url ?? null,
+    ])->values();
+
+    $jsTopEntries = $topProductsArr->map(fn($tp) => [
+        'id'         => $tp->id,
+        'product_id' => $tp->product_id,
+        'section'    => $tp->section,
+        'nombre'     => optional($tp->product)->nombre ?? '—',
+        'imagen_url' => optional($tp->product)->imagen_url ?? null,
+    ])->values();
+
+    $jsPrimeraSeccion = $secciones->first();
+@endphp
+
 <script>
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener('DOMContentLoaded', () => {
 
-    // Sincronización automática con Toast claro
-    function lanzarToastGuardado(mensaje) {
-        let toast = document.createElement('div');
-        toast.className = 'toast-green-sync';
-        toast.innerHTML = `<i class="bi bi-check-circle-fill" style="color:var(--mint-accent); font-size:1.2rem;"></i> ${mensaje}`;
-        document.body.appendChild(toast);
+    // ── Datos desde Blade ───────────────────────────────────────────────────
+    const allProducts = @json($jsAllProducts);
+    const topEntries  = @json($jsTopEntries);
 
-        setTimeout(() => toast.classList.add('show'), 50);
+    let seccionActiva = @json($jsPrimeraSeccion);
+    let entriesLocal  = [...topEntries]; // copia local mutable
 
-        setTimeout(() => {
-            toast.classList.remove('show');
-            setTimeout(() => toast.remove(), 300);
-        }, 1800);
+    // ── Toast ───────────────────────────────────────────────────────────────
+    function toast(msg, error = false) {
+        const t    = document.createElement('div');
+        t.className = 'toast-green-sync';
+        const icon  = error
+            ? 'bi-x-circle-fill" style="color:#dc2626'
+            : 'bi-check-circle-fill" style="color:#198754';
+        t.innerHTML = `<i class="bi ${icon}; font-size:1.1rem;"></i> ${msg}`;
+        document.body.appendChild(t);
+        setTimeout(() => t.classList.add('show'), 50);
+        setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 2400);
     }
-    
-    // ==========================================
-    // Guardado Automático (Fetch / AJAX)
-    // ==========================================
-    document.querySelectorAll('.auto-submit').forEach(select => {
-        select.addEventListener('change', function() {
-            let fila = this.closest('.table-row-item');
-            let topProductId = this.dataset.id;
-            
-            let productSelect = fila.querySelector('.table-select:not(.auto-submit-section)');
-            let sectionSelect = fila.querySelector('.auto-submit-section');
 
-            let productId = productSelect ? productSelect.value : null;
-            let sectionValue = sectionSelect ? sectionSelect.value : 'todos';
+    // ── Tabs ────────────────────────────────────────────────────────────────
+    document.querySelectorAll('.section-tab').forEach(btn => {
+        btn.addEventListener('click', function () {
+            document.querySelectorAll('.section-tab').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            seccionActiva = this.dataset.section;
+            document.getElementById('labelSeccionActiva').textContent =
+                seccionActiva.charAt(0).toUpperCase() + seccionActiva.slice(1);
+            document.getElementById('buscarProducto').value = '';
+            document.getElementById('searchResults').style.display = 'none';
+            renderTabla();
+        });
+    });
 
-            fetch(`/employees/top-products/${topProductId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({
-                    product_id: productId,
-                    section: sectionValue
-                })
-            })
-            .then(res => res.json())
-            .then(data => {
-                lanzarToastGuardado('Cambio guardado automáticamente');
-            })
-            .catch(err => {
-                console.error(err);
-                alert('No se pudo guardar la información');
+    // ── Render tabla ────────────────────────────────────────────────────────
+    function renderTabla() {
+        const tbody    = document.getElementById('productosTableBody');
+        const contador = document.getElementById('contadorProductos');
+        const filas    = entriesLocal.filter(e => e.section === seccionActiva);
+
+        contador.textContent = `${filas.length} producto${filas.length !== 1 ? 's' : ''}`;
+        tbody.innerHTML = '';
+
+        if (filas.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5">
+                <div class="empty-state">
+                    <i class="bi bi-box-seam" style="font-size:2rem; display:block; margin-bottom:8px; color:#adb5bd;"></i>
+                    No hay productos en esta sección. Usa el buscador para agregar.
+                </div>
+            </td></tr>`;
+            return;
+        }
+
+        filas.forEach((entry, idx) => {
+            // Secciones en las que aparece este producto
+            const seccionesDelProducto = [...new Set(
+                entriesLocal.filter(e => e.product_id === entry.product_id).map(e => e.section)
+            )];
+
+            const badgesSecciones = seccionesDelProducto
+                .map(s => `<span class="badge-section me-1">${s.charAt(0).toUpperCase() + s.slice(1)}</span>`)
+                .join('');
+
+            const imgHtml = entry.imagen_url
+                ? `<img src="${entry.imagen_url}" class="product-thumb" alt="${entry.nombre}">`
+                : `<div class="product-thumb-placeholder"><i class="bi bi-image"></i></div>`;
+
+            const tr = document.createElement('tr');
+            tr.dataset.entryId = entry.id;
+            tr.innerHTML = `
+                <td class="fw-bold" style="color:#198754;">${idx + 1}</td>
+                <td>${imgHtml}</td>
+                <td class="fw-semibold">${entry.nombre}</td>
+                <td>${badgesSecciones}</td>
+                <td class="text-center">
+                    <button class="btn btn-table-delete btn-quitar" title="Quitar de esta sección">
+                        <i class="bi bi-trash-fill"></i>
+                    </button>
+                </td>
+            `;
+
+            tr.querySelector('.btn-quitar').addEventListener('click', () => {
+                quitarProducto(entry.id, entry.nombre, tr);
             });
+
+            tbody.appendChild(tr);
         });
-    });
+    }
 
-    // ==========================================
-    // Filtro en Tiempo Real por Sección
-    // ==========================================
-    const filterSection = document.getElementById('newBestSection');
-    filterSection?.addEventListener('change', function() {
-        let seccionSeleccionada = this.value;
-        
-        document.querySelectorAll('#topProductsTbody .table-row-item').forEach(fila => {
-            let selectSeccionFila = fila.querySelector('.auto-submit-section');
-            let seccionFila = selectSeccionFila ? selectSeccionFila.value : 'todos';
-
-            if (seccionSeleccionada === 'todos' || seccionFila === seccionSeleccionada) {
-                fila.style.display = ''; 
-            } else {
-                fila.style.display = 'none'; 
-            }
-        });
-    });
-
-    // Eliminación asíncrona de fila con efecto visual limpio
-    document.querySelectorAll('.btn-delete').forEach(btn => {
-        btn.addEventListener('click', async function() {
-            const fila = btn.closest('.table-row-item');
-            const topProductId = fila?.dataset.topProductId;
-            if (!topProductId) return;
-
-            if (!confirm('¿Seguro que deseas eliminar esta fila de destacados?')) return;
-
-            try {
-                await fetch(`/employees/top-products/${topProductId}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'Accept': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    }
-                });
-                
-                fila.style.opacity = '0';
-                fila.style.backgroundColor = '#fde8e8';
-                fila.style.transition = 'all 0.3s ease';
-                setTimeout(() => {
-                    fila.remove();
-                    lanzarToastGuardado('Fila eliminada correctamente');
-                }, 300);
-
-            } catch (e) {
-                console.error(e);
-                alert('Ocurrió un problema técnico al eliminar');
-            }
-        });
-    });
-
-    // Agregar nueva fila vacía
-    const btnAdd = document.getElementById('btnAddTopProduct');
-    const newSection = document.getElementById('newBestSection');
-
-    btnAdd?.addEventListener('click', async function() {
-        const section = newSection?.value || 'todos';
+    // ── Quitar producto de sección ──────────────────────────────────────────
+    async function quitarProducto(topId, nombre, tr) {
+        if (!confirm(`¿Quitar "${nombre}" de la sección "${seccionActiva}"?`)) return;
 
         try {
-            await fetch(`/employees/top-products`, {
+            const res = await fetch(`/employees/top-products/${topId}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                }
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                entriesLocal = entriesLocal.filter(e => e.id !== topId);
+                tr.style.transition  = 'all 0.3s';
+                tr.style.opacity     = '0';
+                tr.style.background  = '#fde8e8';
+                setTimeout(() => renderTabla(), 300);
+                toast(`"${nombre}" quitado de la sección.`);
+            } else {
+                toast('No se pudo quitar el producto.', true);
+            }
+        } catch (e) {
+            console.error(e);
+            toast('Error de conexión.', true);
+        }
+    }
+
+    // ── Buscador para agregar ───────────────────────────────────────────────
+    const inputBuscar  = document.getElementById('buscarProducto');
+    const searchResults = document.getElementById('searchResults');
+
+    inputBuscar.addEventListener('input', function () {
+        const q = this.value.trim().toLowerCase();
+        searchResults.innerHTML = '';
+
+        if (!q) { searchResults.style.display = 'none'; return; }
+
+        // Ids ya en esta sección
+        const idsEnSeccion = new Set(
+            entriesLocal.filter(e => e.section === seccionActiva).map(e => e.product_id)
+        );
+
+        const coincidencias = allProducts.filter(p =>
+            p.nombre.toLowerCase().includes(q) && !idsEnSeccion.has(p.id)
+        ).slice(0, 8);
+
+        if (coincidencias.length === 0) {
+            searchResults.innerHTML = `<div class="search-result-item text-muted" style="cursor:default;">Sin resultados</div>`;
+            searchResults.style.display = 'block';
+            return;
+        }
+
+        coincidencias.forEach(p => {
+            const item = document.createElement('div');
+            item.className = 'search-result-item';
+            const imgHtml = p.imagen_url
+                ? `<img src="${p.imagen_url}" alt="${p.nombre}">`
+                : `<div style="width:36px;height:36px;border-radius:6px;background:#e6f4ea;display:flex;align-items:center;justify-content:center;"><i class="bi bi-image" style="color:#adb5bd;"></i></div>`;
+            item.innerHTML = `${imgHtml}<span class="item-name">${p.nombre}</span>`;
+            item.addEventListener('click', () => agregarProducto(p));
+            searchResults.appendChild(item);
+        });
+
+        searchResults.style.display = 'block';
+    });
+
+    // Cerrar resultados al hacer click fuera
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.search-wrap')) {
+            searchResults.style.display = 'none';
+        }
+    });
+
+    // ── Agregar producto a sección ──────────────────────────────────────────
+    async function agregarProducto(producto) {
+        searchResults.style.display = 'none';
+        inputBuscar.value = '';
+
+        try {
+            const res  = await fetch('/employees/top-products', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Accept': 'application/json',
+                    'Accept':       'application/json',
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
                 body: JSON.stringify({
-                    product_id: null,
-                    section
+                    product_id: producto.id,
+                    section:    seccionActiva
                 })
             });
-            window.location.reload();
+            const data = await res.json();
+
+            if (data.success) {
+                // Agregar a la lista local
+                entriesLocal.push({
+                    id:          data.data.id,
+                    product_id:  producto.id,
+                    section:     seccionActiva,
+                    nombre:      producto.nombre,
+                    imagen_url:  producto.imagen_url,
+                });
+                renderTabla();
+                toast(`"${producto.nombre}" agregado a "${seccionActiva}".`);
+            } else {
+                toast(data.message ?? 'No se pudo agregar el producto.', true);
+            }
         } catch (e) {
             console.error(e);
-            alert('Error al agregar un nuevo espacio en la lista');
+            toast('Error de conexión.', true);
         }
-    });
+    }
+
+    // ── Arranque ────────────────────────────────────────────────────────────
+    renderTabla();
 });
 </script>
+@endif
 
 </body>
 </html>

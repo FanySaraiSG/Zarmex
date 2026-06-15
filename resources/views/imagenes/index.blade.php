@@ -88,6 +88,40 @@
       /* Estilos del Modal de Previsualización */
       .modal-content-custom { border: none; border-radius: 20px; overflow: hidden; background-color: #fff; }
       .preview-modal-media { width: 100%; max-height: 500px; object-fit: contain; background: #1a1a1a; display: block; }
+
+      /* Badge de URL de redirección */
+      .link-url-badge {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 0.78rem;
+        background-color: #e8f4f5;
+        color: #28666e;
+        border: 1px solid #b2d8dc;
+        border-radius: 8px;
+        padding: 5px 10px;
+        font-weight: 600;
+        text-decoration: none;
+        margin-bottom: 12px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        transition: background-color 0.2s;
+      }
+      .link-url-badge:hover { background-color: #28666e; color: #fedc97; }
+      .link-url-badge span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .no-link-badge {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 0.78rem;
+        background-color: #f8f9fa;
+        color: #adb5bd;
+        border: 1px dashed #dee2e6;
+        border-radius: 8px;
+        padding: 5px 10px;
+        margin-bottom: 12px;
+      }
     </style>
   </head>
   <body>
@@ -154,10 +188,24 @@
 
                 <div class="card-body-custom">
                   <div class="small fw-semibold text-dark mb-1">Ruta del archivo:</div>
-                  <p class="path-text" title="{{ $imagen->imagen_url }}">
+                  <p class="path-text" title="{{ $imagen->imagen_url }}" style="margin-bottom: 8px;">
                     {{ $imagen->imagen_url }}
                   </p>
-                  
+
+                  {{-- URL de redirección --}}
+                  <div class="small fw-semibold text-dark mb-1">URL de redirección:</div>
+                  @if($imagen->link_url)
+                    <a href="{{ $imagen->link_url }}" target="_blank" rel="noopener noreferrer" class="link-url-badge" title="{{ $imagen->link_url }}">
+                      <i class="fa-solid fa-link flex-shrink-0"></i>
+                      <span>{{ $imagen->link_url }}</span>
+                    </a>
+                  @else
+                    <div class="no-link-badge">
+                      <i class="fa-solid fa-link-slash"></i>
+                      <span>Sin redirección asignada</span>
+                    </div>
+                  @endif
+
                   <div class="d-flex gap-2 mt-auto">
                     <a href="{{ route('imagenes.edit', $imagen->id) }}" class="btn btn-sm btn-outline-primary w-50 rounded-3 d-flex align-items-center justify-content-center">
                       <i class="fa-solid fa-pen-to-square me-1.5"></i>Editar
