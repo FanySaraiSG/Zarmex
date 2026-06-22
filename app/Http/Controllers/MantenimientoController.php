@@ -307,7 +307,7 @@ class MantenimientoController extends Controller
        FORMULARIO PÚBLICO — muestra las imágenes al usuario
     ══════════════════════════════════════════════════════ */
 
-    public function mostrarFormularioPublico()
+    public function mostrarFormularioPublico($vista = 'mantenimiento')
     {
         // Leer todas las posiciones y filtrar nulls para evitar huecos en la vista
         $izq = collect([
@@ -334,7 +334,7 @@ class MantenimientoController extends Controller
         $layout_izq = max($izq->count(), 1);
         $layout_der = max($der->count(), 1);
 
-        return view('mantenimiento', compact(
+        return view($vista, compact(
             'layout_izq', 'layout_der',
             'img_izq_1', 'img_izq_2', 'img_izq_3',
             'img_der_1', 'img_der_2', 'img_der_3'

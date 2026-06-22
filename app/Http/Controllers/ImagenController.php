@@ -124,23 +124,29 @@ class ImagenController extends Controller
     public function createVideoBanner() { return view('videos.create_videos_banner'); }
 
     public function storeVideoBanner(Request $request)
-    {
-        $request->validate(['seccion' => 'required|string', 'video' => 'required|file|mimes:mp4,webm,mov,avi|max:61440']);
+{
+    $request->validate([
+        'seccion' => 'required|in:banner,nosotros_banner,nosotros_video',
+        'video' => 'required|file|mimes:mp4,webm,mov,avi|max:61440'
+    ]);
 
-        if ($request->hasFile('video')) {
-            $file = $request->file('video');
-            $filename = time() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('videos/banners'), $filename);
+    if ($request->hasFile('video')) {
+        $file = $request->file('video');
+        $filename = time() . '_' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+        $file->move(public_path('videos/banners'), $filename);
 
-            Imagen::create([
-                'nombre'     => 'video_banner_' . time(),
-                'imagen_url' => 'videos/banners/' . $filename,
-                'seccion'    => $request->seccion,
-            ]);
-            return redirect()->route('imagenes.index')->with('success', '¡Video del banner subido con éxito!');
-        }
-        return back()->with('error', 'Ocurrió un error al intentar subir el archivo.');
+        Imagen::create([
+            'nombre'     => 'video_banner_' . time(),
+            'imagen_url' => 'videos/banners/' . $filename,
+            'seccion'    => $request->seccion,
+            'activo'     => 1,
+        ]);
+
+        return redirect()->route('imagenes.index')->with('success', '¡Video subido y activado correctamente!');
     }
+
+    return back()->with('error', 'Ocurrió un error al intentar subir el archivo.');
+}
 
     // ==========================================================
     // FESTIVIDADES

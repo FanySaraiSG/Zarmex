@@ -44,6 +44,7 @@
               <option value="" selected disabled>Selecciona una sección...</option>
               <option value="banner_principal">Banner Principal (Inicio)</option>
               <option value="banner_nosotros">Banner Nosotros</option>
+              <option value="nosotros_video">Video Inferior</option>
     
               <!-- Agrega aquí las secciones que uses en tu base de datos -->
             </select>

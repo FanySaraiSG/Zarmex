@@ -13,8 +13,8 @@ class ImagenesSeeder extends Seeder
         DB::table('imagenes')->insert([
             [
                 'id' => 1,
-                'nombre' => '1742439791_Captura de pantalla 2025-01-19 134751.png',
-                'imagen_url' => 'imagenes/1742439791_Captura de pantalla 2025-01-19 134751.png',
+                'nombre' => 'logo.jpeg',
+                'imagen_url' => 'imagenes/logo.jpeg',
                 'seccion' => 'logo',
                 'created_at' => Carbon::create(2025, 3, 22, 0, 8, 37),
                 'updated_at' => Carbon::create(2025, 3, 22, 0, 8, 37),

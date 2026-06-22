@@ -63,12 +63,14 @@ class Producto extends Model
      * Tabla pivote: color_producto (producto_id, color_id → id_color de colors)
      */
     public function colores()
-    {
-        return $this->belongsToMany(
-            Color::class,     // modelo App\Models\Color
-            'color_producto', // tabla pivote
-            'producto_id',    // FK de productos en la pivote
-            'color_id'        // FK de colors en la pivote (apunta a id_color)
-        );
-    }
+{
+    return $this->belongsToMany(
+        Color::class,
+        'color_producto',
+        'producto_id',
+        'color_id',
+        'id',
+        'id_color'
+    );
+}
 }

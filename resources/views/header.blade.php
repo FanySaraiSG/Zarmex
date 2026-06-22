@@ -250,7 +250,7 @@
                     </a>
                     <ul class="zx-sub">
                         <li><a href="{{ url('mantenimiento') }}">Mantenimiento</a></li>
-                        <li><a href="{{ url('reparación') }}">Reparación</a></li>
+                        <li><a href="{{ url('submit_reparacion') }}">Reparación</a></li>
                     </ul>
                 </li>
 

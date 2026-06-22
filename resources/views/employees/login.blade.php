@@ -16,7 +16,7 @@
         </a>
 
         <div class="topbar-logo">
-            <img src="{{ asset('imagenes/Captura de pantalla 2025-01-19 134751.png') }}" alt="Zarmex">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/a/a7/React-icon.svg" height="70">
         </div>
     </header>
 

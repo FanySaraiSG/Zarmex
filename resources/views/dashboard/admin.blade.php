@@ -88,6 +88,7 @@
                     </div>
                 </div>
 
+
                 {{-- ✅ Tarjeta del compañero: Promociones --}}
                 <div class="col">
                     <div class="card p-5 bg-custom shadow-lg text-center w-100 admin-card h-100 d-flex flex-column">

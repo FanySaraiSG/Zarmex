@@ -227,11 +227,49 @@
                         </div>
                     </div>
 
+                    {{-- COLORES DISPONIBLES --}}
+<div class="col-md-12 mb-4">
+    <label class="form-label fw-bold text-muted small">COLORES DISPONIBLES</label>
+
+    <div class="d-flex flex-wrap gap-3">
+        @foreach($colores as $color)
+            <label style="
+                display:flex;
+                align-items:center;
+                gap:8px;
+                border:1px solid #ddd;
+                padding:8px 12px;
+                border-radius:10px;
+                cursor:pointer;
+                background:#fff;
+            ">
+                <input
+                    type="checkbox"
+                    name="colores[]"
+                    value="{{ $color->id_color }}"
+                    {{ $producto->colores->contains('id_color', $color->id_color) ? 'checked' : '' }}
+                >
+
+                <span style="
+                    width:24px;
+                    height:24px;
+                    border-radius:50%;
+                    border:1px solid #999;
+                    background:#{{ $color->id_color }};
+                    display:inline-block;
+                "></span>
+
+                <span>{{ $color->nombre }}</span>
+            </label>
+        @endforeach
+    </div>
+</div>
+
                     <div class="d-flex justify-content-end">
                         <button type="button" class="btn btn-next-tab px-4 py-2" onclick="cambiarPestaña('#tab-media-btn')">Siguiente <i class="bi bi-arrow-right ms-1"></i></button>
                     </div>
                 </div> 
-
+ 
                 {{-- ══════════════ TAB 2: MULTIMEDIA ══════════════ --}}
                 <div class="tab-pane fade" id="tab-media" role="tabpanel">
                     

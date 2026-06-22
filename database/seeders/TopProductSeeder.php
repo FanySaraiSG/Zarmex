@@ -18,31 +18,7 @@ class TopProductSeeder extends Seeder
         $now = Carbon::now();
 
         DB::table('top_products')->insert([
-            [
-                'product_id' => 'ZAR-PDA-033', 
-                'created_at' => $now,
-                'updated_at' => $now,
-            ],
-            [
-                'product_id' => 'ZAR-PDA-033',
-                'created_at' => $now,
-                'updated_at' => $now,
-            ],
-            [
-                'product_id' => 'ZAR-PDA-033', 
-                'created_at' => $now,
-                'updated_at' => $now,
-            ],
-            [
-                'product_id' => 'ZAR-PDA-033', 
-                'created_at' => $now,
-                'updated_at' => $now,
-            ],
-            [
-                'product_id' => 'ZAR-PDA-033', 
-                'created_at' => $now,
-                'updated_at' => $now,
-            ],
+           
         ]);
     }
 }

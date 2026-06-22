@@ -278,9 +278,9 @@
 
       {{-- HEADER CARD --}}
       <div class="form-card-header">
-        <div class="fch-icon"><i class="fa-solid fa-image"></i></div>
-        <h2>Nueva Imagen</h2>
-        <p>Selecciona la sección y sube el archivo que quieres publicar.</p>
+        <div class="fch-icon"><i class="fa-solid fa-photo-film"></i></div>
+        <h2>Subir Recurso</h2>
+        <p>Selecciona la sección y sube la imagen o video que quieres publicar.</p>
       </div>
 
       <div class="form-body">
@@ -349,13 +349,15 @@
           <div class="field-group">
             <label class="field-label">Archivo <span class="req">*</span></label>
             <div class="upload-zone" id="uploadZone">
-              <input type="file" id="imagen" name="imagen" accept="image/*" required>
+              <input type="file" id="imagen" name="imagen" accept="image/*,video/mp4,video/webm,video/mov,video/avi" required>
               <div class="uz-icon"><i class="fa-solid fa-cloud-arrow-up"></i></div>
-              <div class="uz-label">Arrastra aquí o haz clic para seleccionar</div>
-              <div class="uz-sub">Formatos aceptados: JPG, PNG, WEBP, GIF · Máx. recomendado: 5 MB</div>
+              <div class="uz-label" id="uzLabel">Arrastra aquí o haz clic para seleccionar</div>
+              <div class="uz-sub" id="uzSub">Imágenes: JPG, PNG, WEBP, GIF (máx. 5 MB) · Videos: MP4, WEBM, MOV (máx. 60 MB)</div>
             </div>
+            {{-- Preview imagen --}}
             <div class="preview-box" id="previewBox">
-              <img id="previewImg" src="" alt="Vista previa">
+              <img id="previewImg" src="" alt="Vista previa" style="display:none;">
+              <video id="previewVid" controls style="width:100%;max-height:200px;display:none;"></video>
               <div class="prev-overlay" id="previewName"></div>
             </div>
           </div>
@@ -398,32 +400,35 @@
     const uploadZone  = document.getElementById('uploadZone');
     const previewBox  = document.getElementById('previewBox');
     const previewImg  = document.getElementById('previewImg');
+    const previewVid  = document.getElementById('previewVid');
     const previewName = document.getElementById('previewName');
+    const uzSub       = document.getElementById('uzSub');
+    const seccionSel  = document.getElementById('seccion');
 
-    // Escuchar el cambio tradicional por click
+    // Actualizar texto del upload-zone según sección seleccionada
+    seccionSel.addEventListener('change', () => {
+      const isVideoSec = seccionSel.value === 'nosotros_video';
+      uzSub.textContent = isVideoSec
+        ? 'Videos: MP4, WEBM, MOV (máx. 60 MB) · También puedes subir imágenes.'
+        : 'Imágenes: JPG, PNG, WEBP, GIF (máx. 5 MB) · Videos: MP4, WEBM, MOV (máx. 60 MB)';
+    });
+
     inputFile.addEventListener('change', handleFile);
 
-    // Evita que el navegador abra el archivo en otra pestaña al arrastrar
     ['dragover', 'dragenter'].forEach(e => uploadZone.addEventListener(e, ev => {
-      ev.preventDefault(); 
+      ev.preventDefault();
       uploadZone.classList.add('dragover');
     }));
-
     ['dragleave'].forEach(e => uploadZone.addEventListener(e, ev => {
       uploadZone.classList.remove('dragover');
     }));
-
-    // Controla la acción de soltar el archivo dentro del cuadro
     uploadZone.addEventListener('drop', ev => {
-      ev.preventDefault(); // Evita abrir la imagen en otra ventana
+      ev.preventDefault();
       uploadZone.classList.remove('dragover');
-
       const droppedFiles = ev.dataTransfer.files;
       if (droppedFiles && droppedFiles.length > 0) {
-        // Asigna el archivo arrastrado directamente al input file para el envío del formulario
-        inputFile.files = droppedFiles; 
-        // Invoca la lógica de previsualización pasando el input actualizado
-        handleFile({ target: inputFile }); 
+        inputFile.files = droppedFiles;
+        handleFile({ target: inputFile });
       }
     });
 
@@ -437,9 +442,18 @@
       }
 
       const url = URL.createObjectURL(file);
-      previewImg.src = url;
-      previewName.textContent = file.name;
       previewBox.style.display = 'block';
+      previewName.textContent  = file.name;
+
+      if (file.type.startsWith('video/')) {
+        previewImg.style.display = 'none';
+        previewVid.src           = url;
+        previewVid.style.display = 'block';
+      } else {
+        previewVid.style.display = 'none';
+        previewImg.src           = url;
+        previewImg.style.display = 'block';
+      }
     }
 
     // Pre-seleccionar sección si viene en query param
@@ -447,7 +461,7 @@
     const secParam  = urlParams.get('seccion');
     if (secParam) {
       const sel = document.getElementById('seccion');
-      if (sel) sel.value = secParam;
+      if (sel) { sel.value = secParam; sel.dispatchEvent(new Event('change')); }
     }
   </script>
 </body>

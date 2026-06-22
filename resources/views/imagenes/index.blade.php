@@ -805,11 +805,23 @@
       }
 
       function filterType(type, btn) {
-        currentType = type;
-        document.querySelectorAll('.ftab').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        applyFilters();
-      }
+  currentType = type;
+
+  document.querySelectorAll('.ftab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  document.querySelectorAll('.media-row').forEach(row => {
+    const rowType = row.dataset.type;
+    const rowSection = row.dataset.seccion;
+
+    const matchType = type === 'todos' || rowType === type;
+
+    // Si es pestaña videos, muestra todos los videos sin importar sección
+    const matchSection = type === 'videos' ? true : rowSection === currentSection;
+
+    row.style.display = matchType && matchSection ? '' : 'none';
+  });
+}
 
       function searchFiles() {
         currentSearch = document.getElementById('searchInput').value.toLowerCase();

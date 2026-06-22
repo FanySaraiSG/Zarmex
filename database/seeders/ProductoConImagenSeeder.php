@@ -54,6 +54,26 @@ class ProductoConImagenSeeder extends Seeder
                 'imagen_extra'=> 'images/productos/ZAR-CQP-002/extra_1780514034_6a207cf2e0a4b.jpeg',
             ],
             [
+                'id'          => 'ZAR-CQP-003',
+                'nombre'      => 'Pelvic bench portátil MOD ZARQ-003',
+                'descripcion' => "Medidas\r\nLargo 180cm\r\nAncho 60cm\r\nAltura Std 50-55cm (opcional)\r\nBase de Herreria PTR 1\"\r\nForrada de vinil Automotriz\r\nPinturna electrostatica\r\nAcojinamiento firme de alta densidad\r\nCojin rectangular incluido\r\nEstructura de madera de Pino de 1ra",
+                'precio'      => 4500.00,
+                'stock'       => 0,
+                'categoria_id'=> 'ZAR-CQP',
+                'imagen'      => 'images/productos/ZAR-CQP-003/img_1780514034_6a207cf2e330e.jpeg',
+                'imagen_extra'=> 'images/productos/ZAR-CQP-003/extra_1780514034_6a207cf2e0a4b.jpeg',
+            ],
+            [
+                'id'          => 'ZAR-CQP-003-02',
+                'nombre'      => 'Pelvic bench portátil MOD ZARQ-002',
+                'descripcion' => "Medidas\r\nLargo 180cm\r\nAncho 60cm\r\nAltura Std 50-55cm (opcional)\r\nBase de Herreria PTR 1\"\r\nForrada de vinil Automotriz\r\nPinturna electrostatica\r\nAcojinamiento firme de alta densidad\r\nCojin rectangular incluido\r\nEstructura de madera de Pino de 1ra",
+                'precio'      => 4500.00,
+                'stock'       => 0,
+                'categoria_id'=> 'ZAR-CQP',
+                'imagen'      => 'images/productos/ZAR-CQP-003-02/img_1780514034_6a207cf2e330e.jpeg',
+                'imagen_extra'=> 'images/productos/ZAR-CQP-003-02/extra_1780514034_6a207cf2e0a4b.jpeg',
+            ],
+            [
                 'id'          => 'ZAR-CQP-004',
                 'nombre'      => 'Mesa para embarazadas ZARQ-004',
                 'descripcion' => "Medidas\r\nLargo 120cm\r\nAncho 50cm\r\nAltura 50cm\r\nEstructura de madera de Pino de 1ra\r\nForrada de vinil automotriz\r\nAcojinamiento firme de alta densidad",
@@ -249,7 +269,7 @@ class ProductoConImagenSeeder extends Seeder
             // ── FTA ───────────────────────────────────────────────────────
             [
                 'id'          => 'ZAR-FTA-027',
-                'nombre'      => 'Mesa Bobath ZARF-002',
+                'nombre'      => 'Mesa Bobath ZARF-027',
                 'descripcion' => "Medidas\r\nAlto 40cm\r\nAncho 100cm\r\nLargo 200cm\r\nEstructura y base de madera de pino de 1ra\r\nForrada de vinil automotriz\r\nAcojinamiento firme de alta densidad",
                 'precio'      => 12000.00,
                 'stock'       => 0,
@@ -259,7 +279,7 @@ class ProductoConImagenSeeder extends Seeder
             ],
             [
                 'id'          => 'ZAR-FTA-028',
-                'nombre'      => 'Mesa estándar ZARF-003',
+                'nombre'      => 'Mesa estándar ZARF-028',
                 'descripcion' => "Medidas\r\nLargo 180cm\r\nAncho 70cm\r\nAltura Std 70-80 cm (Opcional)\r\nBase de Herreria PTR 1 1/4\"\r\nForrada de vinil Automotriz\r\nPintura electrostatica\r\nAcojinamiento firme de alta densidad\r\nEstructura de madera de Pino de 1ra",
                 'precio'      => 5500.00,
                 'stock'       => 0,
@@ -269,7 +289,7 @@ class ProductoConImagenSeeder extends Seeder
             ],
             [
                 'id'          => 'ZAR-FTA-029',
-                'nombre'      => 'Mesa base eléctrica ZARF-004',
+                'nombre'      => 'Mesa base eléctrica ZARF-029',
                 'descripcion' => "Medidas\r\nLargo 180cm\r\nAncho 70cm\r\nAltura motorizada Std 55-80 cm (Opcional)\r\nBase de Herreria PTR 1 1/4\"\r\nPlaca base de 1/4 140cm x 48cm\r\nForrada de vinil Automotriz\r\nPintura electrostatica\r\nAcojinamiento firme de alta densidad\r\nEstructura de madera de Pino de 1ra",
                 'precio'      => 22500.00,
                 'stock'       => 0,
@@ -281,7 +301,7 @@ class ProductoConImagenSeeder extends Seeder
             // ── GNA ───────────────────────────────────────────────────────
             [
                 'id'          => 'ZAR-GNA-034',
-                'nombre'      => 'Equipo 4 motores especializado ZARG-003',
+                'nombre'      => 'Equipo 4 motores especializado ZARG-034',
                 'descripcion' => "Base eléctrica\r\nRespaldo eléctrico\r\nPieceras independientes eléctricas\r\nPiecera posa pie abatible y extensible hasta +10cm\r\nAcabado vinil automotriz\r\nPierneras acero inoxidable ajustables a altura\r\nLampara ginecológica con brazo articulado abatible\r\nControl de mano\r\nSoporta 200kg (Todos los equipos)\r\nBrazos abatibles\r\nEstructura de base placa de ¼\r\nPintura electroestática\r\nMedidas: 60cm ancho x 1.30 alto\r\nMedida extendida 1.60\r\nMotor 110v\r\nExtensión toma corriente 1.5m (todas las eléctricas)",
                 'precio'      => 65000.00,
                 'stock'       => 0,
@@ -291,7 +311,7 @@ class ProductoConImagenSeeder extends Seeder
             ],
             [
                 'id'          => 'ZAR-GNA-035',
-                'nombre'      => 'Equipo 2 motores exploración ZARG-004',
+                'nombre'      => 'Equipo 2 motores exploración ZARG-035',
                 'descripcion' => "Medidas:\r\nAlto 140cm\r\nAncho 70cm\r\nLargo180cm (extendido)\r\nPlaca ¼\r\nBrazo Abatible\r\nRespaldo y piecera reclinable motorizados (movimiento compartido)\r\nPiernera de aluminio\r\nGiro 340º\r\nAltura motorizada de 55cm mínima y de 75cm máxima\r\nMotor 110\r\nPintura Electrostatica\r\nVinil Tipo Automotriz\r\nCojin Cabezal Desmontable\r\nAcojinamiento firme de alta densidad\r\nControl Al Piso",
                 'precio'      => 32000.00,
                 'stock'       => 0,
@@ -303,7 +323,7 @@ class ProductoConImagenSeeder extends Seeder
             // ── ODN ───────────────────────────────────────────────────────
             [
                 'id'          => 'ZAR-ODN-036',
-                'nombre'      => 'Equipo ZARMEX eléctrico ZARDE-005',
+                'nombre'      => 'Equipo ZARMEX eléctrico ZARDE-036',
                 'descripcion' => "S/N",
                 'precio'      => 31000.00,
                 'stock'       => 0,
@@ -315,7 +335,7 @@ class ProductoConImagenSeeder extends Seeder
             // ── OTN ───────────────────────────────────────────────────────
             [
                 'id'          => 'ZAR-OTN-022',
-                'nombre'      => 'Sillón giratorio 1 motor ZAROT-002',
+                'nombre'      => 'Sillón giratorio 1 motor ZAROT-022',
                 'descripcion' => "Medidas:\r\nAlto 140cm\r\nAncho 70cm\r\nLargo180cm (extendido)\r\nPlaca ¼\r\nBrazo Abatible\r\nRespaldo reclinable manual\r\nGiro 340º\r\nAltura motorizada de 55cm mínima y de 75cm máxima\r\nMotor 110\r\nPintura Electrostatica\r\nVinil Tipo Automotriz\r\nCojin Cabezal Desmontable\r\nAcojinamiento firme de alta densidad\r\nControl Al Piso",
                 'precio'      => 27000.00,
                 'stock'       => 1,
@@ -325,7 +345,7 @@ class ProductoConImagenSeeder extends Seeder
             ],
             [
                 'id'          => 'ZAR-OTN-023',
-                'nombre'      => 'Sillón giratorio 2 motores ZAROT-003',
+                'nombre'      => 'Sillón giratorio 2 motores ZAROT-023',
                 'descripcion' => "Medidas:\r\nAlto 140cm\r\nAncho 70cm\r\nLargo180cm (extendido)\r\nPlaca ¼\r\nBrazo Abatible\r\nRespaldo y piecera reclinable motorizados (movimiento compartido)\r\nGiro 340º\r\nAltura motorizada de 55cm mínima y de 75cm máxima\r\nMotor 110\r\nPintura Electrostatica\r\nVinil Tipo Automotriz\r\nCojin Cabezal Desmontable\r\nAcojinamiento firme de alta densidad\r\nControl Al Piso",
                 'precio'      => 30500.00,
                 'stock'       => 0,
@@ -335,7 +355,7 @@ class ProductoConImagenSeeder extends Seeder
             ],
             [
                 'id'          => 'ZAR-OTN-024',
-                'nombre'      => 'Sillón giratorio 3 motores ZART-004',
+                'nombre'      => 'Sillón giratorio 3 motores ZART-024',
                 'descripcion' => "Medidas:\r\nAlto 140cm\r\nAncho 70cm\r\nLargo180cm (extendido)\r\nPlaca ¼\r\nBrazo Abatible\r\nRespaldo reclinable motorizado independiente\r\nPiecera motorizado independiente\r\nGiro 340º\r\nAltura motorizada de 55cm mínima y de 75cm máxima\r\nMotor 110\r\nPintura Electrostatica\r\nVinil Tipo Automotriz\r\nCojin Cabezal Desmontable\r\nAcojinamiento firme de alta densidad\r\nControl Al Piso",
                 'precio'      => 35000.00,
                 'stock'       => 0,
@@ -345,7 +365,7 @@ class ProductoConImagenSeeder extends Seeder
             ],
             [
                 'id'          => 'ZAR-OTN-025',
-                'nombre'      => 'Unidad con sistema aspiración ZART-005',
+                'nombre'      => 'Unidad con sistema aspiración ZART-025',
                 'descripcion' => "Medidas\r\nAlto 140cm\r\nAncho 70cm\r\nFondo 50cm\r\nEstructura de triplay de pino de 1ra\r\n5 cajoneras con barra independiente\r\nSeguros en cajoneras\r\nLlantas con freno\r\nForro de formaica\r\nMotor de 1hp para aspiración\r\n2 contenedores de 2lt c/u desmontables\r\n2 metros de manguera extendible\r\nApagador independiente para sistema de aspiración\r\n1.5metros de cable toma corriente a 110v",
                 'precio'      => 14000.00,
                 'stock'       => 0,
@@ -355,7 +375,7 @@ class ProductoConImagenSeeder extends Seeder
             ],
             [
                 'id'          => 'ZAR-OTN-026',
-                'nombre'      => 'Unidad con sistema aspiración y aspersión ZART-006',
+                'nombre'      => 'Unidad con sistema aspiración y aspersión ZART-026',
                 'descripcion' => "Medidas\r\nAlto 140cm\r\nAncho 70cm\r\nFondo 50cm\r\nEstructura de triplay de pino de 1ra\r\n5 cajoneras con barra independiente\r\nSeguros en cajoneras\r\nLlantas con freno\r\nForro de formaica\r\nMotor de 1hp para aspiración\r\n2 contenedores de 2lt c/u desmontables\r\n2 metros de manguera extendible para aspiración\r\nApagador independiente para sistema de aspiración\r\nMotor independiente para aspersor\r\nDeposito de aire de 12 lt\r\nConector para botella de líquido de 1lt\r\n2 metros de manguera extendible para aspersión\r\nApagador independiente para sistema de aspersión\r\n1.5metros de cable toma corriente a 110v",
                 'precio'      => 21000.00,
                 'stock'       => 0,
@@ -367,7 +387,7 @@ class ProductoConImagenSeeder extends Seeder
             // ── PDA ───────────────────────────────────────────────────────
             [
                 'id'          => 'ZAR-PDA-030',
-                'nombre'      => 'Equipo base estándar ZARP-003',
+                'nombre'      => 'Equipo base estándar ZARP-030',
                 'descripcion' => "Placa base de ¼\r\nMotor 4000 newtons (Nw) 110 v\r\nAltura mínima 55 cm máxima 70 cm\r\nCharola de residuos de acero inoxidable ajustable\r\nLampara Steren con brazo reforzado articulado\r\nCojín circular\r\nPiecera extensible\r\nRespaldo manual reclinable\r\nCojín cabezal desmontable\r\nBanquillo importado\r\nMueble auxiliar\r\nControl al pie\r\nPintura electrostática\r\nVinil tipo automotriz",
                 'precio'      => 24400.00,
                 'stock'       => 0,
@@ -377,7 +397,7 @@ class ProductoConImagenSeeder extends Seeder
             ],
             [
                 'id'          => 'ZAR-PDA-031',
-                'nombre'      => 'Equipo base tijera Equipo sistema trendelemburg ZARP-004',
+                'nombre'      => 'Equipo base tijera Equipo sistema trendelemburg ZARP-031',
                 'descripcion' => "Placa base de ¼\r\nMotor 4000new 110v para sistema trendelemburg con control de pie al piso\r\nElevación de hasta 20 grados\r\nMotor 4000 newtons (Nw) 110 v\r\nAltura mínima 55 cm máxima 75 cm\r\nCharola de residuos de acero inoxidable ajustable\r\nLampara Steren con brazo reforzado articulado\r\nCojín circular\r\nPiecera extensible\r\nRespaldo electrico reclinable\r\nCojín cabezal desmontable\r\nBanquillo importado\r\nMueble auxiliar\r\nControl al pie\r\nPintura electrostática\r\nVinil tipo automotriz",
                 'precio'      => 31900.00,
                 'stock'       => 0,
@@ -387,7 +407,7 @@ class ProductoConImagenSeeder extends Seeder
             ],
             [
                 'id'          => 'ZAR-PDA-032',
-                'nombre'      => 'Equipo sistema flush ZARP-005',
+                'nombre'      => 'Equipo sistema flush ZARP-032',
                 'descripcion' => "Placa base de ¼\r\nMotor 4000 newtons (Nw) 110 v\r\nAltura mínima 55 cm máxima 75 cm\r\nCharola de residuos de acero inoxidable ajustable\r\nLampara Steren con brazo reforzado articulado\r\nCojín circular\r\nPiecera extensible\r\nRespaldo manual reclinable\r\nBrazo auxiliar para laptop y cafe\r\nModulo con sistema de baja\r\n2 jeringas triples\r\nBarometro para medición de aire\r\nAdaptador para pieza de baja\r\nCojín cabezal desmontable\r\nBanquillo importado\r\nMueble auxiliar\r\nControl al pie\r\nPintura electrostática\r\nVinil tipo automotriz",
                 'precio'      => 31950.00,
                 'stock'       => 0,
@@ -397,7 +417,7 @@ class ProductoConImagenSeeder extends Seeder
             ],
             [
                 'id'          => 'ZAR-PDA-033',
-                'nombre'      => 'Equipo base tijera ZARP-006',
+                'nombre'      => 'Equipo base tijera ZARP-033',
                 'descripcion' => "Placa base de ¼\r\nMotor 4000 newtons (Nw) 110 v\r\nAltura mínima 55 cm máxima 75 cm \r\nCharola de residuos de acero inoxidable ajustable \r\nlampara Steren con brazo reforzado articulado \r\ncojín circular\r\npiecera extensible \r\nrespaldo manual reclinable \r\ncojín cabezal desmontable\r\nbanquillo importado \r\nmueble auxiliar \r\ncontrol al pie \r\npintura electrostática \r\nvinil tipo automotriz",
                 'precio'      => 26700.00,
                 'stock'       => 0,

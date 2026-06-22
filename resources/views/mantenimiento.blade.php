@@ -98,7 +98,7 @@
                     @csrf
 
                     <div class="form-group full-width">
-                        <label for="nombre">Nombre</label>
+                        <label for="nombre">Nombre: </label>
                         @auth
                             <input type="text" id="nombre" name="nombre" value="{{ auth()->user()->name }}" required>
                         @else
@@ -107,12 +107,12 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="ocupacion">Ocupación</label>
+                        <label for="ocupacion">Ocupación: </label>
                         <input type="text" id="ocupacion" name="ocupacion" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="tipo_maquina">Tipo de máquina</label>
+                        <label for="tipo_maquina">Tipo de máquina: </label>
                         <select id="tipo_maquina" name="tipo_maquina" required>
                             <option value="" disabled selected>Seleccione una categoría</option>
                             @foreach(App\Models\Categoria::all() as $categoria)
@@ -122,7 +122,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="codigo_equipo">Código del equipo</label>
+                        <label for="codigo_equipo">Código del equipo: </label>
                         <select id="codigo_equipo" name="codigo_equipo" required>
                             <option value="" disabled selected>Seleccione un producto</option>
                             @foreach(App\Models\Producto::all() as $producto)
@@ -134,27 +134,27 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="codigo_postal">Código postal</label>
+                        <label for="codigo_postal">Código postal: </label>
                         <input type="text" id="codigo_postal" name="codigo_postal" required>
                     </div>
 
                     <div class="form-group full-width">
-                        <label for="descripcion">Descripción del problema</label>
+                        <label for="descripcion">Descripción del problema: </label>
                         <textarea id="descripcion" name="descripcion" rows="4" required></textarea>
                     </div>
 
                     <div class="form-group">
-                        <label for="direccion">Dirección</label>
+                        <label for="direccion">Dirección: </label>
                         <input type="text" id="direccion" name="direccion" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="estado">Estado</label>
+                        <label for="estado">Estado: </label>
                         <input type="text" id="estado" name="estado" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="correo_electronico">Correo electrónico</label>
+                        <label for="correo_electronico">Correo electrónico: </label>
                         @auth
                             <input type="email" id="correo_electronico" name="correo_electronico" value="{{ auth()->user()->email }}" required>
                         @else
@@ -163,7 +163,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="numero_celular">Número de celular</label>
+                        <label for="numero_celular">Número de celular: </label>
                         <input type="tel" id="numero_celular" name="numero_celular" required>
                     </div>
 

@@ -15,7 +15,7 @@
             </div>
             <div class="logo">
                 <a href="../">
-                    <img src="{{ asset('imagenes/Captura de pantalla 2025-01-19 134751.png') }}" alt="Zarmex">
+                    <img src="{{ asset('imagenes/logo.jpeg') }}" alt="Zarmex">
                 </a>
             </div>
             <div class="nav-right"></div>

@@ -232,6 +232,7 @@ header, footer, .whatsapp, #whatsapp { display: none !important; }
 @php
     $jsAllProducts = $allProducts->map(fn($p) => [
         'id'         => $p->id,
+        'codigo'     => $p->id,
         'nombre'     => $p->nombre,
         'imagen_url' => $p->imagen_url ?? null,
     ])->values();
@@ -322,7 +323,16 @@ document.addEventListener('DOMContentLoaded', () => {
             tr.innerHTML = `
                 <td class="fw-bold" style="color:#198754;">${idx + 1}</td>
                 <td>${imgHtml}</td>
-                <td class="fw-semibold">${entry.nombre}</td>
+                <td>
+    <span style="
+        font-weight:700;
+        color:#198754;
+        font-size:14px;
+        letter-spacing:.5px;
+    ">
+        ${entry.product_id}
+    </span>
+</td>
                 <td>${badgesSecciones}</td>
                 <td class="text-center">
                     <button class="btn btn-table-delete btn-quitar" title="Quitar de esta sección">
@@ -369,52 +379,116 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // ── Buscador para agregar ───────────────────────────────────────────────
-    const inputBuscar  = document.getElementById('buscarProducto');
-    const searchResults = document.getElementById('searchResults');
+  // ─────────────────────────────────────────────────────────────
+// BUSCADOR DE PRODUCTOS DEL CATÁLOGO
+// ─────────────────────────────────────────────────────────────
 
-    inputBuscar.addEventListener('input', function () {
-        const q = this.value.trim().toLowerCase();
-        searchResults.innerHTML = '';
+const inputBuscar   = document.getElementById('buscarProducto');
+const searchResults = document.getElementById('searchResults');
 
-        if (!q) { searchResults.style.display = 'none'; return; }
+function renderProductosBusqueda(texto = '') {
 
-        // Ids ya en esta sección
-        const idsEnSeccion = new Set(
-            entriesLocal.filter(e => e.section === seccionActiva).map(e => e.product_id)
-        );
+    const q = texto.toLowerCase().trim();
 
-        const coincidencias = allProducts.filter(p =>
-            p.nombre.toLowerCase().includes(q) && !idsEnSeccion.has(p.id)
-        ).slice(0, 8);
+    searchResults.innerHTML = '';
 
-        if (coincidencias.length === 0) {
-            searchResults.innerHTML = `<div class="search-result-item text-muted" style="cursor:default;">Sin resultados</div>`;
-            searchResults.style.display = 'block';
-            return;
+    const idsEnSeccion = new Set(
+        entriesLocal
+            .filter(e => e.section === seccionActiva)
+            .map(e => e.product_id)
+    );
+
+    let productos = allProducts.filter(producto => {
+
+        if (idsEnSeccion.has(producto.id)) {
+            return false;
         }
 
-        coincidencias.forEach(p => {
-            const item = document.createElement('div');
-            item.className = 'search-result-item';
-            const imgHtml = p.imagen_url
-                ? `<img src="${p.imagen_url}" alt="${p.nombre}">`
-                : `<div style="width:36px;height:36px;border-radius:6px;background:#e6f4ea;display:flex;align-items:center;justify-content:center;"><i class="bi bi-image" style="color:#adb5bd;"></i></div>`;
-            item.innerHTML = `${imgHtml}<span class="item-name">${p.nombre}</span>`;
-            item.addEventListener('click', () => agregarProducto(p));
-            searchResults.appendChild(item);
-        });
+        if (!q) {
+            return true;
+        }
+
+        return (
+            producto.nombre.toLowerCase().includes(q) ||
+            producto.codigo.toLowerCase().includes(q)
+        );
+    });
+
+    productos = productos.slice(0, 50);
+
+    if (productos.length === 0) {
+
+        searchResults.innerHTML = `
+            <div class="search-result-item text-muted" style="cursor:default;">
+                No se encontraron productos
+            </div>
+        `;
 
         searchResults.style.display = 'block';
+        return;
+    }
+
+    productos.forEach(producto => {
+
+        const item = document.createElement('div');
+        item.className = 'search-result-item';
+
+        const imgHtml = producto.imagen_url
+            ? `<img src="${producto.imagen_url}" alt="${producto.nombre}">`
+            : `
+                <div style="
+                    width:36px;
+                    height:36px;
+                    border-radius:6px;
+                    background:#e6f4ea;
+                    display:flex;
+                    align-items:center;
+                    justify-content:center;
+                ">
+                    <i class="bi bi-image" style="color:#adb5bd;"></i>
+                </div>
+            `;
+
+        item.innerHTML = `
+            ${imgHtml}
+
+            <div>
+                <div style="
+                    font-size:12px;
+                    font-weight:700;
+                    color:#198754;
+                    line-height:1.2;
+                ">
+                    ${producto.codigo}
+                </div>
+        `;
+
+        item.addEventListener('click', () => {
+            agregarProducto(producto);
+        });
+
+        searchResults.appendChild(item);
     });
 
-    // Cerrar resultados al hacer click fuera
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.search-wrap')) {
-            searchResults.style.display = 'none';
-        }
-    });
+    searchResults.style.display = 'block';
+}
 
+// Mostrar toda la lista al hacer click
+inputBuscar.addEventListener('focus', () => {
+    renderProductosBusqueda();
+});
+
+// Filtrar mientras escribe
+inputBuscar.addEventListener('input', function () {
+    renderProductosBusqueda(this.value);
+});
+
+// Cerrar al hacer click fuera
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.search-wrap')) {
+        searchResults.style.display = 'none';
+    }
+});
     // ── Agregar producto a sección ──────────────────────────────────────────
     async function agregarProducto(producto) {
         searchResults.style.display = 'none';

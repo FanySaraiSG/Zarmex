@@ -23,12 +23,14 @@ class Color extends Model
      * Productos que tienen este color asignado.
      */
     public function productos()
-    {
-        return $this->belongsToMany(
-            Producto::class,  // modelo relacionado
-            'color_producto', // tabla pivote
-            'color_id',       // FK de colors en la pivote
-            'producto_id'     // FK de productos en la pivote
-        );
-    }
+{
+    return $this->belongsToMany(
+        Producto::class,
+        'color_producto',
+        'color_id',
+        'producto_id',
+        'id_color',
+        'id'
+    );
+}
 }

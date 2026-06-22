@@ -424,6 +424,12 @@
                             <textarea name="descripcion" class="cp-textarea" required
                                       placeholder="Escribe la descripción de la pieza...">{{ old('descripcion') }}</textarea>
                         </div>
+                        
+                        <input
+    type="checkbox"
+    name="colores[]"
+    value="{{ $color->id_color }}"
+>
 
                         <div>
                             <p class="cp-docs-title">Documentos Técnicos <small class="text-muted">(PDF, DOCX - Máx. 5MB)</small></p>

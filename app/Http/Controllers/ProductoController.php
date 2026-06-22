@@ -143,6 +143,10 @@ class ProductoController extends Controller
         }
 
         $this->procesarDocumentos($request, $producto);
+        // Guardar colores del producto
+if ($request->filled('colores')) {
+    $producto->colores()->sync($request->colores);
+}
         $producto->save();
 
         return redirect()->route('productos.index')->with('success', 'Producto creado correctamente.');
@@ -279,6 +283,8 @@ class ProductoController extends Controller
         }
 
         $this->procesarDocumentos($request, $producto);
+        // Actualizar colores
+$producto->colores()->sync($request->input('colores', []));
         $producto->save();
 
         return redirect()->route('productos.edit', $producto->id)->with('success_edit', 'Producto actualizado.');

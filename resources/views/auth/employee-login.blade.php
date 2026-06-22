@@ -11,7 +11,7 @@
 <body>
     <header class="topbar">
     <a href="{{ url('/') }}" class="topbar-logo">
-        <img src="{{ asset('imagenes/Captura de pantalla 2025-01-19 134751.png') }}" alt="Zarmex">
+        <img src="{{ asset('imagenes/logo.jpeg') }}" alt="Zarmex">
     </a>
 </header>
     <main class="login-page">
