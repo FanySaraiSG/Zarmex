@@ -310,6 +310,7 @@ header, footer, .whatsapp, #whatsapp, .btn-whatsapp{ display: none !important; }
 
 /* ── Acciones por fila ────────────────────── */
 .zx-row-actions{ display: flex; gap: 6px; align-items: center; }
+.zx-row-actions form{ display: contents; }
 
 .btn-edit{
     display: inline-flex; align-items: center; gap: 4px;
@@ -325,9 +326,9 @@ header, footer, .whatsapp, #whatsapp, .btn-whatsapp{ display: none !important; }
     display: inline-flex; align-items: center; gap: 4px;
     padding: 6px 14px;
     border: 1.5px solid #ef4444; border-radius: 8px;
-    color: #ef4444; background: #fff;
+    color: #ef4444; background: transparent;
     font-weight: 700; font-size: 12.5px;
-    cursor: pointer; transition: .14s; white-space: nowrap;
+    text-decoration: none; transition: .14s; white-space: nowrap;
 }
 .btn-delete:hover{ background: #fef2f2; color: #dc2626; border-color: #dc2626; }
 

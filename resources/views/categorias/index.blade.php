@@ -1,190 +1,196 @@
 <x-app-layout>
 @auth('employee')
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
-  <title>Categorías</title>
 
-  <style>
-    :root{
-      --zx: #234d50;           /* azul verdoso */
-      --zx-soft: rgba(35,77,80,.10);
-      --bd: rgba(0,0,0,.10);
-    }
+<div class="zx-wrapper">
 
-    nav{ background-color: inherit !important; }
+    {{-- HEADER --}}
+    <div class="zx-header">
+        <a class="btn-back" href="{{ route('admin.dashboard') }}">← Regresar</a>
+        <div class="zx-header-center">
+            <h1 class="zx-title">Categorías</h1>
+            <p class="zx-subtitle">Administra las categorías de tus productos</p>
+        </div>
+        <a class="btn-add" href="{{ route('categorias.create') }}">+ Añadir Categoría</a>
+    </div>
 
-    /* Fondo general (igual al de reseñas) */
-    body{
-      background: var(--zx);
-      min-height: 100vh;
-    }
-
-    /* Contenedor estilo “panel” */
-    .zx-wrap{
-      max-width: 1200px;
-      margin: 26px auto;
-      padding: 0 14px;
-    }
-
-    .zx-card{
-      background: #fff;
-      border: 1px solid var(--bd);
-      border-radius: 18px;
-      box-shadow: 0 16px 35px rgba(0,0,0,.18);
-      padding: 18px;
-    }
-
-    .zx-title{
-      font-weight: 900;
-      font-size: 26px;
-      color: #234d50;
-      text-align: center;
-      margin: 6px 0 16px;
-      letter-spacing: .4px;
-    }
-
-    /* Barra superior de botones */
-    .zx-actions{
-      display: flex;
-      gap: 10px;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      margin-bottom: 14px;
-    }
-
-    .btn-zx{
-  background: var(--zx);
-  color: #fff !important;
-  border: none;
-  border-radius: 10px;
-  font-weight: 800;
-  padding: 10px 14px;
-  transition: all .2s ease;
-}
-
-.btn-zx:hover,
-.btn-zx:focus,
-.btn-zx:active{
-  background: var(--zx) !important;
-  color: #fff !important;
-  opacity: .85;
-  box-shadow: none !important;
-}
-
-    .btn-zx-outline{
-      background: rgba(35,77,80,.12);
-      color: var(--zx);
-      border: 1px solid rgba(35,77,80,.25);
-      border-radius: 10px;
-      font-weight: 800;
-      padding: 10px 14px;
-    }
-    .btn-zx-outline{
-  background: rgba(35,77,80,.12);
-  color: var(--zx) !important;
-  border: 1px solid rgba(35,77,80,.25);
-  border-radius: 10px;
-  font-weight: 800;
-  padding: 10px 14px;
-  transition: all .2s ease;
-}
-
-.btn-zx-outline:hover,
-.btn-zx-outline:focus,
-.btn-zx-outline:active{
-  background: rgba(35,77,80,.12) !important;
-  color: var(--zx) !important;
-  opacity: .8;
-  box-shadow: none !important;
-}
-
-    /* Tabla */
-    .table{
-      background: #fff !important;
-      margin-bottom: 0;
-    }
-    .table thead th{
-      background: #28666e !important;
-      color: #fff !important;
-      border-color: rgba(255,255,255,.08);
-      white-space: nowrap;
-    }
-    .table td{ vertical-align: middle; }
-
-    /* Botones de acciones (editar/eliminar) */
-    .btn-sm{ border-radius: 10px; font-weight: 800; }
-
-  </style>
-</head>
-
-<body>
-  <div class="zx-wrap">
+    {{-- TARJETA CONTENEDORA --}}
     <div class="zx-card">
 
-      <div class="zx-title">Categorías</div>
-
-      <div class="zx-actions">
-        <a class="btn btn-zx" href="{{ route('admin.dashboard') }}">
-          ← Volver al Panel
-        </a>
-
-        <a class="btn btn-zx-outline" href="{{ route('categorias.create') }}">
-          + Añadir Categoría
-        </a>
-      </div>
-
-      <div class="table-responsive">
-        <table class="table table-striped table-bordered table-hover">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Nombre</th>
-              <th>Descripción</th>
-              <th style="width:190px;">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            @foreach ($categorias as $categoria)
-              <tr>
-                <td>{{ $loop->iteration }}</td>
-                <td>{{ $categoria->nombre }}</td>
-                <td>{{ $categoria->descripcion }}</td>
-                <td class="d-flex gap-2">
-                  <a href="{{ route('categorias.edit', $categoria->id_categoria) }}"
-                     class="btn btn-primary btn-sm">
-                    Editar
-                  </a>
-
-                  <form action="{{ route('categorias.destroy', $categoria->id_categoria) }}"
-                        method="post" class="d-inline">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn btn-danger btn-sm"
-                      onclick="return confirm('¿Estás seguro de eliminar esta categoría?')">
-                      Eliminar
-                    </button>
-                  </form>
-                </td>
-              </tr>
-            @endforeach
-          </tbody>
-        </table>
-      </div>
+        @if($categorias->isEmpty())
+            <div class="zx-empty">No hay categorías registradas.</div>
+        @else
+            <table class="zx-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($categorias as $categoria)
+                    <tr>
+                        <td>{{ $loop->iteration }}</td>
+                        <td class="zx-td-name">{{ $categoria->nombre }}</td>
+                        <td class="zx-td-desc">{{ $categoria->descripcion }}</td>
+                        <td>
+                            <div class="zx-row-actions">
+                                <a href="{{ route('categorias.edit', $categoria->id_categoria) }}"
+                                   class="btn-edit">✏️ Editar</a>
+                                <form action="{{ route('categorias.destroy', $categoria->id_categoria) }}"
+                                      method="POST">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn-delete"
+                                            onclick="return confirm('¿Estás seguro de eliminar esta categoría?')">
+                                        🗑 Eliminar
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @endif
 
     </div>
-  </div>
 
-  @if(session('success'))
-    <script>alert(@json(session('success')));</script>
-  @endif
-</body>
-</html>
+</div>
+
+<style>
+*{ box-sizing: border-box; }
+
+body{
+    background: linear-gradient(135deg, #a7f3d0, #6ee7b7);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+nav{ background-color: inherit !important; }
+
+header, footer, .whatsapp, #whatsapp, .btn-whatsapp{ display: none !important; }
+
+/* ── Wrapper ──────────────────────────────── */
+.zx-wrapper{
+    max-width: 1060px;
+    margin: 0 auto;
+    padding: 32px 20px 60px;
+}
+
+/* ── Header ───────────────────────────────── */
+.zx-header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+}
+.zx-header-center{ text-align: center; flex: 1; }
+.zx-title{ font-size: 28px; font-weight: 800; color: #1a1a2e; margin: 0 0 4px; }
+.zx-subtitle{ font-size: 13px; color: #6b7280; margin: 0; }
+
+/* ── Botones header ───────────────────────── */
+.btn-back{
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 10px 20px;
+    border: 1.5px solid #d1d5db; border-radius: 10px;
+    background: #fff; color: #374151;
+    font-weight: 600; font-size: 14px;
+    text-decoration: none; transition: .18s; white-space: nowrap;
+}
+.btn-back:hover{ background: #f9fafb; border-color: #9ca3af; color: #111; transform: translateY(-1px); }
+
+.btn-add{
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 10px 22px;
+    background: #1a5c38; color: #fff;
+    border-radius: 10px; font-weight: 700; font-size: 14px;
+    text-decoration: none; white-space: nowrap;
+    box-shadow: 0 4px 14px rgba(26,92,56,.25); transition: .18s;
+}
+.btn-add:hover{ background: #145030; color: #fff; transform: translateY(-1px); }
+
+/* ── Card contenedora ─────────────────────── */
+.zx-card{
+    background: #fff;
+    border-radius: 16px;
+    padding: 10px 22px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    border: 1px solid #e5e7eb;
+}
+
+/* ── Tabla ─────────────────────────────────── */
+.zx-table{
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+}
+.zx-table thead th{
+    background: #1a5c38;
+    color: #fff;
+    padding: 12px 14px;
+    text-align: left;
+    font-weight: 700;
+    font-size: 12.5px;
+    letter-spacing: .02em;
+}
+.zx-table thead th:first-child{ border-radius: 10px 0 0 0; }
+.zx-table thead th:last-child{ border-radius: 0 10px 0 0; }
+
+.zx-table tbody tr{
+    border-bottom: 1px solid #f0f0f0;
+    transition: background .12s;
+}
+.zx-table tbody tr:last-child{ border-bottom: none; }
+.zx-table tbody tr:hover{ background: #f9fafb; }
+.zx-table tbody td{ padding: 12px 14px; vertical-align: middle; color: #374151; }
+
+.zx-td-name{ font-weight: 700; color: #111827; }
+.zx-td-desc{ max-width: 380px; }
+
+/* ── Acciones por fila ────────────────────── */
+.zx-row-actions{ display: flex; gap: 6px; align-items: center; }
+.zx-row-actions form{ display: contents; }
+
+.btn-edit{
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 6px 14px;
+    border: 1.5px solid #3b82f6; border-radius: 8px;
+    color: #3b82f6; background: #fff;
+    font-weight: 700; font-size: 12.5px;
+    text-decoration: none; transition: .14s; white-space: nowrap;
+}
+.btn-edit:hover{ background: #eff6ff; color: #2563eb; border-color: #2563eb; }
+
+.btn-delete{
+    display: inline-flex; align-items: center; gap: 4px;
+    width: auto;
+    padding: 6px 12px;
+    border: 1.5px solid #ef4444; border-radius: 8px;
+    color: #ef4444; background: transparent;
+    font-weight: 700; font-size: 12px;
+    cursor: pointer; transition: .14s; white-space: nowrap;
+}
+.btn-delete:hover{ background: #fef2f2; color: #dc2626; border-color: #dc2626; }
+
+/* ── Empty state ──────────────────────────── */
+.zx-empty{
+    text-align: center; color: #9ca3af; font-size: 15px;
+    padding: 40px;
+}
+
+/* ── Responsive ───────────────────────────── */
+@media (max-width: 640px){
+    .zx-header{ flex-direction: column; align-items: stretch; text-align: center; }
+    .zx-table{ font-size: 12px; }
+}
+</style>
+
+@if(session('success'))
+<script>alert("{{ session('success') }}");</script>
+@endif
+
 @endauth
 </x-app-layout>

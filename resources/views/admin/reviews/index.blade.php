@@ -1,40 +1,33 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container-fluid py-4" style="background-color: #2F5F63; min-height: 100vh;">
-    <div class="container bg-white p-4 rounded shadow">
+<div class="zx-wrapper">
 
-    <h2 class="mb-4 fw-bold text-center titulo-reseñas">Gestión de Reseñas</h2>
+    {{-- HEADER --}}
+    <div class="zx-header">
+        <a class="btn-back" href="{{ route('admin.dashboard') }}">← Regresar</a>
+        <div class="zx-header-center">
+            <h1 class="zx-title">Gestión de Reseñas</h1>
+            <p class="zx-subtitle">Modera y administra las reseñas de tus clientes</p>
+        </div>
+        <span></span>
+    </div>
 
     @if(session('ok'))
-        <div class="alert alert-success">
-            {{ session('ok') }}
-        </div>
+        <div class="zx-alert-success">✅ {{ session('ok') }}</div>
     @endif
-
-    {{-- =========================
-        BOTÓN REGRESAR
-    ========================== --}}
-    <div class="mb-3">
-        <a href="{{ route('admin.dashboard') }}" class="btn btn-regresar text-black">
-            <i class="fas fa-arrow-left me-2"></i> Volver al Panel
-        </a>
-    </div>
 
     {{-- =========================
         RESEÑAS PENDIENTES
     ========================== --}}
-    <div class="card mb-5">
-        <div class="card-header encabezado-azul">
-            <strong>Reseñas Pendientes</strong>
-        </div>
-
-        <div class="card-body">
+    <div class="zx-section">
+        <div class="zx-section-header">Reseñas Pendientes</div>
+        <div class="zx-card">
             @if($pendientes->isEmpty())
-                <p class="text-muted mb-0">No hay reseñas pendientes.</p>
+                <div class="zx-empty">No hay reseñas pendientes.</div>
             @else
-                <div class="table-responsive">
-                    <table class="table table-bordered table-hover vertical-align-middle">
+                <div class="zx-table-scroll">
+                    <table class="zx-table">
                         <thead>
                             <tr>
                                 <th>ID</th>
@@ -55,27 +48,25 @@
                                     <td>{{ $r->guest_nombre ?? 'Anónimo' }}</td>
                                     <td>{{ $r->guest_email ?? '-' }}</td>
                                     <td>{{ $r->calificacion }}/5</td>
-                                    <td>{{ $r->descripcion }}</td>
+                                    <td class="zx-td-desc">{{ $r->descripcion }}</td>
                                     <td>{{ $r->created_at }}</td>
                                     <td>
-                                        <div class="d-flex gap-2">
+                                        <div class="zx-row-actions">
                                             {{-- Aprobar --}}
                                             <form method="POST" action="{{ route('admin.reviews.estado', $r->id) }}">
                                                 @csrf
                                                 @method('PATCH')
-                                                {{-- ✅ CORREGIDO: El valor ahora es 'aprobado' para que pase el validador --}}
                                                 <input type="hidden" name="estatus" value="aprobado">
-                                                <button class="btn btn-success btn-sm">
-                                                    <i class="fas fa-check me-1"></i> Aprobar
-                                                </button>
+                                                <button type="submit" class="btn-approve">✔ Aprobar</button>
                                             </form>
 
                                             {{-- Eliminar --}}
                                             <form method="POST" action="{{ route('admin.reviews.destroy', $r->id) }}">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button class="btn btn-danger btn-sm" onclick="return confirm('¿Eliminar reseña?')">
-                                                    <i class="fas fa-trash me-1"></i> Eliminar
+                                                <button type="submit" class="btn-delete"
+                                                        onclick="return confirm('¿Eliminar reseña?')">
+                                                    🗑 Eliminar
                                                 </button>
                                             </form>
                                         </div>
@@ -89,21 +80,17 @@
         </div>
     </div>
 
-
     {{-- =========================
         RESEÑAS ACTIVAS (APROBADAS)
     ========================== --}}
-    <div class="card">
-        <div class="card-header encabezado-azul">
-            <strong>Reseñas Activas</strong>
-        </div>
-
-        <div class="card-body">
+    <div class="zx-section">
+        <div class="zx-section-header">Reseñas Activas</div>
+        <div class="zx-card">
             @if($activos->isEmpty())
-                <p class="text-muted mb-0">No hay reseñas activas.</p>
+                <div class="zx-empty">No hay reseñas activas.</div>
             @else
-                <div class="table-responsive">
-                    <table class="table table-bordered table-hover vertical-align-middle">
+                <div class="zx-table-scroll">
+                    <table class="zx-table">
                         <thead>
                             <tr>
                                 <th>ID</th>
@@ -124,26 +111,25 @@
                                     <td>{{ $r->guest_nombre ?? 'Anónimo' }}</td>
                                     <td>{{ $r->guest_email ?? '-' }}</td>
                                     <td>{{ $r->calificacion }}/5</td>
-                                    <td>{{ $r->descripcion }}</td>
+                                    <td class="zx-td-desc">{{ $r->descripcion }}</td>
                                     <td>{{ $r->created_at }}</td>
                                     <td>
-                                        <div class="d-flex gap-2">
+                                        <div class="zx-row-actions">
                                             {{-- Volver a pendiente --}}
                                             <form method="POST" action="{{ route('admin.reviews.estado', $r->id) }}">
                                                 @csrf
                                                 @method('PATCH')
                                                 <input type="hidden" name="estatus" value="pendiente">
-                                                <button class="btn btn-secondary btn-sm">
-                                                    <i class="fas fa-undo me-1"></i> Desactivar
-                                                </button>
+                                                <button type="submit" class="btn-edit">↺ Desactivar</button>
                                             </form>
 
                                             {{-- Eliminar --}}
                                             <form method="POST" action="{{ route('admin.reviews.destroy', $r->id) }}">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button class="btn btn-danger btn-sm" onclick="return confirm('¿Eliminar reseña?')">
-                                                    <i class="fas fa-trash me-1"></i> Eliminar
+                                                <button type="submit" class="btn-delete"
+                                                        onclick="return confirm('¿Eliminar reseña?')">
+                                                    🗑 Eliminar
                                                 </button>
                                             </form>
                                         </div>
@@ -157,32 +143,150 @@
         </div>
     </div>
 
-  </div>
 </div>
 @endsection
 
 <style>
-.titulo-reseñas {
-    font-size: 2rem;
-    font-weight: 800;
-    color: #1f3f42;
+*{ box-sizing: border-box; }
+
+body{
+    background: linear-gradient(135deg, #a7f3d0, #6ee7b7);
+    font-family: 'Segoe UI', system-ui, sans-serif;
 }
-.btn-regresar {
-    background-color: #2F5F63;
+
+nav{ background-color: inherit !important; }
+
+/* ── Wrapper ──────────────────────────────── */
+.zx-wrapper{
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 20px 60px;
+}
+
+/* ── Header ───────────────────────────────── */
+.zx-header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+}
+.zx-header-center{ text-align: center; flex: 1; }
+.zx-title{ font-size: 28px; font-weight: 800; color: #1a1a2e; margin: 0 0 4px; }
+.zx-subtitle{ font-size: 13px; color: #6b7280; margin: 0; }
+
+.btn-back{
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 10px 20px;
+    border: 1.5px solid #d1d5db; border-radius: 10px;
+    background: #fff; color: #374151;
+    font-weight: 600; font-size: 14px;
+    text-decoration: none; transition: .18s; white-space: nowrap;
+}
+.btn-back:hover{ background: #f9fafb; border-color: #9ca3af; color: #111; transform: translateY(-1px); }
+
+/* ── Alert success ─────────────────────────── */
+.zx-alert-success{
+    background: #dcfce7;
+    border-left: 4px solid #1a5c38;
+    border-radius: 10px;
+    color: #145030;
     font-weight: 600;
-    border: none;
-    transition: background-color 0.2s;
+    font-size: 14px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
 }
-.btn-regresar:hover {
-    background-color: #244b4f;
+
+/* ── Secciones ─────────────────────────────── */
+.zx-section{ margin-bottom: 28px; }
+.zx-section-header{
+    font-size: 15px; font-weight: 800; color: #1a1a2e;
+    margin-bottom: 10px; padding-left: 4px;
 }
-.encabezado-azul {
-    background-color: #2F5F63 !important;
-    color: white;
+
+.zx-card{
+    background: #fff;
+    border-radius: 16px;
+    padding: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+}
+
+.zx-table-scroll{ overflow-x: auto; }
+
+/* ── Tabla ─────────────────────────────────── */
+.zx-table{
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+.zx-table thead th{
+    background: #1a5c38;
+    color: #fff;
+    padding: 11px 12px;
+    text-align: left;
     font-weight: 700;
-    font-size: 1.1rem;
+    font-size: 12px;
+    letter-spacing: .02em;
+    white-space: nowrap;
 }
-.table text-center th, .table text-center td {
-    vertical-align: middle;
+.zx-table thead th:first-child{ border-radius: 10px 0 0 0; }
+.zx-table thead th:last-child{ border-radius: 0 10px 0 0; }
+
+.zx-table tbody tr{
+    border-bottom: 1px solid #f0f0f0;
+    transition: background .12s;
+}
+.zx-table tbody tr:last-child{ border-bottom: none; }
+.zx-table tbody tr:hover{ background: #f9fafb; }
+.zx-table tbody td{ padding: 10px 12px; vertical-align: middle; color: #374151; }
+.zx-td-desc{ max-width: 220px; }
+
+/* ── Acciones por fila ────────────────────── */
+.zx-row-actions{ display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.zx-row-actions form{ display: contents; }
+
+.btn-edit{
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 6px 14px;
+    border: 1.5px solid #3b82f6; border-radius: 8px;
+    color: #3b82f6; background: transparent;
+    font-weight: 700; font-size: 12px;
+    cursor: pointer; transition: .14s; white-space: nowrap;
+}
+.btn-edit:hover{ background: #eff6ff; color: #2563eb; border-color: #2563eb; }
+
+.btn-approve{
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 6px 14px;
+    border: 1.5px solid #1a5c38; border-radius: 8px;
+    color: #1a5c38; background: transparent;
+    font-weight: 700; font-size: 12px;
+    cursor: pointer; transition: .14s; white-space: nowrap;
+}
+.btn-approve:hover{ background: #f0fdf4; color: #145030; border-color: #145030; }
+
+.btn-delete{
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 6px 12px;
+    border: 1.5px solid #ef4444; border-radius: 8px;
+    color: #ef4444; background: transparent;
+    font-weight: 700; font-size: 12px;
+    cursor: pointer; transition: .14s; white-space: nowrap;
+}
+.btn-delete:hover{ background: #fef2f2; color: #dc2626; border-color: #dc2626; }
+
+/* ── Empty state ──────────────────────────── */
+.zx-empty{
+    text-align: center; color: #9ca3af; font-size: 14px;
+    padding: 30px;
+}
+
+/* ── Responsive ───────────────────────────── */
+@media (max-width: 640px){
+    .zx-header{ flex-direction: column; align-items: stretch; text-align: center; }
+    .zx-table{ font-size: 12px; }
 }
 </style>

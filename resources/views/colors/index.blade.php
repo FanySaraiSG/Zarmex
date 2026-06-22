@@ -1,285 +1,215 @@
 <x-app-layout>
-    @auth('employee')
-    <!DOCTYPE html>
-    <html lang="es">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
-            integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-        <title>Colores</title>
-        <style>
-            :root {
-                --primary-green: #1a7431;
-                --medium-green: #2d6a4f;
-                --light-green: #d8f3dc;
-                --accent-green: #74c69d;
-                --bg-gray: #9ddabb;
-            }
+@auth('employee')
 
-            nav { background-color: inherit !important; }
+<div class="zx-wrapper">
 
-            body {
-                background-color: var(--bg-gray);
-                font-family: 'Segoe UI', sans-serif;
-                min-height: 100vh;
-            }
-
-            .page-wrap {
-                max-width: 1100px;
-                margin: 0 auto;
-                padding: 40px 24px 60px;
-            }
-
-            /* HEADER */
-            .top-bar {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                margin-bottom: 36px;
-            }
-
-            .page-title {
-                font-size: 1.8rem;
-                font-weight: 900;
-                color: #fff;
-                margin: 0;
-                text-shadow: 0 2px 8px rgba(0,0,0,0.15);
-                letter-spacing: -0.3px;
-            }
-
-            .btn-back {
-                background: rgba(255,255,255,0.25);
-                color: #fff;
-                border: 1.5px solid rgba(255,255,255,0.5);
-                border-radius: 12px;
-                padding: 9px 20px;
-                font-weight: 700;
-                font-size: 0.88rem;
-                text-decoration: none;
-                display: inline-flex;
-                align-items: center;
-                gap: 7px;
-                backdrop-filter: blur(4px);
-                transition: background 0.2s;
-            }
-            .btn-back:hover { background: rgba(255,255,255,0.38); color: #fff; }
-
-            .btn-add {
-                background: #fff;
-                color: var(--primary-green);
-                border: none;
-                border-radius: 12px;
-                padding: 10px 22px;
-                font-weight: 800;
-                font-size: 0.9rem;
-                text-decoration: none;
-                display: inline-flex;
-                align-items: center;
-                gap: 8px;
-                box-shadow: 0 4px 14px rgba(0,0,0,0.12);
-                transition: transform 0.2s, box-shadow 0.2s;
-            }
-            .btn-add:hover {
-                color: var(--medium-green);
-                transform: translateY(-2px);
-                box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-            }
-
-            /* ALERT */
-            .alert-success-custom {
-                background: rgba(255,255,255,0.85);
-                border: none;
-                border-left: 4px solid var(--primary-green);
-                border-radius: 12px;
-                color: var(--medium-green);
-                font-weight: 600;
-                padding: 14px 18px;
-                margin-bottom: 28px;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-            }
-
-            /* GRID DE FILAS — UNA POR FILA, AIREADAS */
-            .color-list {
-                display: flex;
-                flex-direction: column;
-                gap: 14px;
-            }
-
-            .color-row {
-                background: #fff;
-                border-radius: 18px;
-                padding: 18px 24px;
-                display: flex;
-                align-items: center;
-                gap: 24px;
-                box-shadow: 0 4px 16px rgba(0,0,0,0.07);
-                transition: transform 0.2s, box-shadow 0.2s;
-            }
-            .color-row:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 8px 24px rgba(0,0,0,0.11);
-            }
-
-            /* CIRCULO GRANDE */
-            .color-swatch {
-                width: 56px;
-                height: 56px;
-                border-radius: 50%;
-                flex-shrink: 0;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.18);
-                border: 3px solid rgba(255,255,255,0.9);
-                outline: 1px solid rgba(0,0,0,0.08);
-            }
-
-            /* NÚMERO DE ORDEN */
-            .color-num {
-                font-size: 0.8rem;
-                font-weight: 800;
-                color: #bbb;
-                min-width: 22px;
-                text-align: center;
-            }
-
-            /* INFO */
-            .color-meta {
-                flex: 1;
-            }
-            .color-name {
-                font-size: 1rem;
-                font-weight: 800;
-                color: #1a1a1a;
-                margin-bottom: 3px;
-            }
-            .color-hex {
-                font-size: 0.78rem;
-                color: #999;
-                font-family: 'Courier New', monospace;
-                font-weight: 600;
-                letter-spacing: 0.5px;
-            }
-
-            /* ACCIONES */
-            .color-actions {
-                display: flex;
-                gap: 10px;
-                flex-shrink: 0;
-            }
-
-            .btn-edit, .btn-delete {
-                width: 38px;
-                height: 38px;
-                border-radius: 50%;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 1rem;
-                border: none;
-                cursor: pointer;
-                transition: transform 0.2s, box-shadow 0.2s;
-                flex-shrink: 0;
-                text-decoration: none;
-            }
-
-            .btn-edit {
-                background: var(--primary-green);
-                color: #fff;
-                box-shadow: 0 4px 10px rgba(26,116,49,0.3);
-            }
-            .btn-edit:hover {
-                transform: scale(1.12);
-                box-shadow: 0 6px 16px rgba(26,116,49,0.45);
-                color: #fff;
-            }
-
-            .btn-delete {
-                background: #e74c3c;
-                color: #fff;
-                box-shadow: 0 4px 10px rgba(231,76,60,0.3);
-            }
-            .btn-delete:hover {
-                transform: scale(1.12);
-                box-shadow: 0 6px 16px rgba(231,76,60,0.45);
-            }
-
-            /* EMPTY STATE */
-            .empty-state {
-                text-align: center;
-                padding: 70px 20px;
-                background: #fff;
-                border-radius: 18px;
-                box-shadow: 0 4px 16px rgba(0,0,0,0.07);
-            }
-            .empty-state i { font-size: 3.5rem; color: #ccc; margin-bottom: 14px; display: block; }
-            .empty-state p { color: #aaa; font-weight: 600; margin-bottom: 20px; }
-        </style>
-    </head>
-    <body>
-        @section('content')
-        <div class="page-wrap">
-
-            <div class="top-bar">
-                <div class="d-flex align-items-center gap-3">
-                    <a href="{{ route('admin.dashboard') }}" class="btn-back">
-                        <i class="bi bi-arrow-left"></i> Regresar
-                    </a>
-                    <h1 class="page-title">Paleta de Colores</h1>
-                </div>
-                <a href="{{ route('colors.create') }}" class="btn-add">
-                    <i class="bi bi-plus-circle-fill"></i> Añadir Color
-                </a>
-            </div>
-
-            @if(session('success'))
-                <div class="alert-success-custom">
-                    <i class="bi bi-check-circle-fill fs-5"></i>
-                    {{ session('success') }}
-                </div>
-            @endif
-
-            @if($colors->isEmpty())
-                <div class="empty-state">
-                    <i class="bi bi-palette"></i>
-                    <p>No hay colores registrados aún.</p>
-                    <a href="{{ route('colors.create') }}" class="btn-add mx-auto">
-                        <i class="bi bi-plus-circle-fill"></i> Añadir el primero
-                    </a>
-                </div>
-            @else
-                <div class="color-list">
-                    @foreach($colors as $color)
-                        @php $hex = ltrim($color->id_color, '#'); @endphp
-                        <div class="color-row">
-                            <span class="color-num">{{ $loop->iteration }}</span>
-                            <div class="color-swatch" style="background-color: #{{ $hex }};"></div>
-                            <div class="color-meta">
-                                <div class="color-name">{{ $color->nombre }}</div>
-                                <div class="color-hex">#{{ strtoupper($hex) }}</div>
-                            </div>
-                            <div class="color-actions">
-                                <a href="{{ route('colors.edit', $color->id_color) }}" class="btn-edit" title="Editar">
-                                    <i class="bi bi-pencil-fill"></i>
-                                </a>
-                                <form action="{{ route('colors.destroy', ltrim($color->id_color, '#')) }}" method="post" style="margin:0; padding:0; border:none; background:none; display:inline-flex;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn-delete" title="Eliminar"
-                                        onclick="return confirm('¿Eliminar el color {{ $color->nombre }}?')">
-                                        <i class="bi bi-trash-fill"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            @endif
-
+    {{-- HEADER --}}
+    <div class="zx-header">
+        <a class="btn-back" href="{{ route('admin.dashboard') }}">← Regresar</a>
+        <div class="zx-header-center">
+            <h1 class="zx-title">Paleta de Colores</h1>
+            <p class="zx-subtitle">Administra los colores disponibles para tus productos</p>
         </div>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    </body>
-    </html>
-    @endauth
+        <a class="btn-add" href="{{ route('colors.create') }}">+ Añadir Color</a>
+    </div>
+
+    @if(session('success'))
+        <div class="zx-alert-success">
+            ✅ {{ session('success') }}
+        </div>
+    @endif
+
+    @if($colors->isEmpty())
+        <div class="zx-empty">
+            No hay colores registrados aún.
+            <div style="margin-top:14px;">
+                <a href="{{ route('colors.create') }}" class="btn-add" style="display:inline-flex;">+ Añadir el primero</a>
+            </div>
+        </div>
+    @else
+        <div class="zx-card-list">
+            @foreach($colors as $color)
+                @php $hex = ltrim($color->id_color, '#'); @endphp
+                <div class="zx-card">
+                    <span class="zx-color-num">{{ $loop->iteration }}</span>
+                    <div class="zx-color-swatch" style="background-color: #{{ $hex }};"></div>
+                    <div class="zx-card-info">
+                        <span class="zx-card-name">{{ $color->nombre }}</span>
+                        <span class="zx-color-hex">#{{ strtoupper($hex) }}</span>
+                    </div>
+                    <div class="zx-card-actions">
+                        <a href="{{ route('colors.edit', $color->id_color) }}" class="btn-circle-edit" title="Editar">
+                            ✏️
+                        </a>
+                        <form action="{{ route('colors.destroy', ltrim($color->id_color, '#')) }}" method="POST" class="zx-inline-form">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn-circle-delete" title="Eliminar"
+                                onclick="return confirm('¿Eliminar el color {{ $color->nombre }}?')">
+                                🗑
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    @endif
+
+</div>
+
+<style>
+*{ box-sizing: border-box; }
+
+body{
+    background: linear-gradient(135deg, #a7f3d0, #6ee7b7);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+}
+
+nav{ background-color: inherit !important; }
+
+header, footer, .whatsapp, #whatsapp, .btn-whatsapp{ display: none !important; }
+
+/* ── Wrapper ──────────────────────────────── */
+.zx-wrapper{
+    max-width: 1060px;
+    margin: 0 auto;
+    padding: 32px 20px 60px;
+}
+
+/* ── Header ───────────────────────────────── */
+.zx-header{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+}
+.zx-header-center{ text-align: center; flex: 1; }
+.zx-title{ font-size: 28px; font-weight: 800; color: #1a1a2e; margin: 0 0 4px; }
+.zx-subtitle{ font-size: 13px; color: #6b7280; margin: 0; }
+
+/* ── Botones header ───────────────────────── */
+.btn-back{
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 10px 20px;
+    border: 1.5px solid #d1d5db; border-radius: 10px;
+    background: #fff; color: #374151;
+    font-weight: 600; font-size: 14px;
+    text-decoration: none; transition: .18s; white-space: nowrap;
+}
+.btn-back:hover{ background: #f9fafb; border-color: #9ca3af; color: #111; transform: translateY(-1px); }
+
+.btn-add{
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 10px 22px;
+    background: #1a5c38; color: #fff;
+    border-radius: 10px; font-weight: 700; font-size: 14px;
+    text-decoration: none; white-space: nowrap;
+    box-shadow: 0 4px 14px rgba(26,92,56,.25); transition: .18s;
+}
+.btn-add:hover{ background: #145030; color: #fff; transform: translateY(-1px); }
+
+/* ── Alert success ─────────────────────────── */
+.zx-alert-success{
+    background: #dcfce7;
+    border-left: 4px solid #1a5c38;
+    border-radius: 10px;
+    color: #145030;
+    font-weight: 600;
+    font-size: 14px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+}
+
+/* ── Lista de colores ─────────────────────── */
+.zx-card-list{ display: flex; flex-direction: column; gap: 10px; }
+
+.zx-card{
+    display: flex; align-items: center; gap: 18px;
+    background: #fff;
+    border-radius: 16px;
+    padding: 15px 22px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    border: 1px solid #e5e7eb;
+    transition: box-shadow .18s;
+    flex-wrap: wrap;
+}
+.zx-card:hover{ box-shadow: 0 6px 18px rgba(0,0,0,.08); }
+
+/* ── Número de orden ──────────────────────── */
+.zx-color-num{
+    font-size: 12px; font-weight: 700; color: #9ca3af;
+    min-width: 20px; text-align: center; flex-shrink: 0;
+}
+
+/* ── Swatch circular ───────────────────────── */
+.zx-color-swatch{
+    width: 48px; height: 48px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 3px solid #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,.15), 0 0 0 1px #e5e7eb;
+}
+
+/* ── Info ──────────────────────────────────── */
+.zx-card-info{
+    flex: 1; min-width: 140px;
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+}
+.zx-card-name{ font-size: 16px; font-weight: 700; color: #111827; }
+.zx-color-hex{
+    font-size: 12px; font-weight: 600; color: #6b7280;
+    font-family: monospace; letter-spacing: .03em;
+}
+
+/* ── Acciones (círculos con icono) ────────── */
+.zx-card-actions{ display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+.zx-inline-form{ display: contents; }
+
+.btn-circle-edit, .btn-circle-delete{
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-size: 15px;
+    border: none; cursor: pointer;
+    text-decoration: none;
+    transition: transform .18s, box-shadow .18s;
+    flex-shrink: 0;
+}
+
+.btn-circle-edit{
+    background: #1a5c38;
+    box-shadow: 0 4px 10px rgba(26,92,56,.3);
+}
+.btn-circle-edit:hover{
+    transform: scale(1.1);
+    box-shadow: 0 6px 14px rgba(26,92,56,.45);
+}
+
+.btn-circle-delete{
+    background: #ef4444;
+    box-shadow: 0 4px 10px rgba(239,68,68,.3);
+}
+.btn-circle-delete:hover{
+    transform: scale(1.1);
+    box-shadow: 0 6px 14px rgba(239,68,68,.45);
+}
+
+/* ── Empty state ──────────────────────────── */
+.zx-empty{
+    text-align: center; color: #9ca3af; font-size: 15px;
+    padding: 40px; background: #fff;
+    border-radius: 16px; border: 1px dashed #e5e7eb;
+}
+
+/* ── Responsive ───────────────────────────── */
+@media (max-width: 640px){
+    .zx-header{ flex-direction: column; align-items: stretch; text-align: center; }
+    .zx-card{ gap: 12px; }
+    .zx-card-info{ width: 100%; }
+}
+</style>
+
+@endauth
 </x-app-layout>
