@@ -154,9 +154,14 @@ header, footer, .whatsapp, #whatsapp { display: none !important; }
                 <i class="bi bi-star-fill me-2" style="color:#198754; font-size:1.4rem;"></i>
                 Productos Destacados
             </h2>
-            <a href="{{ route('top-products.gestionar') }}" class="btn btn-outline-green">
-                <i class="bi bi-sliders"></i> Gestionar secciones
-            </a>
+            <div class="d-flex gap-2">
+                <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-green">
+                    <i class="bi bi-arrow-left-circle"></i> Volver al panel
+                </a>
+                <a href="{{ route('top-products.gestionar') }}" class="btn btn-outline-green">
+                    <i class="bi bi-sliders"></i> Gestionar secciones
+                </a>
+            </div>
         </div>
 
         @if($secciones->isEmpty())

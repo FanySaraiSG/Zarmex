@@ -8,16 +8,11 @@ use Carbon\Carbon;
 
 class CategoriaSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
     public function run()
     {
         $now = Carbon::now();
 
-        DB::table('categorias')->insert([
+        DB::table('categorias')->insertOrIgnore([
             [
                 'id_categoria' => 'ZAR-CQP',
                 'nombre' => 'Quiropráctica',

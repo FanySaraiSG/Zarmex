@@ -463,7 +463,20 @@
         $carouselItems[] = ['tipo' => 'imagen', 'ruta' => $rutaPortada];
     }
 
-    // 2. Videos Dinámicos Limpios
+    // 2. Video promocional YouTube/Vimeo (video_url guardado en la BD)
+    if (!empty($producto->video_url) && preg_match('/^https?:\/\//', $producto->video_url)) {
+        $embedVideoUrl = '';
+        if (preg_match('/(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/', $producto->video_url, $m)) {
+            $embedVideoUrl = 'https://www.youtube.com/embed/' . $m[1] . '?rel=0&modestbranding=1';
+        } elseif (preg_match('/vimeo\.com\/(\d+)/', $producto->video_url, $m)) {
+            $embedVideoUrl = 'https://player.vimeo.com/video/' . $m[1];
+        }
+        if ($embedVideoUrl) {
+            $carouselItems[] = ['tipo' => 'youtube', 'embed' => $embedVideoUrl];
+        }
+    }
+
+    // 3. Videos Dinámicos Limpios (archivos físicos)
     if (isset($videos) && count($videos) > 0) {
         foreach($videos as $vid) {
             if (!empty($vid->ruta)) {
@@ -496,6 +509,9 @@
                     @if($item['tipo'] === 'video')
                         <div class="video-indicator"><i class="fas fa-play"></i></div>
                         <img src="{{ asset('storage/' . ltrim(str_replace('public/', '', $producto->imagen_url), '/')) }}?v={{ time() }}" alt="Miniatura Video">
+                    @elseif($item['tipo'] === 'youtube')
+                        <div class="video-indicator" style="background:rgba(255,0,0,0.85);"><i class="fab fa-youtube"></i></div>
+                        <img src="{{ asset('storage/' . ltrim(str_replace('public/', '', $producto->imagen_url), '/')) }}?v={{ time() }}" alt="Miniatura YouTube">
                     @else
                         <img src="{{ asset('storage/' . $item['ruta']) }}?v={{ time() }}" alt="Miniatura {{ $i }}">
                     @endif
@@ -516,6 +532,15 @@
                                         <source src="{{ asset('storage/' . $item['ruta']) }}" type="video/mp4">
                                         Tu navegador no soporta el reproductor de video.
                                     </video>
+                                </div>
+                            @elseif($item['tipo'] === 'youtube')
+                                <div class="video-wrapper-carousel" style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden;">
+                                    <iframe
+                                        src="{{ $item['embed'] }}"
+                                        style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        allowfullscreen>
+                                    </iframe>
                                 </div>
                             @else
                                 <img src="{{ asset('storage/' . $item['ruta']) }}?v={{ time() }}" class="zx-main-img" alt="Slide {{ $i }}">

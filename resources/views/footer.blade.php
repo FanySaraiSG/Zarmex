@@ -13,7 +13,7 @@
     }
 
     .zx-container {
-        max-width: 95%; /* Ocupa casi todo el ancho de la pantalla como en la imagen */
+        max-width: 95%;
         margin: 0 auto;
         padding: 0 10px;
     }
@@ -35,7 +35,7 @@
 
     .zx-divider {
         width: 1px;
-        background-color: rgba(254, 220, 151, 0.4); /* Línea dorada sutil */
+        background-color: rgba(254, 220, 151, 0.4);
         height: 55px;
         flex: 0 0 auto;
     }
@@ -66,13 +66,12 @@
         align-items: center;
         justify-content: center;
         border-radius: 50%;
-        background: #fedc97; /* Fondo dorado uniforme para los contactos */
+        background: #fedc97;
         color: #145555;
         margin-right: 8px;
         flex-shrink: 0;
     }
 
-    /* Redes Sociales en Grid Horizontal Alternado */
     .zx-follow-flex {
         display: grid;
         grid-template-columns: auto auto;
@@ -80,16 +79,14 @@
         align-items: center;
     }
 
-    /* Ajuste específico para los círculos de las redes sociales */
     .zx-social-item i {
-        background: #FFFFFF !important; /* Círculo blanco para redes sociales */
+        background: #FFFFFF !important;
     }
 
     .zx-social-item span {
         color: #FFFFFF;
     }
 
-    /* Bloque de contacto en dos columnas perfectas */
     .zx-double-list {
         display: grid;
         grid-template-columns: repeat(2, 1fr); 
@@ -112,7 +109,6 @@
         flex: 0 0 120px;
     }
 
-    /* Contenedor del Mapa - Fijo y Limpio a la derecha */
     .map-container {
         width: 220px; 
         height: 95px;
@@ -122,7 +118,6 @@
         box-shadow: 0 2px 8px rgba(0,0,0,0.2);
     }
 
-    /* Responsivo básico para pantallas medianas/pequeñas */
     @media (max-width: 1100px) {
         .zx-main-grid {
             flex-direction: column;
@@ -141,6 +136,31 @@
         }
         .map-container { margin: 0 auto; }
     }
+
+    /* ===== BOTÓN WHATSAPP FLOTANTE ===== */
+    .whatsapp-float {
+        position: fixed;
+        bottom: 25px;
+        right: 25px;
+        z-index: 999999;
+        background: #25D366;
+        color: #fff;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        font-size: 2rem;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .whatsapp-float:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+        color: #fff;
+    }
 </style>
 
 <footer class="zx-footer">
@@ -155,7 +175,8 @@
                             <i class="fab fa-facebook-f" style="color:#1877F2;"></i>
                             <span>Equipos Médicos Zarmex</span>
                         </a>
-                        <div style="display:none;"></div> <a href="https://www.instagram.com/zarmex_oficialmx/" class="zx-social-item zx-list-item" target="_blank" rel="noopener noreferrer">
+                        <div style="display:none;"></div>
+                        <a href="https://www.instagram.com/zarmex_oficialmx/" class="zx-social-item zx-list-item" target="_blank" rel="noopener noreferrer">
                             <i class="fab fa-instagram" style="color:#E4405F;"></i>
                             <span>Zarmex_oficialmx</span>
                         </a>
@@ -210,3 +231,11 @@
         </div>
     </div>
 </footer>
+
+{{-- ===== BOTÓN WHATSAPP FLOTANTE ===== --}}
+<a href="https://wa.me/525581366555?text=Hola,%20estoy%20interesado%20en%20los%20productos%20de%20Zarmex"
+   target="_blank"
+   class="whatsapp-float"
+   title="Contáctanos por WhatsApp">
+    <i class="fab fa-whatsapp"></i>
+</a>

@@ -10,11 +10,12 @@
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   
-<!-- Remixicon (solo UNA vez) -->
-<link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
+  <!-- Remixicon (solo UNA vez) -->
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.2.0/fonts/remixicon.css" rel="stylesheet"/>
 
-<!-- Font Awesome (AGREGA ESTA LÍNEA) -->
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+
   <!-- CSS Global -->
   <link rel="stylesheet" href="{{ asset('css/main.css') }}">
 
@@ -22,65 +23,84 @@
   @vite(['resources/css/app.css', 'resources/js/app.js'])
 
   <style>
-    /* Fondo global SIEMPRE por encima de CSS de páginas */
     html, body { 
       background: url('{{ asset('fondo.jpg') }}') !important;
       background-size: cover !important;
       background-position: center !important;
       background-attachment: fixed !important;
     }
+
+    .whatsapp-float {
+      position: fixed;
+      bottom: 25px;
+      right: 25px;
+      z-index: 999999;
+      background: #25D366;
+      color: #fff;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      font-size: 2rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .whatsapp-float:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+      color: #fff;
+    }
   </style>
 </head>
-
 
 <body class="font-sans antialiased">
   <div class="min-h-screen zx-bg-wrap" style="background-color: transparent !important;">
 
     {{-- HEADER --}}
-   @if(!request()->is('employees/*'))
-    {{-- HEADER NORMAL --}}
-    @include('header')
-@else
-    {{-- SOLO BOTÓN CERRAR SESIÓN EN ADMIN --}}
-    @auth('employee')
+    @if(!request()->is('employees/*'))
+      @include('header')
+    @else
+      @auth('employee')
         <div class="admin-top-logout">
-            <form method="POST" action="{{ route('employee.logout') }}">
-                @csrf
-                <button type="submit" class="admin-logout-btn" title="Cerrar sesión">
-                    <i class="fa-solid fa-right-from-bracket"></i>
-                </button>
-            </form>
+          <form method="POST" action="{{ route('employee.logout') }}">
+            @csrf
+            <button type="submit" class="admin-logout-btn" title="Cerrar sesión">
+              <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
+          </form>
         </div>
-    @endauth
-@endif
-
-
+      @endauth
+    @endif
 
     {{-- CONTENIDO --}}
     <main>
-      {{-- Para <x-app-layout> --}}
       {{ $slot ?? '' }}
-
-      {{-- Para @extends + @section('content') --}}
       @yield('content')
     </main>
 
     {{-- FOOTER --}}
     @if(!request()->is('employees/*'))
-       @include('footer')
+      @include('footer')
     @endif
 
   </div>
-@if(!request()->is('employees/*'))
+
+  {{-- BOTÓN WHATSAPP FLOTANTE (solo en páginas públicas) --}}
+  @if(!request()->is('employees/*'))
     <a href="https://wa.me/525581366555?text=Hola,%20estoy%20interesado%20en%20los%20productos%20de%20Zarmex"
        target="_blank"
-       style="position:fixed;bottom:25px;right:25px;z-index:999999;background:#25D366;color:#fff;width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;text-decoration:none;font-weight:700;"
+       class="whatsapp-float"
        title="Contáctanos por WhatsApp">
-        WA
+      <i class="fab fa-whatsapp"></i>
     </a>
-@endif
-  <!-- Bootstrap JS (bundle con Popper) -->
+  @endif
+
+  <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
   <style>
     html, body {
       min-height: 100vh;
@@ -95,7 +115,7 @@
       background-color: transparent !important;
     }
 
-    .zx-bg-wrap{
+    .zx-bg-wrap {
       min-height: 100vh;
       background: transparent !important;
     }

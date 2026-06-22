@@ -10,14 +10,17 @@
     <!-- CSS ORIGINAL -->
     <link rel="stylesheet" href="{{ asset('css/formularios.css') }}">
 
-    <!--  CSS SOLO FORMULARIOS -->
+    <!-- CSS SOLO FORMULARIOS -->
     <link rel="stylesheet" href="{{ asset('css/formularios-pro.css') }}">
 
     <!-- BOOTSTRAP -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
 </head>
 
-<!--  CLAVE -->
+<!-- CLAVE -->
 <body class="antialiased form-pro">
 
 @include('header')

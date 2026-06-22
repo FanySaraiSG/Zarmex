@@ -18,8 +18,6 @@ class Producto extends Model
         'id',
         'nombre',
         'descripcion',
-        //'precio',
-        //'stock',
         'categoria_id',
         'imagen_url',
         'video_url',

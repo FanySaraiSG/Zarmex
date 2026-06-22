@@ -1,15 +1,14 @@
 <?php
-
 namespace App\Models;
-
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
-class Promocion extends Model
+class Promotion extends Model
 {
-    protected $table = 'promotions';
-
+     use HasFactory;
+    protected $table = 'promociones';
     protected $fillable = [
-        // agrega aquí los campos de tu tabla promotions
-        // ejemplo: 'titulo', 'descripcion', 'imagen', 'activo'
+        'nombre',
+        'imagen_url',
+        'imagen_path',
     ];
-}
+}   

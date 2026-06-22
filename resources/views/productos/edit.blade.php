@@ -277,12 +277,53 @@
                         </div>
                     </div>
 
-                    <div id="video-preview-container" class="mt-2 mb-4" style="{{ $producto->video_url ? '' : 'display:none;' }}">
-                        <p class="small text-muted mb-1">Vista previa del Video:</p>
+                    <div id="video-preview-container" class="mt-2 mb-4" style="{{ ($producto->video_path ?? null) ? '' : 'display:none;' }}">
+                        <p class="small text-muted mb-1">Vista previa del Video (archivo local):</p>
                         <video id="video-tag" controls style="width: 45%; border-radius: 12px; background: #000;">
-                            <source src="{{ $producto->video_url ? asset($producto->video_url) : '' }}" id="video-source">
+                            <source src="{{ ($producto->video_path ?? null) ? asset($producto->video_path) : '' }}" id="video-source">
                             Tu navegador no soporta la reproducción de video.
                         </video>
+                    </div>
+
+                    {{-- Video Promocional (URL de YouTube/Vimeo) — alternativa al archivo --}}
+                    @php
+                        $videoUrlActual = old('video_url', $producto->video_url ?? '');
+                        $embedUrl = '';
+                        if ($videoUrlActual) {
+                            if (preg_match('/(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/', $videoUrlActual, $m)) {
+                                $embedUrl = 'https://www.youtube.com/embed/' . $m[1] . '?rel=0&modestbranding=1';
+                            } elseif (preg_match('/vimeo\.com\/(\d+)/', $videoUrlActual, $m)) {
+                                $embedUrl = 'https://player.vimeo.com/video/' . $m[1];
+                            }
+                        }
+                    @endphp
+                    <div class="mb-4" style="background:#f0f9fa; border:1px solid #b2d8dc; border-radius:12px; padding:18px;">
+                        <label class="form-label fw-bold" style="color:#1a7431;">
+                            <i class="bi bi-play-circle me-1"></i> O bien, VIDEO PROMOCIONAL POR URL (YouTube o Vimeo)
+                        </label>
+                        <input
+                            type="url"
+                            name="video_url"
+                            id="video-url-input"
+                            class="form-control"
+                            placeholder="https://www.youtube.com/watch?v=... o https://vimeo.com/..."
+                            value="{{ $videoUrlActual }}"
+                            oninput="previewVideoUrl(this.value)"
+                        >
+                        <div class="form-text">Si llenas este campo, no es necesario subir un archivo de video. Pega la URL del video de YouTube o Vimeo.</div>
+
+                        <div id="video-url-preview-container" class="mt-3" style="{{ $embedUrl ? '' : 'display:none;' }}">
+                            <p class="small text-muted mb-1">Vista previa:</p>
+                            <div style="position:relative; padding-bottom:30%; height:0; overflow:hidden; border-radius:12px; max-width:480px;">
+                                <iframe
+                                    id="video-url-iframe"
+                                    src="{{ $embedUrl }}"
+                                    style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowfullscreen>
+                                </iframe>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="d-flex justify-content-between">
@@ -307,7 +348,7 @@
                             if (!empty($data['path'])) {
                                 if (preg_match('#^https?://#', $data['path'])) { $docUrl = $data['path']; }
                                 elseif (preg_match('#^/?storage/#', $data['path'])) { $docUrl = asset($data['path']); }
-                                else { $docUrl = asset($data['path']); }
+                                else { $docUrl = Storage::url($data['path']); }
                             }
                         @endphp
                     <div class="doc-box">
@@ -481,6 +522,26 @@
             source.src = URL.createObjectURL(input.files[0]);
             video.load();
             container.style.display = 'block';
+        }
+    }
+
+    function previewVideoUrl(url) {
+        const container = document.getElementById('video-url-preview-container');
+        const iframe    = document.getElementById('video-url-iframe');
+        let embed = '';
+
+        const ytMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+        if (ytMatch) embed = `https://www.youtube.com/embed/${ytMatch[1]}?rel=0&modestbranding=1`;
+
+        const vmMatch = url.match(/vimeo\.com\/(\d+)/);
+        if (vmMatch) embed = `https://player.vimeo.com/video/${vmMatch[1]}`;
+
+        if (embed) {
+            iframe.src = embed;
+            container.style.display = 'block';
+        } else {
+            iframe.src = '';
+            container.style.display = 'none';
         }
     }
 

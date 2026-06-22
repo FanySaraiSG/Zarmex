@@ -375,16 +375,36 @@
             position: relative; width: 100%; height: 300px; background: #f7f7f7;
             border-radius: 12px; overflow: hidden; margin-bottom: 10px;
         }
-        .prod-carousel-track { display: flex; height: 100%; transition: transform .35s cubic-bezier(.23,1,.32,1); }
-        .prod-carousel-slide { min-width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .prod-carousel-slide img { width: 100%; height: 100%; object-fit: contain; padding: 12px; }
+        .prod-carousel-track {
+            display: flex; height: 100%;
+            transition: transform .35s cubic-bezier(.23,1,.32,1);
+            will-change: transform;
+        }
+        .prod-carousel-slide {
+            width: 100%; height: 100%;
+            flex: 0 0 100%;          /* ni crece ni encoge, siempre 100% */
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;        /* corta cualquier pixel que se cuele */
+            background: #f7f7f7;
+        }
+        .prod-carousel-slide img { width: 100%; height: 100%; object-fit: contain; padding: 12px; display: block; }
+        /* Slide de video: fondo negro, sin padding, tapa el título con un overlay */
+        .prod-carousel-slide.is-video { background: #000; position: relative; }
+        .prod-carousel-slide.is-video iframe { width: 100%; height: 100%; border: 0; display: block; }
+        /* Tapa la barra de título de YouTube (aprox. 40px superior) */
+        .prod-carousel-slide.is-video::before {
+            content: '';
+            position: absolute; top: 0; left: 0; right: 0; height: 42px;
+            background: #000; z-index: 2; pointer-events: none;
+        }
         
         .prod-carr-btn {
             position: absolute; top: 50%; transform: translateY(-50%);
             background: rgba(40,102,110,0.85); border: none; border-radius: 50%;
-            width: 28px; height: 28px; color: #fedc97; font-size: 16px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; z-index: 2;
+            width: 30px; height: 30px; color: #fedc97; font-size: 18px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; z-index: 10;
             transition: background .2s;
+            line-height: 1;
         }
         .prod-carr-btn:hover { background: #28666e; }
         .prod-carr-btn.prev { left: 8px; }
@@ -432,6 +452,9 @@
             transition: background .2s, transform .15s;
         }
         .prod-btn-whatsapp:hover { background: #1ebe5d; transform: translateY(-1px); }
+
+        /* ── Documentos dentro del modal ── */
+        #pm-docs-wrap .prod-info-label { margin-top: 14px; }
 
         /* ===================== SECCIÓN RESEÑAS ===================== */
         .resenas-nav { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-bottom: 32px; }
@@ -554,15 +577,55 @@
                         <div class="custom-carousel-track" id="pasarelaTrack">
                             @foreach($topProducts as $topProduct)
                                 @if($topProduct->product)
+                                    @php
+                                        $prod = $topProduct->product;
+
+                                        // ── Imágenes: usa la relación imagenes() → columna 'ruta' ──
+                                        // Si no hay imágenes extra, cae en imagen_url (que ya tiene asset() via accessor)
+                                        $imgArr = [];
+                                        if ($prod->imagenes && $prod->imagenes->count() > 0) {
+                                            foreach ($prod->imagenes as $img) {
+                                                $imgArr[] = asset($img->ruta);
+                                            }
+                                        }
+                                        // imagen_url ya pasa por el accessor getImagenUrlAttribute que aplica asset()
+                                        if (empty($imgArr) && $prod->imagen_url) {
+                                            $imgArr[] = $prod->imagen_url;
+                                        }
+                                        if (empty($imgArr)) {
+                                            $imgArr[] = asset('Imagenes/84493-4540581.jpg');
+                                        }
+
+                                        // ── Colores: relación colores() → Color ──
+                                        // Pasamos los atributos RAW para detectar el nombre correcto del campo hex
+                                        $coloresMap = [];
+                                        $coloresRaw = [];
+                                        if ($prod->colores && $prod->colores->count() > 0) {
+                                            foreach ($prod->colores as $color) {
+                                                $coloresRaw[] = $color->getAttributes(); // debug
+                                                $hex = '#' . ltrim($color->id_color, '#');
+                                                $coloresMap[$hex] = $color->nombre;
+                                            }
+                                        }
+
+                                        // ── Documentos ──
+                                        $docs = [];
+                                        if (!empty($prod->doc1_url)) $docs[] = ['label' => 'Garantía',          'url' => asset($prod->doc1_url)];
+                                        if (!empty($prod->doc2_url)) $docs[] = ['label' => 'Manual de Usuario', 'url' => asset($prod->doc2_url)];
+                                        if (!empty($prod->doc3_url)) $docs[] = ['label' => 'Ficha Técnica',     'url' => asset($prod->doc3_url)];
+                                    @endphp
                                     <div class="custom-carousel-item" data-section="{{ $topProduct->section ?? '' }}">
                                         <div class="best-card">
-                                            <img src="{{ $topProduct->product->imagen_url ?? asset('Imagenes/84493-4540581.jpg') }}" alt="{{ $topProduct->product->nombre ?? 'Producto' }}">
-                                            <h3>{{ Str::afterLast($topProduct->product->nombre, ' ') }}</h3>
+                                            <img src="{{ $imgArr[0] }}" alt="{{ $prod->nombre ?? 'Producto' }}">
+                                            <h3>{{ Str::afterLast($prod->nombre, ' ') }}</h3>
                                             <button class="best-btn"
-                                                data-nombre="{{ $topProduct->product->nombre ?? 'Producto' }}"
-                                                data-desc="{{ $topProduct->product->descripcion ?? '' }}"
-                                                data-img="{{ $topProduct->product->imagen_url ?? asset('Imagenes/84493-4540581.jpg') }}"
-                                                data-colores="{{ json_encode(optional($topProduct->product->colores)->pluck('nombre', 'hex') ?? []) }}"
+                                                data-nombre="{{ $prod->nombre ?? 'Producto' }}"
+                                                data-desc="{{ $prod->descripcion ?? '' }}"
+                                                data-imagenes="{{ json_encode($imgArr) }}"
+                                                data-colores="{{ json_encode($coloresMap) }}"
+                                                data-debug-colores="{{ json_encode($coloresRaw) }}"
+                                                data-video="{{ $prod->video_url ?? '' }}"
+                                                data-docs="{{ json_encode($docs) }}"
                                                 onclick="abrirProdModalDesdeBtn(this)">
                                                 Ver más
                                             </button>
@@ -583,7 +646,7 @@
                 @endif
             </div>
 
-            {{-- ── MODAL DE DETALLE ── --}}
+            {{-- ── MODAL DE DETALLE (mini-catálogo integrado) ── --}}
             <div class="prod-overlay" id="prodOverlay" onclick="if(event.target===this) cerrarProdModal()">
                 <div class="prod-modal">
                     <button type="button" class="prod-modal-close" onclick="cerrarProdModal()" aria-label="Cerrar">
@@ -611,6 +674,12 @@
                             <p class="prod-info-label">Colores disponibles</p>
                             <div class="prod-colors-wrap" id="pm-colors"></div>
                             <p class="prod-sel-color" id="pm-color-name">Selecciona un color</p>
+
+                            {{-- DOCUMENTOS --}}
+                            <div id="pm-docs-wrap" style="display:none; margin-top:14px;">
+                                <p class="prod-info-label">Documentación Oficial</p>
+                                <div id="pm-docs-links" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+                            </div>
                         </div>
                     </div>
 
@@ -685,84 +754,179 @@
 
                 window.addEventListener('resize', actualizarPasarela);
 
-                // Autoplay — se pausa al pasar el cursor
+                // Autoplay — se pausa al pasar el cursor y al abrir el modal
                 let autoPlayInterval = setInterval(() => moverPasarela(1), 4500);
+
+                function pausarCarrusel() { clearInterval(autoPlayInterval); autoPlayInterval = null; }
+                function reanudarCarrusel() {
+                    if (!autoPlayInterval) autoPlayInterval = setInterval(() => moverPasarela(1), 3500);
+                }
 
                 const container = document.querySelector('.custom-carousel-container');
                 if (container) {
-                    container.addEventListener('mouseenter', () => clearInterval(autoPlayInterval));
-                    container.addEventListener('mouseleave', () => {
-                        autoPlayInterval = setInterval(() => moverPasarela(1), 3500);
-                    });
+                    container.addEventListener('mouseenter', pausarCarrusel);
+                    container.addEventListener('mouseleave', reanudarCarrusel);
                 }
 
                 /* ── MODAL DE DETALLE ── */
                 let pmSlides = [], pmCur = 0, pmNombreActual = '';
 
-                function abrirProdModalDesdeBtn(btn) {
-                    const nombre  = btn.getAttribute('data-nombre');
-                    const desc    = btn.getAttribute('data-desc');
-                    const img     = btn.getAttribute('data-img');
-                    const colores = JSON.parse(btn.getAttribute('data-colores') || '{}');
-                    abrirProdModal(nombre, desc, img, colores);
+                function convertirUrlEmbed(url) {
+                    if (!url) return '';
+                    let m = url.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+                    // rel=0 sin videos relacionados, modestbranding quita logo
+                    // El título/canal ya no puede ocultarse por API — se tapa con overlay CSS negro
+                    if (m) return `https://www.youtube.com/embed/${m[1]}?rel=0&modestbranding=1&iv_load_policy=3&color=white`;
+                    m = url.match(/vimeo\.com\/(\d+)/);
+                    if (m) return `https://player.vimeo.com/video/${m[1]}?title=0&byline=0&portrait=0`;
+                    return url;
                 }
 
-                function abrirProdModal(nombre, desc, imgPrincipal, colores) {
-                    const partes     = nombre.split(' ');
-                    const soloCodigo = partes[partes.length - 1];
+                function abrirProdModalDesdeBtn(btn) {
+                    const nombre   = btn.getAttribute('data-nombre');
+                    const desc     = btn.getAttribute('data-desc');
+                    const imagenes = JSON.parse(btn.getAttribute('data-imagenes') || '[]');
+                    const colores  = JSON.parse(btn.getAttribute('data-colores')  || '{}');
+                    const video    = btn.getAttribute('data-video') || '';
+                    const docs     = JSON.parse(btn.getAttribute('data-docs')     || '[]');
 
-                    pmNombreActual = soloCodigo;
-                    document.getElementById('pm-nombre').textContent = soloCodigo;
-                    document.getElementById('pm-desc').textContent   = desc;
+                    // 🔍 DEBUG: muestra los atributos RAW del modelo Color en consola
+                    const debugColores = btn.getAttribute('data-debug-colores');
+                    if (debugColores) console.log('[DEBUG colores RAW]', JSON.parse(debugColores));
 
+                    pausarCarrusel(); // ⏸ detiene el autoplay mientras el modal está abierto
+                    abrirProdModal(nombre, desc, imagenes, colores, video, docs);
+                }
+
+                function abrirProdModal(nombre, desc, imagenes, colores, videoUrl, docs) {
+                    pmNombreActual = nombre;
+                    document.getElementById('pm-nombre').textContent = nombre;
+                    document.getElementById('pm-desc').textContent   = desc || 'Sin descripción.';
+
+                    // ── Colores ──
                     const cw = document.getElementById('pm-colors');
+                    const colorLabel = document.getElementById('pm-color-name');
                     cw.innerHTML = '';
-                    document.getElementById('pm-color-name').textContent = 'Selecciona un color';
+                    colorLabel.style.display = '';
+                    colorLabel.textContent = 'Selecciona un color';
 
-                    if (colores && typeof colores === 'object') {
-                        Object.entries(colores).forEach(([hex, nombre_color]) => {
+                    const coloresEntries = Object.entries(colores || {});
+                    if (coloresEntries.length > 0) {
+                        coloresEntries.forEach(([hex, nombre_color]) => {
                             const sw = document.createElement('div');
-                            sw.className      = 'prod-color-swatch';
+                            sw.className        = 'prod-color-swatch';
+                            // El hex ya viene con '#' desde el blade
                             sw.style.background = hex;
-                            sw.title          = nombre_color;
+                            sw.title            = nombre_color;
                             sw.onclick = () => {
-                                document.querySelectorAll('.prod-color-swatch').forEach(s => s.classList.remove('selected'));
+                                cw.querySelectorAll('.prod-color-swatch').forEach(s => s.classList.remove('selected'));
                                 sw.classList.add('selected');
-                                document.getElementById('pm-color-name').textContent = nombre_color;
+                                colorLabel.textContent = nombre_color;
                             };
                             cw.appendChild(sw);
                         });
+                    } else {
+                        cw.innerHTML = '<span style="font-size:0.85rem;color:#888;font-style:italic;">No especificados</span>';
+                        colorLabel.style.display = 'none';
                     }
 
-                    pmSlides = [{ type: 'img', src: imgPrincipal, label: 'Imagen 1' }];
-                    pmCur    = 0;
+                    // ── Slides: imágenes + video al final del carrusel ──
+                    pmSlides = (imagenes && imagenes.length > 0)
+                        ? imagenes.map((src, i) => ({ type: 'img', src, label: `Imagen ${i + 1}` }))
+                        : [{ type: 'img', src: '{{ asset("Imagenes/84493-4540581.jpg") }}', label: 'Imagen 1' }];
+
+                    const embedUrl = convertirUrlEmbed(videoUrl);
+                    if (embedUrl) {
+                        pmSlides.push({ type: 'video', src: embedUrl, label: 'Video' });
+                    }
+
+                    pmCur = 0;
                     pmRenderTrack();
                     pmRenderDots();
+
+                    // ── Documentos ──
+                    const docsWrap  = document.getElementById('pm-docs-wrap');
+                    const docsLinks = document.getElementById('pm-docs-links');
+                    docsLinks.innerHTML = '';
+                    if (docs && docs.length > 0) {
+                        docs.forEach(doc => {
+                            const a = document.createElement('a');
+                            a.href      = doc.url;
+                            a.target    = '_blank';
+                            a.rel       = 'noopener noreferrer';
+                            a.style.cssText = 'display:inline-flex;align-items:center;gap:5px;padding:5px 12px;background:#fff;border:1px solid #cce3de;border-radius:10px;text-decoration:none;color:#143d40;font-size:0.8rem;font-weight:700;';
+                            a.innerHTML = `<i class="far fa-file-pdf" style="color:#dc3545;"></i> ${doc.label}`;
+                            docsLinks.appendChild(a);
+                        });
+                        docsWrap.style.display = 'block';
+                    } else {
+                        docsWrap.style.display = 'none';
+                    }
 
                     document.getElementById('prodOverlay').classList.add('open');
                 }
 
                 function cerrarProdModal() {
                     document.getElementById('prodOverlay').classList.remove('open');
+                    // Detener video vaciando src de cualquier iframe en el track
+                    document.querySelectorAll('#pm-track iframe').forEach(f => f.src = '');
+                    document.getElementById('pm-color-name').style.display = '';
+                    reanudarCarrusel(); // ▶ reactiva el autoplay al cerrar
                 }
 
                 function pmRenderTrack() {
-                    document.getElementById('pm-track').innerHTML =
-                        `<div class="prod-carousel-slide"><img src="${pmSlides[0].src}"></div>`;
+                    const track = document.getElementById('pm-track');
+                    track.innerHTML = pmSlides.map(s => {
+                        if (s.type === 'video') {
+                            // El iframe sube 42px para que el overlay CSS negro tape la barra de título de YouTube
+                            return `<div class="prod-carousel-slide is-video">
+                                        <iframe src="${s.src}"
+                                            style="position:absolute;top:-42px;left:0;width:100%;height:calc(100% + 42px);border:0;"
+                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                            allowfullscreen></iframe>
+                                    </div>`;
+                        }
+                        return `<div class="prod-carousel-slide"><img src="${s.src}" alt="${s.label}"></div>`;
+                    }).join('');
+                    track.style.transform = `translateX(-${pmCur * 100}%)`;
                 }
 
                 function pmRenderDots() {
-                    document.getElementById('pm-dots').innerHTML = '<div class="prod-dot active"></div>';
+                    const dots = document.getElementById('pm-dots');
+                    if (pmSlides.length <= 1) { dots.innerHTML = ''; return; }
+                    dots.innerHTML = pmSlides.map((s, i) => {
+                        const icon = s.type === 'video'
+                            ? `<i class="fas fa-play" style="font-size:7px;"></i>`
+                            : '';
+                        return `<div class="prod-dot ${i === pmCur ? 'active' : ''}" onclick="pmIrA(${i})" title="${s.label}">${icon}</div>`;
+                    }).join('');
                 }
 
-                function pmMover(dir) {}
+                function pmMover(dir) {
+                    if (pmSlides.length <= 1) return;
+                    // Al salir de un slide de video, detener el iframe
+                    const currentSlide = document.querySelectorAll('#pm-track .prod-carousel-slide')[pmCur];
+                    if (currentSlide) {
+                        const iframe = currentSlide.querySelector('iframe');
+                        if (iframe) iframe.src = iframe.src; // reload vacía el buffer de video
+                    }
+                    pmCur = (pmCur + dir + pmSlides.length) % pmSlides.length;
+                    document.getElementById('pm-track').style.transform = `translateX(-${pmCur * 100}%)`;
+                    pmRenderDots();
+                }
+
+                function pmIrA(idx) {
+                    pmCur = idx;
+                    document.getElementById('pm-track').style.transform = `translateX(-${pmCur * 100}%)`;
+                    pmRenderDots();
+                }
 
                 function abrirWhatsapp() {
                     const colorSeleccionado = document.getElementById('pm-color-name').textContent;
-                    const textoColor = colorSeleccionado !== 'Selecciona un color'
+                    const textoColor = (colorSeleccionado && colorSeleccionado !== 'Selecciona un color')
                         ? ` en color ${colorSeleccionado}` : '';
                     const mensaje = encodeURIComponent(
-                        `Hola Zarmex, me interesa obtener más información del producto destacado: ${pmNombreActual}${textoColor}`
+                        `Hola Zarmex, me interesa obtener más información del producto: ${pmNombreActual}${textoColor}`
                     );
                     window.open(`https://wa.me/525581366555?text=${mensaje}`, '_blank');
                 }
@@ -1249,7 +1413,7 @@
 
 {{-- ===================== SECCIÓN PROMOCIONES ===================== --}}
 @php
-    $promociones = \App\Models\Promotion::orderBy('id')->take(4)->get();
+    $promociones = \App\Models\Promotion::where('activo', true)->orderBy('id')->take(4)->get();
 @endphp
 
 @if($promociones->isNotEmpty())
@@ -1394,12 +1558,6 @@
 
 {{-- INCLUSIÓN DEL FOOTER --}}
 @include('footer')
-
-{{-- BOTÓN WHATSAPP FLOTANTE --}}
-<a href="https://wa.me/+525581366555?text=Hola,%20estoy%20interesado%20en%20los%20productos%20de%20Zarmex"
-   target="_blank" class="whatsapp-float">
-    <i class="fab fa-whatsapp"></i>
-</a>
 
 {{-- Control de Banners de Video/Imagen --}}
 <script>

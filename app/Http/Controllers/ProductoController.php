@@ -166,7 +166,8 @@ class ProductoController extends Controller
             'id'           => 'required|string|max:50|unique:productos,id,' . $id . ',id',
             'descripcion'  => 'nullable|string',
             'categoria_id' => 'nullable|exists:categorias,id_categoria',
-            'video'        => 'nullable|file|mimes:mp4,mkv,avi,mov|max:51200', 
+            'video'        => 'nullable|file|mimes:mp4,mkv,avi,mov|max:51200',
+            'video_url'    => 'nullable|url|max:500',
             'imagenes'     => 'nullable|array',
             'imagenes.*'   => 'image|mimes:jpg,jpeg,png,webp|max:4096',
             'doc1'         => 'nullable|file|max:10240|mimes:pdf,doc,docx,xls,xlsx',
@@ -261,6 +262,12 @@ class ProductoController extends Controller
             $nombreVideo = 'video_' . time() . '.mp4';
             $request->file('video')->move($rutaProducto, $nombreVideo);
             $producto->video_url = "images/productos/{$producto->id}/{$nombreVideo}";
+        } elseif ($request->filled('video_url')) {
+            // Guardar URL de YouTube o Vimeo (no es archivo, es texto)
+            $producto->video_url = $request->input('video_url');
+        } elseif ($request->has('video_url') && $request->input('video_url') === '') {
+            // Campo enviado vacío = el usuario borró el video URL
+            $producto->video_url = null;
         }
 
         foreach (['doc1', 'doc2', 'doc3'] as $campo) {

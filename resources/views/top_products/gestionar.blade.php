@@ -194,8 +194,8 @@ header, footer, .whatsapp, #whatsapp { display: none !important; }
         {{-- Cabecera --}}
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 mb-4">
 
-            <a class="btn btn-outline-green" href="{{ route('top-products.index') }}">
-                <i class="bi bi-arrow-left"></i> Volver a Destacados
+            <a class="btn btn-outline-green" href="{{ route('admin.dashboard') }}">
+                <i class="bi bi-arrow-left"></i> Volver al Panel
             </a>
 
             <h2 class="panel-title mb-0">Gestionar Secciones</h2>

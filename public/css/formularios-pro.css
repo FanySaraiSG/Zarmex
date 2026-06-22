@@ -1,24 +1,18 @@
-/* =========================
-   SOLO DEGRADADO PARA FORMULARIOS
-========================= */
+/* ==========================================================
+   FONDO GENERAL — Solo en vistas con body.form-pro
+========================================================== */
 
-/* FONDO GENERAL SOLO EN FORMULARIOS */
 body.form-pro {
-    background: linear-gradient(135deg, #4b8a7f, #2f5d62, #243c41);
+    min-height: 100vh;
+    background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.08), transparent 25%),
+        linear-gradient(135deg, #4b8a7f, #2f5d62, #243c41);
     background-attachment: fixed;
 }
 
-/* OPCIONAL: mejorar contraste del form SIN cambiar tu diseño */
-body.form-pro .form-container {
-    background: rgba(255, 255, 255, 0.95); /* casi igual al tuyo */
-    border-radius: 15px;
-}
-
-/* OPCIONAL: sombra más bonita */
-body.form-pro .form-container {
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-}
-/* ================= FOOTER ZARMEX COMPLETO ================= */
+/* ==========================================================
+   FOOTER ZARMEX
+========================================================== */
 
 .test-footer {
     background-color: #3f6b70;
@@ -68,14 +62,14 @@ body.form-pro .form-container {
     color: #ffffff;
 }
 
-/* ===== SÍGUENOS ===== */
-.social-links{
+/* Síguenos */
+.social-links {
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
 
-.social-links a{
+.social-links a {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -84,53 +78,40 @@ body.form-pro .form-container {
     font-size: 14px;
 }
 
-.social-links a i{
+.social-links a i {
     font-size: 18px;
 }
 
-.social-links a:hover{
+.social-links a:hover {
     color: #fedc97;
 }
 
-/* ===== CONTACTO EN HILERA (1 SOLA LÍNEA) ===== 
-.contact-grid{
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 25px;
-}
-
-.contact-grid p{
-    margin: 0;
-    white-space: nowrap;
-}
-*/
-/* CONTACTO COMO SÍGUENOS (EN LISTA VERTICAL) */
-.contact-grid{
+/* Contacto */
+.contact-grid {
     display: flex;
     flex-direction: column;
     gap: 10px;
 }
 
-.contact-grid p{
+.contact-grid p {
     display: flex;
     align-items: center;
     gap: 10px;
     margin: 0;
 }
 
-/* ===== UBICACIÓN ===== */
-.location-text{
+/* Ubicación */
+.location-text {
     margin-bottom: 10px;
     font-size: 14px;
 }
 
-.map-container{
+.map-container {
     border-radius: 10px;
     overflow: hidden;
 }
 
-/* ===== FOOTER BOTTOM ===== */
+/* Footer bottom */
 .test-footer-bottom {
     margin-top: 25px;
     text-align: center;
@@ -138,36 +119,17 @@ body.form-pro .form-container {
     color: #ffffff;
 }
 
-/* ===== RESPONSIVE (para que no se rompa en celular) ===== */
-@media (max-width: 900px){
-    .test-footer-container{
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-
-    .contact-grid{
-        flex-wrap: wrap; /* en móvil baja si no cabe */
-        gap: 12px 18px;
-    }
-
-    .contact-grid p{
-        white-space: normal;
-    }
-}
-
-/* ===== FIX: CONTACTO COMO LISTA (NO COLUMNAS) ===== */
-.test-footer .contact-col .contact-grid{
+/* Fix contacto como lista vertical */
+.test-footer .contact-col .contact-grid {
     display: flex !important;
     flex-direction: column !important;
     flex-wrap: nowrap !important;
     align-items: flex-start !important;
     gap: 10px !important;
-
-    /* por si en algún lado quedó grid */
     grid-template-columns: none !important;
 }
 
-.test-footer .contact-col .contact-grid p{
+.test-footer .contact-col .contact-grid p {
     width: 100% !important;
     margin: 0 !important;
     display: flex !important;
@@ -176,32 +138,61 @@ body.form-pro .form-container {
     gap: 10px !important;
     white-space: normal !important;
 }
-/*termina footer*/
 
+/* Responsive footer */
+@media (max-width: 900px) {
+    .test-footer-container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
 
-/* Estilo para el formulario en una tarjeta */
+    .contact-grid {
+        flex-wrap: wrap;
+        gap: 12px 18px;
+    }
+
+    .contact-grid p {
+        white-space: normal;
+    }
+}
+
+/* ==========================================================
+   TARJETA BASE DEL FORMULARIO
+========================================================== */
+
+.cardform {
+    width: 100%;
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ==========================================================
+   CONTENEDOR DEL FORMULARIO (glass por defecto)
+========================================================== */
+
 .form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
     max-width: 1200px;
     margin: 40px auto;
     padding: 40px;
-
-    /* EFECTO GLASS REAL */
     background: rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-
     border-radius: 20px;
-    border: 1px solid rgba(255,255,255,0.2);
-
+    border: 1px solid rgba(255, 255, 255, 0.2);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-
     font-size: 1.2em;
 }
-/* Título principal de la tarjeta */
+
 .form-container h2 {
     text-align: center;
     color: #28666e;
-    /* Color verde previo */
     font-size: 2.8em;
     margin-bottom: 30px;
     font-weight: bold;
@@ -209,8 +200,13 @@ body.form-pro .form-container {
     letter-spacing: 2px;
 }
 
-/* Estilo para cada grupo de campos dentro del formulario */
+/* ==========================================================
+   GRUPOS Y CAMPOS
+========================================================== */
+
 .form-group {
+    display: flex;
+    flex-direction: column;
     margin-bottom: 30px;
 }
 
@@ -218,12 +214,10 @@ body.form-pro .form-container {
     display: block;
     font-size: 1.3em;
     color: #28666e;
-    /* Color verde previo */
     margin-bottom: 10px;
     font-weight: bold;
 }
 
-/* Estilo para los campos del formulario */
 .form-group input,
 .form-group select,
 .form-group textarea {
@@ -237,81 +231,20 @@ body.form-pro .form-container {
     transition: border-color 0.3s ease;
 }
 
-/* Estilo al enfocar los campos */
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
     border-color: #28666e;
-    /* Color verde previo */
     outline: none;
     box-shadow: 0 0 5px rgba(40, 102, 110, 0.6);
 }
 
-/* Estilo para el textarea (campo de texto largo) */
 textarea {
     height: 150px;
     resize: vertical;
-    /* Permite redimensionar solo verticalmente */
 }
 
-/* Estilo para el contenedor de los botones */
-.button-container {
-    text-align: center;
-    margin-top: 30px;
-}
-
-/* Estilo para el botón de enviar */
-.button-container button {
-    padding: 15px 30px;
-    background-color: #28666e;
-    /* Color verde previo */
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-size: 1.4em;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.3s ease;
-    width: 50%;
-    /* Botón más grande */
-    margin: 0 auto;
-    display: block;
-}
-
-/* Estilo para el botón de enviar al hacer hover */
-.button-container button:hover {
-    background-color: #7c9885;
-    /* Un verde más claro en hover */
-}
-
-/* Estilo para el botón de enviar cuando es presionado */
-.button-container button:active {
-    transform: scale(0.98);
-}
-
-/* Estilo para los mensajes de error o éxito */
-.error-message,
-.success-message {
-    text-align: center;
-    font-size: 1.3em;
-    padding: 15px;
-    margin-top: 20px;
-    border-radius: 10px;
-    font-weight: bold;
-}
-
-/* Estilo para el mensaje de error */
-.error-message {
-    background-color: #f8d7da;
-    color: #721c24;
-}
-
-/* Estilo para el mensaje de éxito */
-.success-message {
-    background-color: #d4edda;
-    color: #155724;
-}
-
-/* Estilo para los campos deshabilitados */
+/* Campos deshabilitados */
 input[disabled],
 select[disabled],
 textarea[disabled] {
@@ -319,7 +252,7 @@ textarea[disabled] {
     cursor: not-allowed;
 }
 
-/* Estilo para los campos con error */
+/* Campos con error */
 input.error,
 select.error,
 textarea.error {
@@ -333,50 +266,72 @@ textarea.error:focus {
     outline: none;
 }
 
-/* Agregar una sombra sutil a los campos cuando están en foco */
+/* Sombra global al enfocar */
 input:focus,
 select:focus,
 textarea:focus {
     box-shadow: 0 0 8px rgba(40, 102, 110, 0.3);
 }
 
-/* Estilos para la tarjeta del formulario */
-.cardform {
-    width: 100%;
-    max-width: 1200px;
-    /* Aumentar el max-width para hacerlo más ancho */
-    margin: 20px auto;
-    padding: 20px;
-    background-color: #fff;
+/* ==========================================================
+   BOTÓN DE ENVIAR
+========================================================== */
+
+.button-container {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.button-container button {
+    padding: 15px 30px;
+    background-color: #28666e;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.4em;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    width: 50%;
+    margin: 0 auto;
+    display: block;
+}
+
+.button-container button:hover {
+    background-color: #7c9885;
+}
+
+.button-container button:active {
+    transform: scale(0.98);
+}
+
+/* ==========================================================
+   MENSAJES DE ERROR / ÉXITO
+========================================================== */
+
+.error-message,
+.success-message {
+    text-align: center;
+    font-size: 1.3em;
+    padding: 15px;
+    margin-top: 20px;
     border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-weight: bold;
 }
 
-.form-container {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+.error-message {
+    background-color: #f8d7da;
+    color: #721c24;
 }
 
-/* Estilos para los campos de entrada */
-.form-group {
-    display: flex;
-    flex-direction: column;
-}
-/* =========================
-   FORMULARIOS COMO EL LOGIN
-   Solo afecta vistas con body.form-pro
-========================= */
-
-body.form-pro {
-    min-height: 100vh;
-    background:
-        radial-gradient(circle at top left, rgba(255, 255, 255, 0.08), transparent 25%),
-        linear-gradient(135deg, #4b8a7f, #2f5d62, #243c41);
-    background-attachment: fixed;
+.success-message {
+    background-color: #d4edda;
+    color: #155724;
 }
 
-/* espacio de la sección */
+/* ==========================================================
+   OVERRIDES PARA body.form-pro (glass mejorado)
+========================================================== */
+
 body.form-pro .cardform {
     width: 100%;
     max-width: 1200px;
@@ -387,30 +342,22 @@ body.form-pro .cardform {
     border-radius: 0;
 }
 
-/* =========================
-   CARD GLASS
-========================= */
 body.form-pro .form-container {
     max-width: 1000px;
     margin: 0 auto;
     padding: 40px;
-
     background: rgba(255, 255, 255, 0.12);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
-
     border: 1px solid rgba(255, 255, 255, 0.18);
     border-radius: 24px;
     box-shadow: 0 14px 40px rgba(0, 0, 0, 0.22);
-
     display: flex;
     flex-direction: column;
     gap: 18px;
+    font-size: 1rem;
 }
 
-/* =========================
-   TITULO
-========================= */
 body.form-pro .form-container h2 {
     text-align: center;
     color: #ffffff;
@@ -421,16 +368,12 @@ body.form-pro .form-container h2 {
     text-transform: uppercase;
 }
 
-/* =========================
-   GRUPOS
-========================= */
 body.form-pro .form-group {
     display: flex;
     flex-direction: column;
     margin-bottom: 0;
 }
 
-/* labels */
 body.form-pro .form-group label {
     display: block;
     color: #ffffff;
@@ -439,9 +382,6 @@ body.form-pro .form-group label {
     margin-bottom: 8px;
 }
 
-/* =========================
-   INPUTS
-========================= */
 body.form-pro .form-group input,
 body.form-pro .form-group select,
 body.form-pro .form-group textarea {
@@ -451,10 +391,8 @@ body.form-pro .form-group textarea {
     border-radius: 14px;
     font-size: 1rem;
     box-sizing: border-box;
-
     background: rgba(255, 255, 255, 0.94);
     color: #28666e;
-
     transition: box-shadow 0.25s ease, transform 0.25s ease, background 0.25s ease;
 }
 
@@ -477,38 +415,28 @@ body.form-pro textarea {
     resize: vertical;
 }
 
-/* =========================
-   BOTON
-========================= */
 body.form-pro .submit-btn,
 body.form-pro .button-container button {
     display: block;
-    width: 220px;              
-    margin: 25px auto 0;       
-
+    width: 220px;
+    margin: 25px auto 0;
     padding: 12px 0;
     border: none;
     border-radius: 12px;
-
-    background: #4b8a7f;       
+    background: #4b8a7f;
     color: #ffffff;
-
     font-size: 1rem;
     font-weight: 600;
-
     cursor: pointer;
     transition: 0.3s ease;
 }
 
-/* HOVER SUAVE */
 body.form-pro .submit-btn:hover,
 body.form-pro .button-container button:hover {
     background: #2f5d62;
     transform: translateY(-2px);
 }
-/* =========================
-   MENSAJES
-========================= */
+
 body.form-pro .error-message,
 body.form-pro .success-message {
     text-align: center;
@@ -529,13 +457,142 @@ body.form-pro .success-message {
     color: #155724;
 }
 
-/* =========================
+/* ==========================================================
+   GRID INTERNO DEL FORMULARIO (2 columnas)
+========================================================== */
+
+.form-responsive-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px 24px;
+}
+
+.form-responsive-grid .form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.button-container-grid {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.submit-btn-grid {
+    padding: 13px 0;
+    width: 220px;
+    border: none;
+    border-radius: 12px;
+    background: #4b8a7f;
+    color: #ffffff;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.submit-btn-grid:hover {
+    background: #2f5d62;
+    transform: translateY(-2px);
+}
+
+/* ==========================================================
+   LAYOUT FORMULARIO + IMÁGENES LATERALES
+========================================================== */
+
+.cardform-grid-wrapper {
+    display: grid;
+    grid-template-columns: 280px 1fr 280px;
+    gap: 18px;
+    width: 100%;
+    max-width: 1600px;
+    margin: 32px auto;
+    padding: 0 20px;
+    box-sizing: border-box;
+    align-items: start;
+}
+
+/* Formulario central */
+.cardform-grid-wrapper .cardform {
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    max-width: none !important;
+}
+
+.cardform-grid-wrapper .form-container {
+    width: 100%;
+    margin: 0;
+}
+
+/* ==========================================================
+   COLUMNAS LATERALES — soporta 1, 2 o 3 imágenes
+   .imgs-1 / .imgs-2 / .imgs-3 se aplican desde el blade
+========================================================== */
+
+.side-images-left,
+.side-images-right {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* Cada img-box ocupa partes iguales de la columna */
+.side-images-left .img-box,
+.side-images-right .img-box {
+    flex: 1;
+    min-height: 0;
+}
+
+/* Cajas de imágenes */
+.img-box {
+    overflow: hidden;
+    border-radius: 18px;
+    position: relative;
+    background: rgba(255, 255, 255, .08);
+    border: 1px solid rgba(255, 255, 255, .15);
+    box-shadow:
+        0 10px 25px rgba(0, 0, 0, .20),
+        0 2px 8px rgba(0, 0, 0, .12);
+}
+
+.img-box img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+/* ==========================================================
    RESPONSIVE
-========================= */
+========================================================== */
+
 @media (max-width: 768px) {
-    body.form-pro .cardform {
-        margin: 24px auto;
-        padding: 14px;
+
+    .cardform-grid-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding: 0 12px;
+    }
+
+    .side-images-left,
+    .side-images-right {
+        width: 100%;
+        height: auto !important; /* JS sync no aplica en móvil */
+        flex-direction: row;     /* imágenes en fila horizontal en móvil */
+        flex-wrap: nowrap;
+    }
+
+    .side-images-left .img-box,
+    .side-images-right .img-box {
+        min-height: 160px;
+        flex: 1;
     }
 
     body.form-pro .form-container {
@@ -550,7 +607,49 @@ body.form-pro .success-message {
     body.form-pro .form-group input,
     body.form-pro .form-group select,
     body.form-pro .form-group textarea {
-        font-size: 0.95rem;
+        font-size: .95rem;
         padding: 13px 14px;
+    }
+}
+
+@media (max-width: 600px) {
+    .form-responsive-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-responsive-grid .form-group.full-width {
+        grid-column: 1;
+    }
+
+    .button-container-grid {
+        grid-column: 1;
+    }
+}
+
+/* ==========================================================
+   VARIANTES DEL GRID SEGÚN IMÁGENES DISPONIBLES
+   Se aplican dinámicamente desde el blade con @php
+========================================================== */
+
+/* Solo formulario, sin imágenes */
+.cardform-grid-wrapper.grid-solo-form {
+    grid-template-columns: 1fr;
+}
+
+/* Imagen izquierda + formulario (sin derecha) */
+.cardform-grid-wrapper.grid-izq-form {
+    grid-template-columns: 280px 1fr;
+}
+
+/* Formulario + imagen derecha (sin izquierda) */
+.cardform-grid-wrapper.grid-form-der {
+    grid-template-columns: 1fr 280px;
+}
+
+@media (max-width: 768px) {
+    .cardform-grid-wrapper.grid-solo-form,
+    .cardform-grid-wrapper.grid-izq-form,
+    .cardform-grid-wrapper.grid-form-der {
+        grid-template-columns: 1fr;
     }
 }

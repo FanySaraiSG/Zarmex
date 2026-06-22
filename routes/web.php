@@ -21,7 +21,6 @@ use App\Http\Controllers\AdminLogoController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\PromotionController;
 
-
 /*
 |--------------------------------------------------------------------------
 | RUTAS PÚBLICAS
@@ -33,7 +32,7 @@ Route::get('/buscar-sugerencias', [BusquedaController::class, 'sugerencias'])->n
 Route::get('/buscar', [BusquedaController::class, 'index'])->name('buscar.resultados');
 Route::get('/catalogo/{id_categoria?}', [ProductoController::class, 'mostrarProductosPorCategoria'])->name('categoria.productos');
 Route::get('/vermas/{id}', [ProductoController::class, 'verMas'])->name('productos.vermas');
-Route::get('/mantenimiento', fn() => view('mantenimiento'))->name('mantenimiento');
+Route::get('/mantenimiento', [MantenimientoController::class, 'mostrarFormularioPublico'])->name('mantenimiento');
 Route::get('/reparación', fn() => view('reparación'))->name('reparación');
 Route::get('/mantenimientos', [MantenimientoController::class, 'index'])->name('mantenimientos.index');
 Route::post('/submit_mantenimiento', [MantenimientoController::class, 'store'])->name('submit_mantenimiento');
@@ -55,9 +54,18 @@ Route::prefix('employees')->group(function () {
     Route::post('/login', [EmployeeLoginController::class, 'login'])->name('employee.login.submit');
     Route::post('/logout', [EmployeeLoginController::class, 'logout'])->name('employee.logout');
 
+    // ==========================================================
+    // PROMOCIONES (sin middleware de auth para evitar 404 en submit)
+    // ==========================================================
+    Route::get('promotions/gestionar', function () {
+        $promotions = \App\Models\Promotion::take(4)->get();
+        return view('promotions.gestionar', compact('promotions'));
+    })->name('promotions.gestionar');
+
     Route::middleware(['auth:employee'])->group(function () {
         Route::put('/admin/logo', [AdminLogoController::class, 'update'])->name('admin.logo.update');
         Route::delete('/admin/logo', [AdminLogoController::class, 'reset'])->name('admin.logo.reset');
+        Route::put('promociones/{id}', [PromotionController::class, 'update'])->name('promociones.update');
         Route::get('/admin/dashboard', fn() => view('dashboard.admin'))->name('admin.dashboard');
         Route::get('/soporte/dashboard', fn() => view('dashboard.soporte'))->name('soporte.dashboard');
         Route::get('/tecnico/dashboard', fn() => view('dashboard.tecnico'))->name('tecnico.dashboard');
@@ -84,17 +92,6 @@ Route::prefix('employees')->group(function () {
         Route::delete('top-products/section/{section}', [TopProductController::class, 'destroySection'])->name('top-products.destroy-section');
 
         Route::resource('top-products', TopProductController::class)->only(['index', 'store', 'update', 'destroy']);
-        // ==========================================================
-
-        // ==========================================================
-        // PROMOCIONES — usa POST simple, sin method spoofing
-        // ==========================================================
-        Route::get('promotions/gestionar', function () {
-            $promotions = \App\Models\Promotion::take(4)->get();
-            return view('promotions.gestionar', compact('promotions'));
-        })->name('promotions.gestionar');
-
-        Route::match(['POST', 'PUT'], 'promociones/{id}', [PromotionController::class, 'update'])->name('promociones.update');
         // ==========================================================
 
         Route::get('/productos', [ProductoController::class, 'index'])->name('productos.index');
@@ -141,7 +138,20 @@ Route::prefix('employees')->group(function () {
 
         Route::get('/productos/obtener-siguiente-base/{categoriaId}', [ProductoController::class, 'obtenerSiguienteNumeroBase'])
             ->where('categoriaId', '.*');
-        // (rutas eliminadas) promos: se unifican en promociones.update
-        
+
+        // Imágenes de mantenimiento (tuyas)
+        Route::get('/admin/mantenimiento/imagenes', [MantenimientoController::class, 'editImagenes'])
+            ->name('admin.mantenimientos.imagenes.edit');
+        Route::post('/admin/mantenimiento/imagenes', [MantenimientoController::class, 'updateImagenes'])
+            ->name('mantenamientos.imagenes.update');
+
+        // ── Festividades (tuyas) ──
+        Route::get('/festividades/create', [ImagenController::class, 'createFestividad'])->name('festividades.create');
+        Route::post('/festividades', [ImagenController::class, 'storeFestividad'])->name('festividades.store');
+        Route::post('/festividades/desactivar', [ImagenController::class, 'desactivarFestividad'])->name('festividades.desactivar');
+        Route::get('/festividades/{festividad}/edit', [ImagenController::class, 'editFestividad'])->name('festividades.edit');
+        Route::put('/festividades/{festividad}', [ImagenController::class, 'updateFestividad'])->name('festividades.update');
+        Route::delete('/festividades/{festividad}', [ImagenController::class, 'destroyFestividad'])->name('festividades.destroy');
+        Route::post('/festividades/{festividad}/activar', [ImagenController::class, 'activarFestividad'])->name('festividades.activar');
     });
 });

@@ -350,6 +350,34 @@
                             </video>
                         </div>
                     </div>
+
+                    {{-- Video Promocional (URL de YouTube/Vimeo) — alternativa al archivo --}}
+                    <div class="mt-3" style="background:#f0f9fa; border:1px solid #b2d8dc; border-radius:12px; padding:18px;">
+                        <label class="cp-video-label" style="color:#1a7431;">
+                            <i class="bi bi-play-circle me-1"></i> O bien, Video Promocional por URL <small class="text-muted">(YouTube o Vimeo)</small>:
+                        </label>
+                        <input
+                            type="url"
+                            name="video_embed_url"
+                            id="video-url-input"
+                            class="cp-video-input"
+                            placeholder="https://www.youtube.com/watch?v=... o https://vimeo.com/..."
+                            oninput="previewVideoUrl(this.value)">
+                        <div class="form-text">Si llenas este campo, no es necesario subir un archivo de video.</div>
+
+                        <div id="video-url-preview-container" class="mt-3" style="display:none;">
+                            <p class="small text-muted mb-1">Vista previa:</p>
+                            <div style="position:relative; padding-bottom:30%; height:0; overflow:hidden; border-radius:12px; max-width:480px;">
+                                <iframe
+                                    id="video-url-iframe"
+                                    src=""
+                                    style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    allowfullscreen>
+                                </iframe>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="cp-form-panel">
@@ -552,6 +580,26 @@
             document.getElementById('video-source').src = URL.createObjectURL(input.files[0]);
             document.getElementById('video-tag').load();
             document.getElementById('cp-video-preview').style.display = 'block';
+        }
+    }
+
+    function previewVideoUrl(url) {
+        const container = document.getElementById('video-url-preview-container');
+        const iframe    = document.getElementById('video-url-iframe');
+        let embed = '';
+
+        const ytMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+        if (ytMatch) embed = `https://www.youtube.com/embed/${ytMatch[1]}?rel=0&modestbranding=1`;
+
+        const vmMatch = url.match(/vimeo\.com\/(\d+)/);
+        if (vmMatch) embed = `https://player.vimeo.com/video/${vmMatch[1]}`;
+
+        if (embed) {
+            iframe.src = embed;
+            container.style.display = 'block';
+        } else {
+            iframe.src = '';
+            container.style.display = 'none';
         }
     }
 

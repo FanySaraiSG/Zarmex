@@ -66,7 +66,7 @@
                                     <td class="zx-td-desc">{{ Str::limit($producto->descripcion, 80) }}</td>
                                     <td>
                                         @if($producto->imagen_url)
-                                            <img src="{{ $producto->imagen_url }}"
+                                            <img src="{{ asset($producto->imagen_url) }}"
                                                  class="zx-thumb" alt="img">
                                         @else
                                             <span class="zx-no-img">—</span>
@@ -352,7 +352,6 @@ header, footer, .whatsapp, #whatsapp, .btn-whatsapp{ display: none !important; }
     .zx-table{ font-size: 12px; }
 }
 </style>
-
 
 <script>
 function toggleProductos(id, btn) {

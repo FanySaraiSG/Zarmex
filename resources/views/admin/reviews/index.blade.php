@@ -16,7 +16,7 @@
         BOTÓN REGRESAR
     ========================== --}}
     <div class="mb-3">
-        <a href="{{ route('admin.dashboard') }}" class="btn btn-regresar text-white">
+        <a href="{{ route('admin.dashboard') }}" class="btn btn-regresar text-black">
             <i class="fas fa-arrow-left me-2"></i> Volver al Panel
         </a>
     </div>

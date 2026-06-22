@@ -3,27 +3,25 @@
 namespace App\Http\Controllers;
 
 use App\Models\Promotion;
-
-// Alias de compatibilidad: tu app usa Promocion (modelo) y algunos lugares usan Promotion (controller)
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class PromotionController extends Controller
 {
     /**
      * Actualiza nombre e imagen de una promoción.
-     * Ruta: PUT /promociones/{id}  →  promociones.update
+     * Ruta: PUT /promociones/{id} → promociones.update
      */
     public function update(Request $request, int $id)
     {
         $request->validate([
-            'nombre' => 'required|string|max:120',
-            'imagen' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'nombre'  => 'required|string|max:120',
+            'imagen'  => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
         $promo = Promotion::findOrFail($id);
 
         $promo->nombre = $request->input('nombre');
+        $promo->activo = true; // ✅ se activa al guardar por primera vez
 
         if ($request->hasFile('imagen')) {
             // Elimina la imagen anterior si existe y no es una URL externa
@@ -35,7 +33,7 @@ class PromotionController extends Controller
             }
 
             // Guarda la nueva imagen en public/imagenes/promociones/
-            $archivo   = $request->file('imagen');
+            $archivo       = $request->file('imagen');
             $nombreArchivo = 'promo_' . $id . '_' . time() . '.' . $archivo->getClientOriginalExtension();
             $archivo->move(public_path('imagenes/promociones'), $nombreArchivo);
 

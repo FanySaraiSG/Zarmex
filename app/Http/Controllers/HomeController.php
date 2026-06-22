@@ -18,7 +18,11 @@ class HomeController extends Controller
             ->get();
 
         $topProducts = TopProduct::query()
-            ->with('product')
+            ->with([
+                'product',
+                'product.imagenes',   // ImagenProducto (columna: ruta, orden)
+                'product.colores',    // Color (pivote: color_producto)
+            ])
             ->orderBy('section')
             ->get()
             ->filter(fn ($tp) => !empty($tp->product));

@@ -402,16 +402,30 @@
                                         <div class="multimedia-layout">
                                             
                                             <div class="thumbnails-sidebar" id="thumbBar{{ $producto->id }}">
+                                                @php
+                                                    $totalSlides = $producto->imagenes ? $producto->imagenes->count() : 0;
+                                                    $tieneVideoYT = !empty($producto->video_url) && preg_match('/^https?:\/\//', $producto->video_url);
+                                                @endphp
                                                 @if($producto->imagenes && $producto->imagenes->count() > 0)
                                                     @foreach($producto->imagenes as $index => $img)
                                                         <button type="button" data-bs-target="#carouselProd{{ $producto->id }}" data-bs-slide-to="{{ $index }}" class="btn-thumbnail {{ $loop->first ? 'active' : '' }}">
                                                             <img src="{{ asset($img->ruta) }}">
                                                         </button>
                                                     @endforeach
+                                                    @if($tieneVideoYT)
+                                                        <button type="button" data-bs-target="#carouselProd{{ $producto->id }}" data-bs-slide-to="{{ $totalSlides }}" class="btn-thumbnail" style="background:#000; display:flex; align-items:center; justify-content:center;">
+                                                            <i class="fab fa-youtube" style="color:#ff0000; font-size:1.4rem;"></i>
+                                                        </button>
+                                                    @endif
                                                 @else
                                                     <button type="button" data-bs-target="#carouselProd{{ $producto->id }}" data-bs-slide-to="0" class="btn-thumbnail active">
                                                         <img src="{{ asset('images/default.png') }}">
                                                     </button>
+                                                    @if($tieneVideoYT)
+                                                        <button type="button" data-bs-target="#carouselProd{{ $producto->id }}" data-bs-slide-to="1" class="btn-thumbnail" style="background:#000; display:flex; align-items:center; justify-content:center;">
+                                                            <i class="fab fa-youtube" style="color:#ff0000; font-size:1.4rem;"></i>
+                                                        </button>
+                                                    @endif
                                                 @endif
                                             </div>
 
@@ -428,18 +442,64 @@
                                                                 </div>
                                                             </div>
                                                         @endforeach
+                                                        @if($tieneVideoYT)
+                                                            @php
+                                                                $embedYT = '';
+                                                                if (preg_match('/(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/', $producto->video_url, $myt)) {
+                                                                    $embedYT = 'https://www.youtube.com/embed/' . $myt[1] . '?autoplay=1&mute=1&controls=0&loop=1&playlist=' . $myt[1] . '&rel=0&modestbranding=1&showinfo=0';
+                                                                } elseif (preg_match('/vimeo\.com\/(\d+)/', $producto->video_url, $myt)) {
+                                                                    $embedYT = 'https://player.vimeo.com/video/' . $myt[1];
+                                                                }
+                                                            @endphp
+                                                            @if($embedYT)
+                                                                <div class="carousel-item h-100">
+                                                                    <div style="position:relative; width:100%; height:100%; overflow:hidden;">
+                                                                        <div style="position:absolute;top:0;left:50px;width:calc(100% - 100px);height:100%;z-index:2;"></div>
+                                                                        <iframe
+                                                                            src="{{ $embedYT }}"
+                                                                            style="position:absolute;top:-60px;left:-2px;width:calc(100% + 4px);height:calc(100% + 120px);border:0;"
+                                                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; loop"
+                                                                            allowfullscreen>
+                                                                        </iframe>
+                                                                    </div>
+                                                                </div>
+                                                            @endif
+                                                        @endif
                                                     @else
                                                         <div class="carousel-item h-100 active">
                                                             <div class="img-zoom-container">
                                                                 <img src="{{ asset('images/default.png') }}" class="img-fluid d-block mx-auto">
                                                             </div>
                                                         </div>
+                                                        @if($tieneVideoYT)
+                                                            @php
+                                                                $embedYT = '';
+                                                                if (preg_match('/(?:youtube\.com\/(?:watch\?v=|shorts\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/', $producto->video_url, $myt)) {
+                                                                    $embedYT = 'https://www.youtube.com/embed/' . $myt[1] . '?autoplay=1&mute=1&controls=0&loop=1&playlist=' . $myt[1] . '&rel=0&modestbranding=1&showinfo=0';
+                                                                } elseif (preg_match('/vimeo\.com\/(\d+)/', $producto->video_url, $myt)) {
+                                                                    $embedYT = 'https://player.vimeo.com/video/' . $myt[1];
+                                                                }
+                                                            @endphp
+                                                            @if($embedYT)
+                                                                <div class="carousel-item h-100">
+                                                                    <div style="position:relative; width:100%; height:100%; overflow:hidden;">
+                                                                        <div style="position:absolute;top:0;left:50px;width:calc(100% - 100px);height:100%;z-index:2;"></div>
+                                                                        <iframe
+                                                                            src="{{ $embedYT }}"
+                                                                            style="position:absolute;top:-60px;left:-2px;width:calc(100% + 4px);height:calc(100% + 120px);border:0;"
+                                                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; loop"
+                                                                            allowfullscreen>
+                                                                        </iframe>
+                                                                    </div>
+                                                                </div>
+                                                            @endif
+                                                        @endif
                                                     @endif
                                                 </div>
-                                                <button class="carousel-control-prev" type="button" data-bs-target="#carouselProd{{ $producto->id }}" data-bs-slide="prev">
+                                                <button class="carousel-control-prev" type="button" data-bs-target="#carouselProd{{ $producto->id }}" data-bs-slide="prev" style="z-index:10;">
                                                     <span class="carousel-control-prev-icon"></span>
                                                 </button>
-                                                <button class="carousel-control-next" type="button" data-bs-target="#carouselProd{{ $producto->id }}" data-bs-slide="next">
+                                                <button class="carousel-control-next" type="button" data-bs-target="#carouselProd{{ $producto->id }}" data-bs-slide="next" style="z-index:10;">
                                                     <span class="carousel-control-next-icon"></span>
                                                 </button>
                                             </div>
