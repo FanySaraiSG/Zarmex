@@ -364,9 +364,9 @@
                 <div class="card2">
                     <div class="card2-img-container">
                         @if($producto->imagenes && $producto->imagenes->count() > 0)
-                            <img src="{{ asset($producto->imagenes->first()->ruta) }}" alt="{{ $producto->nombre }}">
+                            <img src="{{ asset($producto->imagenes->first()->ruta) }}" alt="{{ $producto->nombre ?: $producto->id }}">
                         @else
-                            <img src="{{ asset('images/default.png') }}" alt="{{ $producto->nombre }}">
+                            <img src="{{ asset('images/default.png') }}" alt="{{ $producto->nombre ?: $producto->id }}">
                         @endif
                     </div>
                     
@@ -388,7 +388,7 @@
                             {{-- HEADER --}}
                             <div class="modal-header-luxury">
                                 <h2 class="product-title-luxury">
-                                    {{ $producto->nombre }}
+                                    {{ $producto->nombre ?: $producto->id }}
                                 </h2>
                                 <button type="button" class="btn-close-custom" data-bs-dismiss="modal">
                                     <i class="fas fa-times"></i>
@@ -436,7 +436,7 @@
                                                             <div class="carousel-item h-100 {{ $loop->first ? 'active' : '' }}">
                                                                 <div class="img-zoom-container">
                                                                     <img src="{{ asset($img->ruta) }}" class="img-fluid d-block mx-auto">
-                                                                    <button type="button" class="btn-zoom-overlay" onclick="openZoomModal('{{ asset($img->ruta) }}', '{{ $producto->nombre }}')">
+                                                                    <button type="button" class="btn-zoom-overlay" onclick="openZoomModal('{{ asset($img->ruta) }}', '{{ $producto->nombre ?: $producto->id }}')">
                                                                         <i class="fas fa-search-plus"></i>
                                                                     </button>
                                                                 </div>
@@ -555,7 +555,7 @@
 
                                         {{-- WHATSAPP --}}
                                         <div class="pt-4 ps-md-2">
-                                            <a href="https://wa.me/525581366555?text=Hola,%20me%20interesa%20obtener%20más%20información%20del%20producto:%20{{ urlencode($producto->nombre) }}" target="_blank" class="btn btn-zx-whatsapp w-100 text-center text-decoration-none d-block">
+                                            <a href="https://wa.me/525581366555?text=Hola,%20me%20interesa%20obtener%20más%20información%20del%20producto:%20{{ urlencode($producto->nombre ?: $producto->id) }}" target="_blank" class="btn btn-zx-whatsapp w-100 text-center text-decoration-none d-block">
                                                 <i class="fab fa-whatsapp me-2"></i> Consultar por WhatsApp
                                             </a>
                                         </div>

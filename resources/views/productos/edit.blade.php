@@ -65,6 +65,29 @@
             border-color: var(--primary-green); 
         }
 
+        .nombre-toggle-box {
+            border: 1.5px solid #dee2e6;
+            border-radius: 12px;
+            padding: 14px 16px;
+            background: #fafafa;
+            margin-bottom: 16px;
+        }
+        .nombre-check-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 700;
+            color: #333;
+            cursor: pointer;
+            margin: 0;
+        }
+        .nombre-check-label input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--primary-green);
+            cursor: pointer;
+        }
+
         .gallery-grid { 
             display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); 
@@ -219,6 +242,24 @@
                             <label class="form-label fw-bold">ID del Producto</label>
                             <input type="text" name="id" id="id" class="form-control bg-light" value="{{ old('id', $producto->id) }}" readonly>
                             <small class="text-danger fw-bold">El código identificador no es modificable.</small>
+                        </div>
+
+                        <div class="col-md-12 mb-3">
+                            <div class="nombre-toggle-box">
+                                <label class="nombre-check-label">
+                                    <input type="checkbox" id="check_tiene_nombre" name="tiene_nombre" value="1"
+                                           onchange="toggleNombreProducto()"
+                                           {{ old('tiene_nombre', $producto->nombre ? '1' : '') ? 'checked' : '' }}>
+                                    ¿Deseas asignarle un nombre a este producto?
+                                </label>
+
+                                <div id="wrap_nombre_producto" style="display:none; margin-top:12px;">
+                                    <label class="form-label fw-bold small text-muted">NOMBRE DEL PRODUCTO</label>
+                                    <input type="text" id="nombre" name="nombre" class="form-control"
+                                           placeholder="Ej: Bomba de agua sumergible"
+                                           value="{{ old('nombre', $producto->nombre) }}">
+                                </div>
+                            </div>
                         </div>
 
                         <div class="col-md-12 mb-4">
@@ -599,6 +640,16 @@
         }
     }
 
+    function toggleNombreProducto() {
+        const checked = document.getElementById('check_tiene_nombre').checked;
+        const wrap = document.getElementById('wrap_nombre_producto');
+        const input = document.getElementById('nombre');
+        wrap.style.display = checked ? 'block' : 'none';
+        if (!checked) {
+            input.value = '';
+        }
+    }
+
     function cambiarPestaña(tabButtonId) {
         const triggerEl = document.querySelector(tabButtonId);
         bootstrap.Tab.getOrCreateInstance(triggerEl).show();
@@ -623,7 +674,10 @@
         `;
     });
 
-    document.addEventListener('DOMContentLoaded', actualizarOrdenFormulario);
+    document.addEventListener('DOMContentLoaded', function() {
+        actualizarOrdenFormulario();
+        toggleNombreProducto();
+    });
 </script>
 </body>
 </html>

@@ -649,6 +649,23 @@
     box-shadow: 0 12px 30px rgba(0,0,0,0.15);
     z-index: 10000;
     padding: 12px 0;
+    max-height: 420px;
+    overflow-y: auto;
+}
+
+/* Scrollbar personalizado */
+.zx-results::-webkit-scrollbar {
+    width: 5px;
+}
+.zx-results::-webkit-scrollbar-track {
+    background: transparent;
+}
+.zx-results::-webkit-scrollbar-thumb {
+    background: rgba(20, 85, 85, 0.3);
+    border-radius: 10px;
+}
+.zx-results::-webkit-scrollbar-thumb:hover {
+    background: rgba(20, 85, 85, 0.6);
 }
 
 .zx-results-title {

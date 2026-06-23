@@ -31,12 +31,12 @@ class BusquedaController extends Controller
         $productos = Producto::where('nombre', 'LIKE', "%{$q}%")
             ->orWhere('descripcion', 'LIKE', "%{$q}%")
             ->orWhere('id', 'LIKE', "%{$q}%")
-            ->limit(20)
+            ->limit(10)
             ->get();
 
         $items = $productos->map(function ($p) {
             return [
-                'titulo' => $p->id . ' - ' . ($p->nombre ?? ''),
+                'titulo' => $p->nombre ? ($p->id . ' - ' . $p->nombre) : $p->id,
                 'descripcion' => $p->descripcion ?? '',
                 // ✅ tu ruta para ver producto (ya existe en tu web.php)
                 'url' => url('/vermas/' . $p->id),
