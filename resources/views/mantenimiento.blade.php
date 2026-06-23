@@ -48,21 +48,21 @@
         flex-direction: column;
         gap: 15px; /* Separación suave entre imágenes */
     }
-    
+
     /* Obliga a cada recuadro a tomar una fracción equitativa del alto */
     .side-images-left .img-box, .side-images-right .img-box {
         flex: 1; /* Si hay 1 ocupa el 100%, si hay 2 el 50%, si hay 3 el 33% */
         width: 100%;
-        min-height: 0; 
+        min-height: 0;
         border-radius: 12px;
         overflow: hidden;
     }
-    
+
     /* Ajusta la imagen para cubrir el espacio sin deformarse */
     .side-images-left .img-box img, .side-images-right .img-box img {
         width: 100%;
         height: 100%;
-        object-fit: cover; 
+        object-fit: cover;
         display: block;
     }
 </style>
@@ -96,6 +96,10 @@
 
                 <form action="/submit_mantenimiento" method="POST" class="form-responsive-grid">
                     @csrf
+
+                    <form action="/submit_mantenimiento" method="POST" class="form-responsive-grid">
+                       @csrf
+                     <input type="hidden" name="tipo" value="mantenimiento">
 
                     <div class="form-group full-width">
                         <label for="nombre">Nombre: </label>

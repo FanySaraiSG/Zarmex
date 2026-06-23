@@ -33,8 +33,7 @@ Route::get('/buscar', [BusquedaController::class, 'index'])->name('buscar.result
 Route::get('/catalogo/{id_categoria?}', [ProductoController::class, 'mostrarProductosPorCategoria'])->name('categoria.productos');
 Route::get('/vermas/{id}', [ProductoController::class, 'verMas'])->name('productos.vermas');
 Route::get('/mantenimiento', [MantenimientoController::class, 'mostrarFormularioPublico'])->name('mantenimiento');
-Route::get('/reparación', fn() => app(MantenimientoController::class)->mostrarFormularioPublico('reparación'))->name('reparación');
-Route::get('/mantenimientos', [MantenimientoController::class, 'index'])->name('mantenimientos.index');
+Route::get('/reparacion', fn() => app(MantenimientoController::class)->mostrarFormularioPublico('reparacion'))->name('reparacion');
 Route::post('/submit_mantenimiento', [MantenimientoController::class, 'store'])->name('submit_mantenimiento');
 Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
 Route::get('/reportes/create', [ReporteController::class, 'create'])->name('reportes.create');
@@ -123,8 +122,12 @@ Route::prefix('employees')->group(function () {
         Route::get('imagenes/{id}/edit', [ImagenController::class, 'editImagen'])->name('imagenes.edit');
         Route::put('imagenes/{id}', [ImagenController::class, 'updateImagen'])->name('imagenes.update');
         Route::delete('imagenes/{id}', [ImagenController::class, 'destroyImagen'])->name('imagenes.destroy');
+
+        // ✅ MANTENIMIENTOS — movida aquí para que sea del panel admin
+        Route::get('/mantenimientos', [MantenimientoController::class, 'index'])->name('mantenimientos.index');
         Route::delete('/mantenimientos/{mantenimiento}', [MantenimientoController::class, 'destroy'])->name('mantenimientos.destroy');
         Route::put('/mantenimientos/{id}/updateStatus', [MantenimientoController::class, 'updateStatus'])->name('mantenimientos.updateStatus');
+
         Route::delete('/reportes/{id_reporte}', [ReporteController::class, 'eliminar'])->name('reportes.eliminar');
         Route::get('/reportes/{reporte}/edit', [ReporteController::class, 'edit'])->name('reportes.edit');
         Route::put('/reportes/{reporte}', [ReporteController::class, 'update'])->name('reportes.update');
@@ -139,13 +142,13 @@ Route::prefix('employees')->group(function () {
         Route::get('/productos/obtener-siguiente-base/{categoriaId}', [ProductoController::class, 'obtenerSiguienteNumeroBase'])
             ->where('categoriaId', '.*');
 
-        // Imágenes de mantenimiento (compartidas también por la página de reparación)
+        // Imágenes de mantenimiento
         Route::get('/admin/mantenimiento/imagenes', [MantenimientoController::class, 'editImagenes'])
             ->name('admin.mantenimientos.imagenes.edit');
         Route::post('/admin/mantenimiento/imagenes', [MantenimientoController::class, 'updateImagenes'])
             ->name('mantenamientos.imagenes.update');
 
-        // ── Festividades (tuyas) ──
+        // ── Festividades ──
         Route::get('/festividades/create', [ImagenController::class, 'createFestividad'])->name('festividades.create');
         Route::post('/festividades', [ImagenController::class, 'storeFestividad'])->name('festividades.store');
         Route::post('/festividades/desactivar', [ImagenController::class, 'desactivarFestividad'])->name('festividades.desactivar');

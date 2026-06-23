@@ -16,8 +16,9 @@ class Mantenimiento extends Model
         'direccion',
         'estado',
         'codigo_postal',
-        'numero_celular',      
-        'correo_electronico',  
-        'status',             
+        'numero_celular',
+        'correo_electronico',
+        'status',
+        'tipo',
     ];
 }

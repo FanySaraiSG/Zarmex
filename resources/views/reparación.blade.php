@@ -103,6 +103,10 @@
             <form action="/submit_mantenimiento" method="POST">
                 @csrf
 
+                <form action="/submit_mantenimiento" method="POST">
+                    @csrf
+                <input type="hidden" name="tipo" value="reparacion">
+
                 <!-- NOMBRE -->
                 <div class="form-group">
                     <label for="nombre">Nombre:</label>

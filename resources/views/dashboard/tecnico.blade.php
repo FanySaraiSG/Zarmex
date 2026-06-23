@@ -14,7 +14,7 @@
                 <div class="card p-5 bg-custom shadow-lg text-center w-100">
                     <i class="fas fa-tools fa-4x text-success"></i>
                     <h3 class="text-light mt-3">Mantenimiento y Reparación</h3>
-                    <a href="/mantenimientos" class="btn btn-light mt-2">Gestionar servicios</a>
+                    <a href="{{ route('mantenimientos.index') }}" class="btn btn-light mt-2">Gestionar servicios</a>
                 </div>
             </div>
 
