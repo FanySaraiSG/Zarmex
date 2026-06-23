@@ -51,6 +51,46 @@
 @endphp
 
 <style>
+    /* ── Navegación entre secciones ── */
+    .section-nav-bar {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 18px;
+        padding-bottom: 14px;
+        border-bottom: 2px solid #e9ecef;
+    }
+    .section-nav-active,
+    .section-nav-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 16px;
+        border-radius: 8px;
+        font-size: 0.82rem;
+        font-weight: 600;
+        text-decoration: none;
+        letter-spacing: 0.03em;
+        transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+    }
+    .section-nav-active {
+        background: #2c3e50;
+        color: #fff;
+        cursor: default;
+        pointer-events: none;
+    }
+    .section-nav-link {
+        background: #f0f2f5;
+        color: #495057;
+        border: 1.5px solid #dee2e6;
+    }
+    .section-nav-link:hover {
+        background: #2c3e50;
+        color: #fff;
+        border-color: #2c3e50;
+        box-shadow: 0 2px 8px rgba(44,62,80,.18);
+        text-decoration: none;
+    }
+
     /* Hace que las columnas laterales se comporten como Flex containers */
     .side-images-left, .side-images-right {
         display: flex !important;
@@ -97,6 +137,17 @@
 
     <section class="cardform">
         <div class="form-container">
+
+
+            {{-- ── Navegación entre secciones ── --}}
+            <div class="section-nav-bar">
+                <a href="{{ route('mantenimiento') }}" class="section-nav-link">
+                    <i class="fa-solid fa-wrench"></i> Mantenimiento
+                </a>
+                <span class="section-nav-active">
+                    <i class="fa-solid fa-screwdriver-wrench"></i> Reparación
+                </span>
+            </div>
 
             <h2>REPARACIÓN</h2>
 

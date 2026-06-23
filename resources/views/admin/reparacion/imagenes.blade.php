@@ -13,17 +13,17 @@
                 Volver al Panel
             </button>
             <div style="flex:1;">
-                <h1>Gestión de Imágenes · Mantenimiento</h1>
+                <h1>Gestión de Imágenes · Reparación</h1>
                 <p>Sube hasta 3 imágenes por columna. Usa el tache para quitar las que no quieras.</p>
                 {{-- ── Navegación entre secciones ── --}}
                 <div style="display:flex;gap:8px;margin-top:8px;">
-                    <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:8px;font-size:.78rem;font-weight:700;background:#2f7265;color:#fff;cursor:default;">
-                        <i class="fas fa-wrench"></i> Mantenimiento
-                    </span>
-                    <a href="{{ route('admin.reparacion.imagenes.edit') }}"
+                    <a href="{{ route('admin.mantenimientos.imagenes.edit') }}"
                        style="display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:8px;font-size:.78rem;font-weight:700;text-decoration:none;background:rgba(255,255,255,0.15);color:#fff;border:1.5px solid rgba(255,255,255,0.35);transition:background .18s;">
-                        <i class="fas fa-screwdriver-wrench"></i> Reparación
+                        <i class="fas fa-wrench"></i> Mantenimiento
                     </a>
+                    <span style="display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:8px;font-size:.78rem;font-weight:700;background:#2f7265;color:#fff;cursor:default;">
+                        <i class="fas fa-screwdriver-wrench"></i> Reparación
+                    </span>
                 </div>
             </div>
         </div>
@@ -427,7 +427,7 @@ function guardarDiseno() {
     btnSave.disabled  = true;
     btnSave.innerHTML = 'Guardando…';
 
-    fetch('/employees/admin/mantenimiento/imagenes', {
+    fetch('/employees/admin/reparacion/imagenes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': token, 'Accept': 'application/json' },
         body: JSON.stringify(payload)

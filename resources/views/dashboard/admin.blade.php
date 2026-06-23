@@ -51,7 +51,7 @@
                     <div class="card p-5 bg-custom shadow-lg text-center w-100 admin-card h-100 d-flex flex-column">
                         <i class="fas fa-tools fa-4x icon-accent"></i>
                         <h3 class="text-light mt-3">Mantenimiento y Reparación</h3>
-                        <a href="/mantenimientos" class="btn btn-light mt-auto">Gestionar servicios</a>
+                        <a href="/mantenimientos/index.blade2" class="btn btn-light mt-auto">Gestionar servicios</a>
                     </div>
                 </div>
 
