@@ -31,7 +31,7 @@ class BusquedaController extends Controller
         $productos = Producto::where('nombre', 'LIKE', "%{$q}%")
             ->orWhere('descripcion', 'LIKE', "%{$q}%")
             ->orWhere('id', 'LIKE', "%{$q}%")
-            ->limit(20)
+            ->limit(10)
             ->get();
 
         $items = $productos->map(function ($p) {
