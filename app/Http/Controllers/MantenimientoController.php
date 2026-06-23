@@ -17,18 +17,24 @@ class MantenimientoController extends Controller
     ══════════════════════════════════════════════════════ */
 
     public function index(Request $request)
-    {
-        $query = Mantenimiento::query();
+{
+    $query = Mantenimiento::query();
 
-        if ($request->has('status') && $request->status != '') {
-            $query->where('status', $request->status);
-        }
-
-        $mantenimientos = $query->paginate(8);
-        $statuses = ['En revisión', 'En procedimiento', 'En camino', 'Finalizado'];
-
-        return view('mantenimientos.index', compact('mantenimientos', 'statuses'));
+    if ($request->has('status') && $request->status != '') {
+        $query->where('status', $request->status);
     }
+
+    // 👈 Filtro nuevo por tipo
+    if ($request->has('tipo') && $request->tipo != '') {
+        $query->where('tipo', $request->tipo);
+    }
+
+    $mantenimientos = $query->paginate(8);
+    $statuses = ['En revisión', 'En procedimiento', 'En camino', 'Finalizado'];
+    $tipos = ['mantenimiento', 'reparacion'];
+
+    return view('mantenimientos.admin', compact('mantenimientos', 'statuses')); // 👈 cambiar index por admin
+}
 
     public function create()
     {
@@ -37,31 +43,32 @@ class MantenimientoController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $validatedData = $request->validate([
-            'nombre'             => 'required|string|max:255',
-            'ocupacion'          => 'required|string|max:255',
-            'tipo_maquina'       => 'required|string|max:255',
-            'codigo_equipo'      => 'required|exists:productos,id',
-            'descripcion'        => 'required|string',
-            'direccion'          => 'required|string|max:255',
-            'estado'             => 'required|string|max:255',
-            'codigo_postal'      => 'required|string|max:20',
-            'numero_celular'     => 'nullable|string|max:255',
-            'correo_electronico' => 'nullable|email|max:255',
-        ]);
+{
+    $validatedData = $request->validate([
+        'nombre'             => 'required|string|max:255',
+        'ocupacion'          => 'required|string|max:255',
+        'tipo_maquina'       => 'required|string|max:255',
+        'codigo_equipo'      => 'required|exists:productos,id',
+        'descripcion'        => 'required|string',
+        'direccion'          => 'required|string|max:255',
+        'estado'             => 'required|string|max:255',
+        'codigo_postal'      => 'required|string|max:20',
+        'numero_celular'     => 'nullable|string|max:255',
+        'correo_electronico' => 'nullable|email|max:255',
+        'tipo'               => 'required|in:mantenimiento,reparacion', // 👈
+    ]);
 
-        try {
-            if (auth()->check()) {
-                $validatedData['correo_electronico'] = auth()->user()->email;
-            }
-
-            Mantenimiento::create($validatedData);
-            return redirect()->route('dashboard')->with('success', '¡Solicitud de mantenimiento enviada con éxito!');
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Error al enviar la solicitud: ' . $e->getMessage());
+    try {
+        if (auth()->check()) {
+            $validatedData['correo_electronico'] = auth()->user()->email;
         }
+
+        Mantenimiento::create($validatedData);
+        return redirect()->route('dashboard')->with('success', '¡Solicitud enviada con éxito!');
+    } catch (\Exception $e) {
+        return redirect()->back()->with('error', 'Error al enviar la solicitud: ' . $e->getMessage());
     }
+}
 
     public function edit($id)
     {
