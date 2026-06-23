@@ -20,6 +20,7 @@ use App\Http\Controllers\SolicitudController;
 use App\Http\Controllers\AdminLogoController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\PromotionController;
+use App\Http\Controllers\ReparacionImagenController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,7 +34,8 @@ Route::get('/buscar', [BusquedaController::class, 'index'])->name('buscar.result
 Route::get('/catalogo/{id_categoria?}', [ProductoController::class, 'mostrarProductosPorCategoria'])->name('categoria.productos');
 Route::get('/vermas/{id}', [ProductoController::class, 'verMas'])->name('productos.vermas');
 Route::get('/mantenimiento', [MantenimientoController::class, 'mostrarFormularioPublico'])->name('mantenimiento');
-Route::get('/reparacion', fn() => app(MantenimientoController::class)->mostrarFormularioPublico('reparacion'))->name('reparacion');
+Route::get('/reparacion', [ReparacionImagenController::class, 'mostrarFormularioPublico'])->name('reparacion');
+Route::get('/mantenimientos', [MantenimientoController::class, 'index'])->name('mantenimientos.index');
 Route::post('/submit_mantenimiento', [MantenimientoController::class, 'store'])->name('submit_mantenimiento');
 Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
 Route::get('/reportes/create', [ReporteController::class, 'create'])->name('reportes.create');
@@ -147,6 +149,12 @@ Route::prefix('employees')->group(function () {
             ->name('admin.mantenimientos.imagenes.edit');
         Route::post('/admin/mantenimiento/imagenes', [MantenimientoController::class, 'updateImagenes'])
             ->name('mantenamientos.imagenes.update');
+
+        // Imágenes de Reparación
+        Route::get('/admin/reparacion/imagenes', [ReparacionImagenController::class, 'editImagenes'])
+            ->name('admin.reparacion.imagenes.edit');
+        Route::post('/admin/reparacion/imagenes', [ReparacionImagenController::class, 'updateImagenes'])
+            ->name('admin.reparacion.imagenes.update');
 
         // ── Festividades ──
         Route::get('/festividades/create', [ImagenController::class, 'createFestividad'])->name('festividades.create');
