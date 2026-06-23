@@ -240,6 +240,29 @@
     .cp-input[readonly] { background: #f1f8f4; color: var(--medium); font-weight: 700; }
     .cp-textarea { resize: vertical; min-height: 70px; }
 
+    .cp-nombre-toggle-box {
+        border: 1.5px solid var(--border);
+        border-radius: 10px;
+        padding: 12px 14px;
+        background: #fafafa;
+    }
+    .cp-check-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: .85rem;
+        font-weight: 700;
+        color: #333;
+        cursor: pointer;
+        margin: 0;
+    }
+    .cp-check-label input[type="checkbox"] {
+        width: 17px;
+        height: 17px;
+        accent-color: var(--primary);
+        cursor: pointer;
+    }
+
     .cp-docs-title {
         font-size: .75rem;
         font-weight: 800;
@@ -419,6 +442,22 @@
                             <input type="text" id="id" name="id" class="cp-input" readonly required>
                         </div>
 
+                        <div class="cp-nombre-toggle-box">
+                            <label class="cp-check-label">
+                                <input type="checkbox" id="check_tiene_nombre" name="tiene_nombre" value="1"
+                                       onchange="toggleNombreProducto()"
+                                       {{ old('tiene_nombre') ? 'checked' : '' }}>
+                                ¿Deseas asignarle un nombre a este producto?
+                            </label>
+
+                            <div id="wrap_nombre_producto" style="display:none; margin-top:10px;">
+                                <label class="cp-label">Nombre del Producto:</label>
+                                <input type="text" id="nombre" name="nombre" class="cp-input"
+                                       placeholder="Ej: Bomba de agua sumergible"
+                                       value="{{ old('nombre') }}">
+                            </div>
+                        </div>
+
                         <div>
                             <label class="cp-label">Descripción: <span class="text-danger">*</span></label>
                             <textarea name="descripcion" class="cp-textarea" required
@@ -465,6 +504,16 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 <script>
+    function toggleNombreProducto() {
+        const checked = document.getElementById('check_tiene_nombre').checked;
+        const wrap = document.getElementById('wrap_nombre_producto');
+        const input = document.getElementById('nombre');
+        wrap.style.display = checked ? 'block' : 'none';
+        if (!checked) {
+            input.value = '';
+        }
+    }
+
     function generarId() {
     const catSelect = document.getElementById('categoria_id');
     const idCat = catSelect.value;
@@ -640,6 +689,7 @@
     });
 
     document.addEventListener('DOMContentLoaded', function() {
+        toggleNombreProducto();
         ['div.zx-bg-wrap', 'main'].forEach(function(sel) {
             const el = document.querySelector(sel);
             if (el) {

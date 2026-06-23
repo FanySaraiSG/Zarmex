@@ -78,7 +78,7 @@ class ProductoController extends Controller
         ]);
 
         $idProducto = $request->input('id');
-        $nombreAuto = 'Producto ' . $idProducto;
+        $nombreFinal = $request->boolean('tiene_nombre') ? trim((string) $request->input('nombre')) : '';
 
         $rutaProducto = public_path("images/productos/{$idProducto}");
         if (!file_exists($rutaProducto)) {
@@ -101,7 +101,7 @@ class ProductoController extends Controller
 
         $producto = Producto::create([
             'id'           => $idProducto,
-            'nombre'       => $nombreAuto,
+            'nombre'       => $nombreFinal,
             'descripcion'  => $request->descripcion ?? '',
             'categoria_id' => $request->categoria_id,
             'precio'       => $request->input('precio', 0) ?? 0,
@@ -202,6 +202,13 @@ if ($request->filled('colores')) {
         // NO usar except() aquí — pisaría doc1_url/doc2_url/doc3_url con null
         // antes de que procesarDocumentos() los pueda guardar correctamente.
         $datos = $request->only(['descripcion', 'categoria_id']);
+
+        // Nombre del producto: si el checkbox "tiene_nombre" no viene marcado,
+        // se limpia explícitamente a '' (la columna nombre es NOT NULL en la BD)
+        // para que desaparezca en todas las vistas.
+        $nombreFinal = $request->boolean('tiene_nombre') ? trim((string) $request->input('nombre')) : '';
+        $datos['nombre'] = $nombreFinal;
+
         $producto->fill($datos);
 
         $rutaProducto = public_path("images/productos/{$producto->id}");

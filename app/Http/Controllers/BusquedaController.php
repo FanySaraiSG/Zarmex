@@ -36,7 +36,7 @@ class BusquedaController extends Controller
 
         $items = $productos->map(function ($p) {
             return [
-                'titulo' => $p->id . ' - ' . ($p->nombre ?? ''),
+                'titulo' => $p->nombre ? ($p->id . ' - ' . $p->nombre) : $p->id,
                 'descripcion' => $p->descripcion ?? '',
                 // ✅ tu ruta para ver producto (ya existe en tu web.php)
                 'url' => url('/vermas/' . $p->id),

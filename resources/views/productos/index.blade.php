@@ -52,6 +52,7 @@
                                 <tr>
                                     <th>#</th>
                                     <th>ID</th>
+                                    <th>Nombre</th>
                                     <th>Descripción</th>
                                     <th>Imagen</th>
                                     <th>Docs</th>
@@ -63,6 +64,13 @@
                                 <tr>
                                     <td>{{ $i + 1 }}</td>
                                     <td class="zx-td-id">{{ $producto->id }}</td>
+                                    <td class="zx-td-nombre">
+                                        @if($producto->nombre)
+                                            {{ $producto->nombre }}
+                                        @else
+                                            <span class="zx-no-img">—</span>
+                                        @endif
+                                    </td>
                                     <td class="zx-td-desc">{{ Str::limit($producto->descripcion, 80) }}</td>
                                     <td>
                                         @if($producto->imagen_url)
@@ -286,6 +294,7 @@ header, footer, .whatsapp, #whatsapp, .btn-whatsapp{ display: none !important; }
 .zx-table tbody td{ padding: 10px 12px; vertical-align: middle; color: #374151; }
 
 .zx-td-id{ font-family: monospace; font-size: 12px; color: #6b7280; }
+.zx-td-nombre{ font-weight: 600; color: #111827; max-width: 180px; }
 .zx-td-desc{ max-width: 260px; }
 
 .zx-thumb{
