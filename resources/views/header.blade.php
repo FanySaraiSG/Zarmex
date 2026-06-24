@@ -299,8 +299,112 @@
             @endif
         </div>
 
+
+        {{-- ACCIONES MÓVILES (solo celular): buscar + inicio de sesión --}}
+        <div class="zx-mobile-actions" aria-label="Acciones móviles">
+            <button type="button" class="zx-mobile-icon-btn" id="zxMobileSearchBtn" aria-label="Abrir búsqueda">
+                <i class="fas fa-search"></i>
+            </button>
+            <a class="zx-mobile-icon-btn" href="{{ route('employee.login') }}" aria-label="Iniciar sesión">
+                <i class="far fa-user"></i>
+            </a>
+        </div>
+
     </div>
 </header>
+
+{{-- MENÚ LATERAL MÓVIL (solo celular) --}}
+<div class="zx-mobile-backdrop" id="zxMobileBackdrop" hidden></div>
+<aside class="zx-mobile-drawer" id="zxMobileDrawer" aria-hidden="true">
+    <button type="button" class="zx-mobile-close" id="zxMobileClose" aria-label="Cerrar menú">
+        <i class="fas fa-times"></i>
+    </button>
+
+    <nav class="zx-mobile-nav" aria-label="Menú móvil">
+        <a href="{{ url('/') }}" class="zx-mobile-nav-link">
+            <i class="fas fa-home"></i>
+            <span>Inicio</span>
+        </a>
+
+        <button type="button" class="zx-mobile-nav-link zx-mobile-sub-toggle" data-target="zxMobileCategorias">
+            <i class="fas fa-cube"></i>
+            <span>Categorías</span>
+            <i class="fas fa-chevron-right zx-mobile-chev"></i>
+        </button>
+        <div class="zx-mobile-sub" id="zxMobileCategorias">
+            @foreach(App\Models\Categoria::all() as $categoria)
+                <a href="{{ route('categoria.productos', $categoria->id_categoria) }}">{{ $categoria->nombre }}</a>
+            @endforeach
+        </div>
+
+        <button type="button" class="zx-mobile-nav-link zx-mobile-sub-toggle" data-target="zxMobileServicios">
+            <i class="fas fa-briefcase"></i>
+            <span>Servicios</span>
+            <i class="fas fa-chevron-right zx-mobile-chev"></i>
+        </button>
+        <div class="zx-mobile-sub" id="zxMobileServicios">
+            <a href="{{ url('mantenimiento') }}">Mantenimiento</a>
+            <a href="{{ route('reparacion') }}">Reparación</a>
+        </div>
+
+        <a href="{{ route('nosotros') }}" class="zx-mobile-nav-link">
+            <i class="fas fa-users"></i>
+            <span>Nosotros</span>
+        </a>
+
+        <div class="zx-mobile-line"></div>
+
+        <a href="{{ route('employee.login') }}" class="zx-mobile-nav-link zx-mobile-login">
+            <i class="far fa-user-circle"></i>
+            <span>Iniciar sesión</span>
+        </a>
+    </nav>
+</aside>
+
+{{-- BUSCADOR MÓVIL (solo celular) --}}
+<div class="zx-mobile-search-modal" id="zxMobileSearchModal" hidden>
+    <div class="zx-mobile-search-card" role="dialog" aria-modal="true" aria-label="Buscar productos">
+        <button type="button" class="zx-mobile-search-close" id="zxMobileSearchClose" aria-label="Cerrar búsqueda">
+            <i class="fas fa-times"></i>
+        </button>
+
+        <form class="zx-mobile-search-form" action="{{ route('buscar.resultados') }}" method="GET" autocomplete="off">
+            <i class="fas fa-search"></i>
+            <input id="zxMobileSearchInput" type="text" name="q" placeholder="¿Qué estás buscando?" value="{{ request('q','') }}">
+        </form>
+
+        <div class="zx-mobile-search-section">
+            <h4>Búsquedas recientes</h4>
+            <button type="button" class="zx-mobile-recent" data-q="perfil rectangular"><i class="far fa-clock"></i> perfil rectangular</button>
+            <button type="button" class="zx-mobile-recent" data-q="tubo cuadrado"><i class="far fa-clock"></i> tubo cuadrado</button>
+            <button type="button" class="zx-mobile-recent" data-q="lámina galvanizada"><i class="far fa-clock"></i> lámina galvanizada</button>
+        </div>
+
+        <div class="zx-mobile-search-section">
+            <h4>Opciones</h4>
+            @foreach(App\Models\Categoria::all() as $categoria)
+                <a class="zx-mobile-suggestion" href="{{ route('categoria.productos', $categoria->id_categoria) }}">
+                    <span class="zx-mobile-suggestion-img"><i class="fas fa-cube"></i></span>
+                    <span>{{ $categoria->nombre }}</span>
+                </a>
+            @endforeach
+            <a class="zx-mobile-suggestion" href="{{ url('mantenimiento') }}">
+                <span class="zx-mobile-suggestion-img"><i class="fas fa-tools"></i></span>
+                <span>Mantenimiento</span>
+            </a>
+            <a class="zx-mobile-suggestion" href="{{ route('reparacion') }}">
+                <span class="zx-mobile-suggestion-img"><i class="fas fa-wrench"></i></span>
+                <span>Reparación</span>
+            </a>
+        </div>
+
+        <div class="zx-mobile-results" id="zxMobileResults" hidden>
+            <h4>Resultados de búsqueda</h4>
+            <div id="zxMobileResultsList"></div>
+        </div>
+    </div>
+</div>
+
 
 <style>
 :root {
@@ -1117,3 +1221,468 @@
     box-shadow: 0 6px 15px rgba(20, 85, 85, 0.12);
   }
 </style>
+
+<style>
+/* ===== MOBILE HEADER ZARMEX: solo celulares ===== */
+.zx-mobile-actions,
+.zx-mobile-backdrop,
+.zx-mobile-drawer,
+.zx-mobile-search-modal { display: none; }
+
+@media (max-width: 650px) {
+    body.zx-mobile-lock { overflow: hidden; }
+
+    .zx-header,
+    .zx-header.zx-hidden-mode {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        transform: none !important;
+        width: 100% !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
+        border-top: 0 !important;
+        border-bottom: 0 !important;
+        background: rgba(5, 45, 36, .96) !important;
+        box-shadow: 0 5px 18px rgba(0,0,0,.28) !important;
+    }
+
+    .zx-bar,
+    .zx-header.zx-hidden-mode .zx-bar {
+        height: 72px !important;
+        padding: 0 10px !important;
+        justify-content: space-between !important;
+        gap: 6px !important;
+        overflow: visible !important;
+    }
+
+    .zx-header.zx-hidden-mode .zx-brand-text-link,
+    .zx-header.zx-hidden-mode .zx-ham,
+    .zx-header.zx-hidden-mode .zx-mobile-actions {
+        display: flex !important;
+    }
+
+    .zx-menu,
+    .zx-search-wrap,
+    .zx-user-actions,
+    .zx-logo-badge {
+        display: none !important;
+    }
+
+    .zx-ham {
+        display: inline-flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 5px !important;
+        order: 1;
+        width: 38px !important;
+        height: 44px !important;
+        padding: 0 !important;
+        flex: 0 0 38px !important;
+    }
+
+    .zx-ham span {
+        display: block !important;
+        background: #ffffff !important;
+        width: 28px !important;
+        height: 2.5px !important;
+        margin: 0 !important;
+        border-radius: 20px !important;
+        flex: 0 0 auto !important;
+    }
+
+    .zx-brand-wrapper {
+        order: 2;
+        flex: 1 1 auto;
+        justify-content: center;
+        gap: 7px;
+        min-width: 0;
+        max-width: calc(100vw - 130px);
+        overflow: hidden;
+    }
+
+    .zx-logo-toggle-btn {
+        width: 40px;
+        height: 40px;
+        flex: 0 0 40px;
+    }
+
+    .zx-logo-circle {
+        width: 40px !important;
+        height: 40px !important;
+        border-width: 2px;
+        box-shadow: none !important;
+    }
+
+    .zx-pulse-waves::before,
+    .zx-pulse-waves::after { display: none !important; }
+
+    .zx-brand-text-link { display: flex !important; }
+    .zx-brand-name {
+        display: inline-block !important;
+        font-size: 23px !important;
+        letter-spacing: 2px !important;
+        border-right: 0 !important;
+        padding: 0 !important;
+        color: #d6b14a !important;
+        max-width: 135px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .zx-mobile-actions {
+        order: 3;
+        display: flex !important;
+        align-items: center;
+        gap: 10px;
+        flex: 0 0 auto;
+    }
+
+    .zx-mobile-icon-btn {
+        border: 0;
+        background: transparent;
+        color: #ffffff;
+        width: 30px;
+        height: 38px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 23px;
+        text-decoration: none;
+        padding: 0;
+    }
+
+    .zx-mobile-backdrop {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.58);
+        z-index: 10000;
+    }
+    .zx-mobile-backdrop.is-open { display: block; }
+
+    .zx-mobile-drawer {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: min(82vw, 360px);
+        background: rgba(5, 51, 41, .98);
+        z-index: 10001;
+        display: block;
+        padding: 88px 28px 28px;
+        box-shadow: 14px 0 30px rgba(0,0,0,.35);
+        transform: translateX(-105%);
+        transition: transform .28s ease;
+        border-radius: 0 22px 22px 0;
+    }
+    .zx-mobile-drawer.is-open {
+        transform: translateX(0);
+    }
+
+    .zx-mobile-close,
+    .zx-mobile-search-close {
+        position: absolute;
+        border: 0;
+        background: transparent;
+        color: #d6b14a;
+        font-size: 28px;
+        cursor: pointer;
+    }
+    .zx-mobile-close { top: 30px; left: 28px; }
+
+    .zx-mobile-nav { display: flex; flex-direction: column; gap: 8px; }
+    .zx-mobile-nav-link {
+        width: 100%;
+        min-height: 58px;
+        border: 0;
+        background: transparent;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        text-decoration: none;
+        font-size: 21px;
+        padding: 0;
+        text-align: left;
+    }
+    .zx-mobile-nav-link > i:first-child {
+        width: 32px;
+        color: #d6b14a;
+        font-size: 25px;
+        text-align: center;
+    }
+    .zx-mobile-sub-toggle { cursor: pointer; }
+    .zx-mobile-chev { margin-left: auto; transition: transform .25s ease; }
+    .zx-mobile-sub-toggle.is-open .zx-mobile-chev { transform: rotate(90deg); }
+    .zx-mobile-sub {
+        display: none;
+        padding: 4px 0 12px 50px;
+    }
+    .zx-mobile-sub.is-open { display: grid; gap: 8px; }
+    .zx-mobile-sub a {
+        color: rgba(255,255,255,.88);
+        text-decoration: none;
+        font-size: 16px;
+        padding: 8px 0;
+    }
+    .zx-mobile-line {
+        height: 1px;
+        background: rgba(214, 177, 74, .22);
+        margin: 12px 0 10px;
+    }
+    .zx-mobile-login { color: #d6b14a; }
+
+    .zx-mobile-search-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 10003;
+        background: rgba(0,0,0,.68);
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+    }
+    .zx-mobile-search-modal.is-open { display: flex; }
+
+    .zx-mobile-search-card {
+        position: relative;
+        width: min(100%, 420px);
+        max-height: calc(100vh - 90px);
+        overflow: auto;
+        background: #ffffff;
+        border-radius: 10px;
+        padding: 56px 18px 24px;
+        box-shadow: 0 20px 50px rgba(0,0,0,.32);
+    }
+    .zx-mobile-search-close {
+        top: 16px;
+        right: 18px;
+        color: #202020;
+        font-size: 24px;
+    }
+    .zx-mobile-search-form {
+        height: 56px;
+        border: 1px solid #dadada;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 0 14px;
+        color: #222;
+    }
+    .zx-mobile-search-form input {
+        border: 0;
+        outline: 0;
+        flex: 1;
+        height: 100%;
+        font-size: 18px;
+        min-width: 0;
+    }
+    .zx-mobile-search-section,
+    .zx-mobile-results { margin-top: 24px; }
+
+    .zx-mobile-search-modal.is-typing .zx-mobile-search-section {
+        display: none !important;
+    }
+
+    .zx-mobile-search-modal.is-typing .zx-mobile-results {
+        display: block !important;
+    }
+    .zx-mobile-search-section h4,
+    .zx-mobile-results h4 {
+        margin: 0 0 12px;
+        color: #6e6e6e;
+        font-size: 13px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .6px;
+    }
+    .zx-mobile-recent,
+    .zx-mobile-suggestion,
+    #zxMobileResultsList .zx-search-item {
+        width: 100%;
+        border: 0;
+        background: transparent;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-height: 44px;
+        color: #1f1f1f;
+        text-decoration: none;
+        font-size: 16px;
+        padding: 6px 0;
+        text-align: left;
+    }
+    .zx-mobile-recent i { color: #6e6e6e; font-size: 20px; width: 24px; }
+    .zx-mobile-suggestion-img {
+        width: 44px;
+        height: 44px;
+        border-radius: 8px;
+        background: #f1f1f1;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: #145555;
+        flex-shrink: 0;
+    }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const isMobile = () => window.matchMedia('(max-width: 650px)').matches;
+    const body = document.body;
+    const mainHeader = document.getElementById('zxMainHeader');
+    const logoToggle = document.getElementById('zxLogoToggle');
+    const ham = document.getElementById('zxHam');
+    const drawer = document.getElementById('zxMobileDrawer');
+    const backdrop = document.getElementById('zxMobileBackdrop');
+    const closeDrawer = document.getElementById('zxMobileClose');
+    const searchBtn = document.getElementById('zxMobileSearchBtn');
+    const searchModal = document.getElementById('zxMobileSearchModal');
+    const searchClose = document.getElementById('zxMobileSearchClose');
+    const mobileInput = document.getElementById('zxMobileSearchInput');
+    const mobileResults = document.getElementById('zxMobileResults');
+    const mobileResultsList = document.getElementById('zxMobileResultsList');
+
+    const openDrawer = () => {
+        if (!drawer || !backdrop) return;
+        drawer.classList.add('is-open');
+        backdrop.classList.add('is-open');
+        drawer.setAttribute('aria-hidden', 'false');
+        backdrop.hidden = false;
+        body.classList.add('zx-mobile-lock');
+    };
+
+    const hideDrawer = () => {
+        if (!drawer || !backdrop) return;
+        drawer.classList.remove('is-open');
+        backdrop.classList.remove('is-open');
+        drawer.setAttribute('aria-hidden', 'true');
+        backdrop.hidden = true;
+        body.classList.remove('zx-mobile-lock');
+    };
+
+    const openSearch = () => {
+        if (!searchModal) return;
+        searchModal.hidden = false;
+        searchModal.classList.add('is-open');
+        body.classList.add('zx-mobile-lock');
+        setTimeout(() => mobileInput?.focus(), 80);
+    };
+
+    const hideSearch = () => {
+        if (!searchModal) return;
+        searchModal.classList.remove('is-open', 'is-typing');
+        searchModal.hidden = true;
+        if (mobileResults) mobileResults.hidden = true;
+        if (mobileResultsList) mobileResultsList.innerHTML = '';
+        body.classList.remove('zx-mobile-lock');
+    };
+
+    // En celular, el logo no colapsa el header completo; abre el despliegue móvil.
+    if (logoToggle && mainHeader) {
+        logoToggle.addEventListener('click', (e) => {
+            if (!isMobile()) return;
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            mainHeader.classList.remove('zx-hidden-mode');
+            openDrawer();
+        }, true);
+    }
+
+    if (ham) {
+        ham.addEventListener('click', (e) => {
+            if (!isMobile()) return;
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            openDrawer();
+        }, true);
+    }
+
+    closeDrawer?.addEventListener('click', hideDrawer);
+    backdrop?.addEventListener('click', hideDrawer);
+    searchBtn?.addEventListener('click', openSearch);
+    searchClose?.addEventListener('click', hideSearch);
+    searchModal?.addEventListener('click', (e) => { if (e.target === searchModal) hideSearch(); });
+
+    document.querySelectorAll('.zx-mobile-sub-toggle').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            const target = document.getElementById(btn.dataset.target || '');
+            btn.classList.toggle('is-open');
+            target?.classList.toggle('is-open');
+        });
+    });
+
+    document.querySelectorAll('.zx-mobile-recent').forEach((btn) => {
+        btn.addEventListener('click', () => {
+            if (!mobileInput) return;
+            mobileInput.value = btn.dataset.q || '';
+            mobileInput.focus();
+            mobileInput.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+    });
+
+    const debounce = (fn, ms = 200) => {
+        let t;
+        return (...args) => {
+            clearTimeout(t);
+            t = setTimeout(() => fn(...args), ms);
+        };
+    };
+
+    const renderMobileItems = (items) => {
+        if (!mobileResults || !mobileResultsList) return;
+        mobileResultsList.innerHTML = '';
+        if (!items || !items.length) {
+            mobileResultsList.innerHTML = '<div style="padding:10px 0;color:#666;">Sin resultados</div>';
+            mobileResults.hidden = false;
+            return;
+        }
+        items.forEach((it) => {
+            const a = document.createElement('a');
+            a.href = it.url || '#';
+            a.className = 'zx-search-item';
+            a.innerHTML = `<span class="zx-mobile-suggestion-img"><i class="fas fa-search"></i></span><span><strong>${it.titulo || ''}</strong><br><small>${it.descripcion || ''}</small></span>`;
+            mobileResultsList.appendChild(a);
+        });
+        mobileResults.hidden = false;
+    };
+
+    const buscarMobile = async () => {
+        const q = (mobileInput?.value || '').trim();
+        if (!mobileResults || !mobileResultsList || q.length < 2) {
+            searchModal?.classList.remove('is-typing');
+            if (mobileResults) mobileResults.hidden = true;
+            if (mobileResultsList) mobileResultsList.innerHTML = '';
+            return;
+        }
+        searchModal?.classList.add('is-typing');
+        try {
+            const res = await fetch(`/buscar-sugerencias?q=${encodeURIComponent(q)}`, { headers: { 'Accept': 'application/json' } });
+            const data = await res.json();
+            renderMobileItems(data.items || []);
+        } catch (err) {
+            mobileResults.hidden = true;
+        }
+    };
+
+    mobileInput?.addEventListener('input', debounce(buscarMobile, 160));
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            hideDrawer();
+            hideSearch();
+        }
+    });
+
+    window.addEventListener('resize', () => {
+        if (!isMobile()) {
+            hideDrawer();
+            hideSearch();
+        }
+    });
+}
+);
+</script>

@@ -43,6 +43,12 @@
                 height: 380px !important;
                 min-height: 380px !important;
             }
+
+            /* Empujar el carousel hacia abajo para que no quede tapado por el header flotante */
+            /* El header ocupa ~89px (top: 14px + height: 75px) */
+            #carouselBanner {
+                margin-top: 95px !important;
+            }
         }
         /* ✅ Badge "Ver más" en banners con link */
         .banner-link-hint {
@@ -197,18 +203,27 @@
         .best-card img { 
             width: 100%; 
             height: 270px; 
-            object-fit: cover; 
+            object-fit: cover;
+            object-position: center;
             background: #FFF; 
-            padding: 20px; 
-            border-radius: 30px;
+            padding: 0; 
+            border-radius: 30px 30px 0 0;
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .best-card img {
+                height: 200px;
+            }
         }
 
         .best-card h3 { 
             font-size: 1.1em; 
-            margin: -12px 0 8px; 
+            margin: 12px 0 8px; 
             color: #28666e; 
             font-weight: 700; 
-            text-align: center; 
+            text-align: center;
+            padding: 0 12px;
         }
 
         .best-btn {
@@ -600,9 +615,9 @@
     }
 
     .zx-prod-gallery {
-    height: 430px;
-    min-height: 430px;
-}
+        height: 430px;
+        min-height: 430px;
+    }
 
     .zx-prod-info {
         order: 3;
@@ -611,6 +626,103 @@
     .zx-prod-footer {
         justify-content: center;
     }
+}
+
+/* ===== MODAL RESPONSIVE MÓVIL ===== */
+@media(max-width: 768px) {
+    /* El overlay ocupa toda la pantalla sin padding lateral */
+    .prod-overlay {
+        padding: 0;
+        align-items: flex-end;
+    }
+
+    /* El modal sube como sheet desde abajo, ocupa casi toda la pantalla */
+    .zx-prod-modal {
+        width: 100vw;
+        max-height: 92vh;
+        border-radius: 22px 22px 0 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    /* El cuerpo hace scroll internamente */
+    .zx-prod-body {
+        flex: 1 1 auto;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 16px;
+        gap: 16px;
+    }
+
+    /* Galería más compacta */
+    .zx-prod-gallery {
+        height: 240px;
+        min-height: 240px;
+    }
+
+    /* Thumbnails en fila horizontal pequeña */
+    .zx-prod-thumbs {
+        flex-direction: row;
+        order: 2;
+        max-height: none;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding-bottom: 4px;
+        gap: 8px;
+    }
+
+    .zx-thumb-btn {
+        width: 48px;
+        height: 48px;
+        flex-shrink: 0;
+    }
+
+    /* Info del producto */
+    .zx-prod-info {
+        order: 3;
+        gap: 16px;
+    }
+
+    /* Header del modal más compacto */
+    .zx-prod-header {
+        padding: 12px 16px;
+        flex-shrink: 0;
+    }
+
+    .zx-prod-header h3 {
+        font-size: 1rem;
+        /* Evitar que el título empuje el botón de cierre */
+        max-width: calc(100% - 40px);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* Footer siempre visible al fondo */
+    .zx-prod-footer {
+        flex-shrink: 0;
+        justify-content: center;
+        padding: 10px 16px 16px;
+    }
+
+    /* Botón de WhatsApp ocupa todo el ancho */
+    .zx-whatsapp-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 13px 20px;
+        font-size: 1rem;
+    }
+
+    /* Flechas de la galería más pequeñas */
+    .zx-prod-arrow {
+        width: 32px;
+        height: 32px;
+        font-size: 1.3rem;
+    }
+
+    .zx-prod-arrow.left { left: 8px; }
+    .zx-prod-arrow.right { right: 8px; }
 }
 
         /* ===================== SECCIÓN RESEÑAS ===================== */
@@ -1729,7 +1841,6 @@ function ajustarImagen(img){
         gap: 24px;
     }
     @media (max-width: 1024px) { .zx-promos-grid { grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 560px)  { .zx-promos-grid { grid-template-columns: 1fr; gap: 16px; } }
 
     /* Tarjeta */
     .zx-promo-card {
@@ -1793,6 +1904,55 @@ function ajustarImagen(img){
         text-align: center;
         margin: 0;
         line-height: 1.4;
+    }
+
+    /* ===== MÓVIL: scroll horizontal tipo carrusel ===== */
+    @media (max-width: 768px) {
+        .zx-promos-section {
+            padding: 36px 0 40px;
+        }
+
+        .zx-promos-inner {
+            padding: 0;
+        }
+
+        .zx-promos-title,
+        .zx-promos-sub {
+            padding: 0 16px;
+        }
+
+        .zx-promos-sub {
+            margin-bottom: 20px;
+        }
+
+        /* El grid se convierte en fila con scroll horizontal */
+        .zx-promos-grid {
+            display: flex;
+            flex-direction: row;
+            gap: 14px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+            scroll-snap-type: x mandatory;
+            padding: 8px 16px 20px;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            grid-template-columns: unset;
+        }
+        .zx-promos-grid::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Cada tarjeta ocupa ~75% del ancho, se ve el borde de la siguiente */
+        .zx-promo-card {
+            flex: 0 0 72vw;
+            max-width: 280px;
+            scroll-snap-align: start;
+        }
+
+        .zx-promo-img-wrap {
+            height: 170px;
+        }
     }
 </style>
 
