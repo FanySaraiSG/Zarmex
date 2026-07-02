@@ -361,6 +361,51 @@ header, footer, .whatsapp, #whatsapp, .btn-whatsapp{ display: none !important; }
     .zx-card-info{ width: 100%; }
     .zx-table{ font-size: 12px; }
 }
+/* ===== Responsive tabla productos ===== */
+@media (max-width: 768px){
+
+    .zx-wrapper{
+        padding: 20px 10px 50px;
+    }
+
+    .zx-productos-panel.open .zx-productos-inner{
+        padding: 12px 10px 16px;
+    }
+
+    .zx-productos-inner{
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .zx-table{
+        min-width: 760px;
+    }
+
+    .zx-productos-inner::after{
+        content:"← Desliza para ver toda la tabla →";
+        display:block;
+        text-align:center;
+        font-size:12px;
+        color:#6b7280;
+        margin-top:8px;
+    }
+
+    .zx-thumb{
+        width:42px;
+        height:42px;
+    }
+
+    .zx-row-actions{
+        flex-direction:column;
+        align-items:stretch;
+    }
+
+    .btn-edit,
+    .btn-delete{
+        width:100%;
+        justify-content:center;
+    }
+    }
 </style>
 
 <script>

@@ -511,7 +511,7 @@
                                     <div class="col-md-5 d-flex flex-column justify-content-between">
                                         <div class="ps-md-2">
                                             <div class="info-card-luxury">
-                                                <span class="info-label-luxury">Descripción del Equipo</span>
+                                                <span class="info-label-luxury">{{ $product->id }}</span>
                                                 <p style="font-size: 0.9rem; color: var(--zx-text-muted); text-align: justify; margin: 0; line-height: 1.4;">
                                                     {{ $producto->descripcion ?? 'S/N' }}
                                                 </p>

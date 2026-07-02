@@ -638,7 +638,8 @@
 
     /* El modal sube como sheet desde abajo, ocupa casi toda la pantalla */
     .zx-prod-modal {
-        width: 100vw;
+        width: 100%;
+        max-width: 100%;
         max-height: 92vh;
         border-radius: 22px 22px 0 0;
         display: flex;
@@ -828,13 +829,22 @@
                 {{-- Botón "Todos" siempre visible; los demás solo si hay secciones en la BD --}}
                 @if(($topProducts ?? collect())->count() > 0)
                 <div class="best-section-actions" aria-label="Secciones de productos destacados">
-                    <button type="button" class="best-section-action-btn active" data-filter="todos">Todos</button>
-                    @foreach($seccionesCarrusel as $seccion)
-                        <button type="button" class="best-section-action-btn" data-filter="{{ $seccion }}">
-                            {{ ucfirst($seccion) }}
-                        </button>
-                    @endforeach
-                </div>
+
+    @foreach($seccionesCarrusel as $index => $seccion)
+        <button type="button"
+                class="best-section-action-btn {{ $index === 0 ? 'active' : '' }}"
+                data-filter="{{ $seccion }}">
+            {{ ucfirst($seccion) }}
+        </button>
+    @endforeach
+
+    <button type="button"
+            class="best-section-action-btn"
+            data-filter="todos">
+        Todos
+    </button>
+
+</div>
                 @endif
 
                 @if(($topProducts ?? collect())->count() === 0)
@@ -1277,11 +1287,182 @@ function ajustarImagen(img){
                     const colorSeleccionado = document.getElementById('pm-color-name').textContent;
                     const textoColor = (colorSeleccionado && colorSeleccionado !== 'Selecciona un color')
                         ? ` en color ${colorSeleccionado}` : '';
+
                     const mensaje = encodeURIComponent(
-                        `Hola Zarmex, me interesa obtener más información del producto: ${pmNombreActual}${textoColor}`
+                        `Hola Zarmex, me interesa obtener más información sobre: ${pmNombreActual}${textoColor}`
                     );
+
                     window.open(`https://wa.me/525581366555?text=${mensaje}`, '_blank');
                 }
+
+function abrirPromoComoProducto(nombre, imagen){
+    const overlay = document.getElementById('zxPromoOverlay');
+    if (!overlay) return;
+
+    // Teleport al <body> directo para escapar cualquier stacking context roto
+    if (overlay.parentElement !== document.body) {
+        document.body.appendChild(overlay);
+    }
+
+    // Rellenar contenido
+    const titulo = overlay.querySelector('#zxPromoTitle');
+    const img    = overlay.querySelector('#zxPromoImg');
+    if (titulo) titulo.textContent = nombre || 'Promoción';
+    if (img)    { img.src = ''; img.src = imagen; }
+
+    // Aplicar TODOS los estilos via JS para evitar conflictos de CSS
+    _zxPromoEstilos(overlay);
+
+    document.body.style.overflow = 'hidden';
+}
+
+function _zxPromoEstilos(overlay){
+    const isMobile = window.innerWidth <= 768;
+
+    // ── Overlay ──
+    Object.assign(overlay.style, {
+        position:       'fixed',
+        inset:          '0',
+        top:            '0',
+        left:           '0',
+        right:          '0',
+        bottom:         '0',
+        width:          '100%',
+        height:         '100%',
+        background:     'rgba(0,0,0,.65)',
+        zIndex:         '2147483647',
+        display:        'flex',
+        alignItems:     isMobile ? 'center' : 'center',
+        justifyContent: 'center',
+        padding:        isMobile ? '16px' : '18px',
+        boxSizing:      'border-box',
+        overflow:       'hidden'
+    });
+
+    // ── Modal box ──
+    const modal = overlay.querySelector('.zx-promo-modal');
+    if (modal) Object.assign(modal.style, {
+        width:        isMobile ? '100%' : 'min(520px, 94vw)',
+        maxWidth:     '520px',
+        maxHeight:    isMobile ? '90vh'  : '90vh',
+        background:   '#ffffff',
+        borderRadius: '22px',
+        overflow:     'hidden',
+        boxShadow:    '0 25px 70px rgba(0,0,0,.4)',
+        display:      'flex',
+        flexDirection:'column',
+        animation:    'promoPopIn .22s ease'
+    });
+
+    // ── Header ──
+    const header = overlay.querySelector('.zx-promo-modal-header');
+    if (header) Object.assign(header.style, {
+        background:     '#143f43',
+        color:          '#fedc97',
+        padding:        '14px 20px',
+        display:        'flex',
+        alignItems:     'center',
+        justifyContent: 'space-between',
+        flexShrink:     '0'
+    });
+    const h3 = overlay.querySelector('#zxPromoTitle');
+    if (h3) Object.assign(h3.style, {
+        margin:     '0',
+        fontSize:   '1.1rem',
+        fontWeight: '900',
+        color:      '#fedc97'
+    });
+    const closeBtn = overlay.querySelector('.zx-promo-modal-close');
+    if (closeBtn) Object.assign(closeBtn.style, {
+        background:  'transparent',
+        border:      'none',
+        color:       '#fff',
+        fontSize:    '1.5rem',
+        cursor:      'pointer',
+        lineHeight:  '1',
+        padding:     '0 2px'
+    });
+
+    // ── Body ──
+    const body = overlay.querySelector('.zx-promo-modal-body');
+    if (body) Object.assign(body.style, {
+        background:     '#dff4f0',
+        padding:        '16px',
+        display:        'flex',
+        justifyContent: 'center',
+        alignItems:     'center',
+        flex:           '1 1 auto',
+        overflow:       'hidden'
+    });
+    const img = overlay.querySelector('#zxPromoImg');
+    if (img) Object.assign(img.style, {
+        width:        '100%',
+        maxHeight:    isMobile ? '55vh' : '62vh',
+        objectFit:    'contain',
+        borderRadius: '14px',
+        display:      'block'
+    });
+
+    // ── Footer ──
+    const footer = overlay.querySelector('.zx-promo-modal-footer');
+    if (footer) Object.assign(footer.style, {
+        padding:        '14px 18px 18px',
+        display:        'flex',
+        justifyContent: 'center',
+        background:     '#fff',
+        flexShrink:     '0'
+    });
+    const waBtn = overlay.querySelector('.zx-promo-wa-btn');
+    if (waBtn) Object.assign(waBtn.style, {
+        width:          '100%',
+        maxWidth:       '380px',
+        background:     '#25d366',
+        color:          '#fff',
+        border:         'none',
+        borderRadius:   '14px',
+        padding:        '13px 22px',
+        fontSize:       '1rem',
+        fontWeight:     '900',
+        cursor:         'pointer',
+        display:        'inline-flex',
+        alignItems:     'center',
+        justifyContent: 'center',
+        gap:            '10px'
+    });
+}
+
+function cerrarPromoOverlay(){
+    const overlay = document.getElementById('zxPromoOverlay');
+    if (!overlay) return;
+    overlay.style.display = 'none';
+    document.body.style.overflow = '';
+}
+
+function abrirWhatsappPromoModal(){
+    const nombre = document.getElementById('zxPromoTitle')?.textContent || 'Promoción';
+    const mensaje = encodeURIComponent(
+        `Hola Zarmex, me interesa obtener más información sobre la promoción: ${nombre}`
+    );
+    window.open(`https://wa.me/525581366555?text=${mensaje}`, '_blank');
+}
+
+// Teleport + ocultar en cuanto cargue el DOM
+document.addEventListener('DOMContentLoaded', function(){
+    const overlay = document.getElementById('zxPromoOverlay');
+    if (!overlay) return;
+    if (overlay.parentElement !== document.body) {
+        document.body.appendChild(overlay);
+    }
+    overlay.style.display = 'none';
+
+    // Inyectar keyframe de animación si no existe
+    if (!document.getElementById('zxPromoKeyframes')) {
+        const s = document.createElement('style');
+        s.id = 'zxPromoKeyframes';
+        s.textContent = '@keyframes promoPopIn { from { opacity:0; transform:scale(.94); } to { opacity:1; transform:scale(1); } }';
+        document.head.appendChild(s);
+    }
+});
             </script>
         </section>
 
@@ -1636,6 +1817,88 @@ function ajustarImagen(img){
             .zx-carousel-control:hover { background: #28666e; color: #fff; border-color: #28666e; }
             .zx-carousel-control.prev { left: 10px; }
             .zx-carousel-control.next { right: 10px; }
+
+                /* ===== FIX scroll horizontal definitivo ===== */
+html {
+    overflow-x: hidden;
+}
+
+body {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    overflow-x: clip;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+/* Solo el carrusel de productos necesita contención propia */
+.custom-carousel-container {
+    overflow-x: hidden !important;
+}
+
+@media (max-width: 768px) {
+
+    #carouselBanner,
+    #carouselBanner .carousel-inner,
+    #carouselBanner .carousel-item {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
+    }
+
+    .best-sellers-wrap {
+        max-width: 100%;
+        overflow: hidden;
+        padding-left: 18px !important;
+        padding-right: 18px !important;
+    }
+
+    .custom-carousel-control.prev { left: 4px; }
+    .custom-carousel-control.next { right: 4px; }
+
+    .whatsapp-float {
+        right:18px;
+        bottom:18px;
+    }
+}
+
+@media (max-width:768px){
+
+    .best-section-actions{
+        justify-content: flex-start;
+        gap: 10px;
+        padding: 0 16px 8px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        flex-wrap: nowrap;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .best-section-actions::-webkit-scrollbar{
+        display:none;
+    }
+
+    .best-section-action-btn{
+        flex: 0 0 auto;
+        width: auto;
+        min-width: 0;
+        max-width: 44vw;
+        padding: 8px 14px;
+        font-size: .82rem;
+        line-height: 1.2;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
         </style>
     </div>
 
@@ -1765,7 +2028,10 @@ function ajustarImagen(img){
 
 {{-- ===================== SECCIÓN PROMOCIONES ===================== --}}
 @php
-    $promociones = \App\Models\Promotion::where('activo', true)->orderBy('id')->take(4)->get();
+    
+    $promociones = \App\Models\Promotion::where('activo', true)
+        ->orderBy('id')
+        ->get();
 @endphp
 
 @if($promociones->isNotEmpty())
@@ -1778,22 +2044,32 @@ function ajustarImagen(img){
 
         <div class="zx-promos-grid">
             @foreach($promociones as $promo)
-            <div class="zx-promo-card">
-                <div class="zx-promo-img-wrap">
-                    <img
-                        src="{{ $promo->imagen_url ? asset($promo->imagen_url) : asset('imagenes/promo-placeholder.png') }}"
-                        alt="{{ $promo->nombre ?? 'Promoción' }}"
-                        loading="lazy">
-                    <div class="zx-promo-badge">PROMO</div>
-                </div>
-                <div class="zx-promo-body">
-                    <p class="zx-promo-name">{{ $promo->nombre ?? 'Promoción especial' }}</p>
-                </div>
-            </div>
+            <div class="zx-promo-card"
+     onclick="abrirPromoComoProducto(
+        '{{ $promo->nombre ?? 'Promoción especial' }}',
+        '{{ $promo->imagen_url ? asset($promo->imagen_url) : asset('imagenes/promo-placeholder.png') }}'
+     )">
+
+    <div class="zx-promo-img-wrap">
+        <img
+            src="{{ $promo->imagen_url ? asset($promo->imagen_url) : asset('imagenes/promo-placeholder.png') }}"
+            alt="{{ $promo->nombre ?? 'Promoción' }}"
+            loading="lazy">
+        <div class="zx-promo-badge">PROMO</div>
+    </div>
+
+    <div class="zx-promo-body">
+        <p class="zx-promo-name">
+            {{ $promo->nombre ?? 'Promoción especial' }}
+        </p>
+    </div>
+
+</div>
             @endforeach
         </div>
     </div>
 </section>
+
 @endif
 
 <style>
@@ -1868,7 +2144,8 @@ function ajustarImagen(img){
     .zx-promo-img-wrap img {
         width: 100%;
         height: 100%;
-        object-fit: cover;
+        object-fit: contain;
+        pading: 8px;
         transition: transform .4s ease;
     }
     .zx-promo-card:hover .zx-promo-img-wrap img { transform: scale(1.04); }
@@ -1945,16 +2222,171 @@ function ajustarImagen(img){
 
         /* Cada tarjeta ocupa ~75% del ancho, se ve el borde de la siguiente */
         .zx-promo-card {
-            flex: 0 0 72vw;
-            max-width: 280px;
-            scroll-snap-align: start;
+            .zx-promo-card {
+        flex: 0 0 82vw;
+        max-width: 340px;
+        scroll-snap-align: start;
         }
 
         .zx-promo-img-wrap {
             height: 170px;
         }
     }
+
+    .zx-promo-card{
+    cursor:pointer;
+}
+
+/* ===================== MODAL SIMPLE DE PROMOCIONES ===================== */
+.zx-promo-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.62);
+    z-index: 999999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+}
+
+.zx-promo-overlay.open {
+    display: flex;
+}
+
+.zx-promo-modal {
+    width: min(520px, 94vw);
+    background: #ffffff;
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 25px 70px rgba(0,0,0,.38);
+    animation: promoPopIn .22s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+@keyframes promoPopIn {
+    from { opacity: 0; transform: scale(.94); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+.zx-promo-modal-header {
+    background: #143f43;
+    color: #fedc97;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+}
+
+.zx-promo-modal-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: #fedc97;
+}
+
+.zx-promo-modal-close {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 1.5rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0 2px;
+}
+
+.zx-promo-modal-body {
+    background: #dff4f0;
+    padding: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1 1 auto;
+}
+
+.zx-promo-modal-body img {
+    width: 100%;
+    max-height: 62vh;
+    object-fit: contain;
+    border-radius: 14px;
+    display: block;
+}
+
+.zx-promo-modal-footer {
+    padding: 14px 18px 18px;
+    display: flex;
+    justify-content: center;
+    background: #fff;
+    flex-shrink: 0;
+}
+
+.zx-promo-wa-btn {
+    width: 100%;
+    max-width: 380px;
+    background: #25d366;
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    padding: 13px 22px;
+    font-size: 1rem;
+    font-weight: 900;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: background .2s ease;
+}
+
+.zx-promo-wa-btn:hover {
+    background: #1ebe5d;
+}
+
+@media (max-width: 768px) {
+    .zx-promo-overlay {
+        padding: 16px;
+        align-items: center;
+    }
+
+    .zx-promo-modal {
+        width: 100%;
+        max-width: 100%;
+        max-height: 90vh;
+        border-radius: 22px;
+    }
+
+    .zx-promo-modal-body img {
+        max-height: 55vh;
+    }
+}
+
+
 </style>
+
+{{-- ── MODAL SIMPLE DE PROMOCIONES ── --}}
+<div class="zx-promo-overlay" id="zxPromoOverlay" style="display:none" onclick="if(event.target===this) cerrarPromoOverlay()">
+    <div class="zx-promo-modal">
+
+        <div class="zx-promo-modal-header">
+            <h3 id="zxPromoTitle">Promoción</h3>
+            <button type="button" class="zx-promo-modal-close" onclick="cerrarPromoOverlay()" aria-label="Cerrar">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="zx-promo-modal-body">
+            <img id="zxPromoImg" src="" alt="Promoción">
+        </div>
+
+        <div class="zx-promo-modal-footer">
+            <button type="button" class="zx-promo-wa-btn" onclick="abrirWhatsappPromoModal()">
+                <i class="fab fa-whatsapp"></i> WhatsApp
+            </button>
+        </div>
+
+    </div>
+</div>
 
 {{-- INCLUSIÓN DEL FOOTER --}}
 @include('footer')
@@ -2007,5 +2439,7 @@ function ajustarImagen(img){
         }, true); // true = fase de captura, antes de que Bootstrap lo vea
     });
 </script>
+
+
 </body>
 </html>

@@ -183,6 +183,92 @@ header, footer, .whatsapp, #whatsapp { display: none !important; }
     color: #6c757d;
     font-size: 0.95rem;
 }
+
+
+/* ===== Gestionar secciones: tabla responsive en celular ===== */
+html,
+body{
+    max-width:100%;
+    overflow-x:hidden;
+}
+
+@media (max-width:768px){
+
+    .container{
+        max-width:100% !important;
+        padding-left:12px !important;
+        padding-right:12px !important;
+        margin-top:20px !important;
+        margin-bottom:30px !important;
+    }
+
+    .panel-box{
+        padding:16px 12px !important;
+        border-radius:14px;
+        overflow:hidden;
+    }
+
+    .panel-title{
+        width:100%;
+        text-align:center;
+        font-size:1.35rem;
+        line-height:1.2;
+    }
+
+    .panel-box > .d-flex,
+    .panel-box .d-flex.gap-2{
+        width:100%;
+    }
+
+    #newSectionName{
+        min-width:0 !important;
+        width:100% !important;
+    }
+
+    #btnCreateSection{
+        width:100%;
+        justify-content:center;
+    }
+
+    .green-table-responsive{
+        width:100%;
+        max-width:100%;
+        overflow-x:auto !important;
+        overflow-y:hidden;
+        -webkit-overflow-scrolling:touch;
+        border-radius:10px;
+    }
+
+    .table-green{
+        min-width:620px;
+        width:620px;
+    }
+
+    .table-green thead th,
+    .table-green tbody td{
+        white-space:nowrap;
+        font-size:.82rem;
+        padding:10px 12px;
+    }
+
+    .btn-mint,
+    .btn-outline-green,
+    .btn-table-edit,
+    .btn-table-delete{
+        padding:7px 11px;
+        font-size:.82rem;
+    }
+
+    .green-table-responsive::after{
+        content:"← Desliza para ver toda la tabla →";
+        display:block;
+        text-align:center;
+        font-size:12px;
+        color:#6c757d;
+        padding:8px 0 2px;
+    }
+}
+
 </style>
 </head>
 

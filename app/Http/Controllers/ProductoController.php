@@ -38,10 +38,12 @@ class ProductoController extends Controller
 
     // Formulario de creación
     public function create()
-    {
-        $categorias = Categoria::all();
-        return view('productos.create', compact('categorias'));
-    }
+{
+    $categorias = Categoria::all();
+    $colores = Color::all();
+
+    return view('productos.create', compact('categorias', 'colores'));
+}
 
     public function obtenerSiguienteNumeroBase($categoriaId)
     {
@@ -159,6 +161,7 @@ if ($request->filled('colores')) {
 
         $categorias = Categoria::all();
         $colores = Color::all(); 
+        return view('productos.create', compact('categorias', 'colores'));
         $imagenesExtra = ImagenProducto::where('producto_id', $producto->id)->orderBy('orden', 'asc')->get();
 
         return view('productos.edit', compact('producto', 'categorias', 'colores', 'imagenesExtra'));

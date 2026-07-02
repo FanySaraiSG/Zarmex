@@ -320,6 +320,73 @@
         .cp-grid  { grid-template-columns: 1fr; }
         .create-page { padding: 16px !important; }
     }
+
+    /* ===== Ajuste móvil create producto ===== */
+@media (max-width: 768px){
+
+    body{
+        overflow-x: hidden;
+    }
+
+    .btn-back,
+    .regresar,
+    a[href*="productos"]{
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        margin: 14px auto 10px !important;
+        width: calc(100% - 40px);
+        max-width: 220px;
+        justify-content: center;
+        display: flex;
+        z-index: 10;
+    }
+
+    .logout-button,
+    .btn-logout,
+    .salir-btn,
+    a[href*="logout"],
+    form[action*="logout"] button{
+        position: fixed !important;
+        top: 18px !important;
+        right: 14px !important;
+        width: 58px !important;
+        height: 58px !important;
+        padding: 0 !important;
+        border-radius: 12px !important;
+        z-index: 999;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .logout-button span,
+    .btn-logout span,
+    .salir-btn span,
+    form[action*="logout"] button span{
+        display: none !important;
+    }
+
+    .container,
+    .form-container,
+    .producto-container,
+    .create-product-wrapper{
+        padding-top: 10px !important;
+        max-width: 100% !important;
+    }
+
+    h1,
+    .titulo,
+    .page-title{
+        font-size: 2rem !important;
+        line-height: 1.15 !important;
+        text-align: center !important;
+        margin-top: 8px !important;
+        margin-bottom: 20px !important;
+        padding: 0 70px 0 70px;
+        word-break: normal;
+    }
+}
 </style>
 
 <div class="create-page">
@@ -464,11 +531,28 @@
                                       placeholder="Escribe la descripción de la pieza...">{{ old('descripcion') }}</textarea>
                         </div>
                         
-                        <input
-    type="checkbox"
-    name="colores[]"
-    value="{{ $color->id_color }}"
->
+                        @if(isset($colores) && $colores->count() > 0)
+    <div>
+        <p class="cp-docs-title">Colores disponibles</p>
+
+        <div style="display:flex; flex-wrap:wrap; gap:10px;">
+            @foreach($colores as $color)
+                <label style="display:flex; align-items:center; gap:8px; border:1.5px solid #b0bec5; border-radius:10px; padding:8px 12px; cursor:pointer;">
+                    <input
+                        type="checkbox"
+                        name="colores[]"
+                        value="{{ $color->id_color }}"
+                        {{ in_array($color->id_color, old('colores', [])) ? 'checked' : '' }}
+                    >
+
+                    <span style="width:22px; height:22px; border-radius:50%; border:1px solid #ccc; background:#{{ ltrim($color->id_color, '#') }};"></span>
+
+                    <span>{{ $color->nombre ?? $color->id_color }}</span>
+                </label>
+            @endforeach
+        </div>
+    </div>
+@endif
 
                         <div>
                             <p class="cp-docs-title">Documentos Técnicos <small class="text-muted">(PDF, DOCX - Máx. 5MB)</small></p>

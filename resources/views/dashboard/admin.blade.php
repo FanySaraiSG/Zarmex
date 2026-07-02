@@ -153,7 +153,7 @@
 
     {{-- ===================== MODAL PRINCIPAL: PROMOCIONES ===================== --}}
     <div class="modal fade" id="modalPromocionesAdmin" tabindex="-1" aria-labelledby="modalPromocionesLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
             <div class="modal-content promo-modal-shell">
                 <div class="modal-header promo-modal-header">
                     <h5 class="modal-title" id="modalPromocionesLabel">
@@ -163,11 +163,11 @@
                 </div>
                 <div class="modal-body p-4">
                     <p class="text-center promo-subtitle mb-4">Selecciona una promoción para editar su nombre e imagen.</p>
-                    <div class="row g-4">
-                        @for($n = 1; $n <= 4; $n++)
+                    <div class="row row-cols-2 row-cols-md-4 row-cols-lg-6 g-3 promo-grid">
+                        @for($n = 1; $n <= 12; $n++)
                         @php $promo = \App\Models\Promotion::find($n); @endphp
-                        <div class="col-6 col-md-3">
-                            <div class="promo-select-card" onclick="abrirModalPromo({{ $n }})" data-bs-toggle="modal" data-bs-target="#modalPromo{{ $n }}">
+                        <div class="col">
+                            <div class="promo-select-card" data-promo-card="{{ $n }}" onclick="abrirModalPromo({{ $n }})" data-bs-toggle="modal" data-bs-target="#modalPromo{{ $n }}">
                                 <div class="promo-card-img-wrap">
                                     @if($promo && $promo->imagen_url)
                                         <img src="{{ asset($promo->imagen_url) }}" alt="Promo {{ $n }}">
@@ -186,7 +186,7 @@
         </div>
     </div>
 
-    @for($n = 1; $n <= 4; $n++)
+    @for($n = 1; $n <= 12; $n++)
     @php $promo = \App\Models\Promotion::find($n); @endphp
     <div class="modal fade" id="modalPromo{{ $n }}" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -257,6 +257,11 @@
     </style>
 
     <script>
+        function abrirModalPromo(n) {
+            const modalPrincipal = bootstrap.Modal.getInstance(document.getElementById('modalPromocionesAdmin'));
+            if (modalPrincipal) modalPrincipal.hide();
+        }
+
         function previewPromoImg(event, n) {
             const file = event.target.files[0];
             if (!file) return;
@@ -293,7 +298,7 @@
                 if (res.ok || res.redirected) {
                     mostrarFeedback(feedback, '✅ Promoción ' + n + ' actualizada correctamente.', true);
                     btn.innerHTML = '<i class="fas fa-check me-1"></i> Guardado';
-                    const cardName = document.querySelector('#modalPromocionesAdmin .col-6:nth-child(' + n + ') .promo-card-name');
+                    const cardName = document.querySelector('#modalPromocionesAdmin [data-promo-card="' + n + '"] .promo-card-name');
                     if (cardName) cardName.textContent = nombre;
                 } else {
                     mostrarFeedback(feedback, '❌ Error al guardar. Intenta de nuevo.', false);

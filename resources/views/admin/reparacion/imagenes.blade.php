@@ -252,6 +252,146 @@ footer, .bg-gradient-to-r, [class*="barra-verde"], .fixed-bottom-bar {
 }
 .gi-toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 .gi-toast svg { flex-shrink:0; }
+
+/* ===========================
+   DISEÑO MÓVIL EN TARJETAS
+=========================== */
+@media (max-width: 768px){
+
+    html,
+    body{
+        overflow:auto !important;
+        height:auto !important;
+    }
+
+    .gi-root{
+        height:auto !important;
+        min-height:100vh;
+        padding:16px 12px 90px;
+        gap:16px;
+    }
+
+    .gi-topbar{
+        flex-direction:column;
+        align-items:stretch;
+        gap:12px;
+    }
+
+    .btn-back{
+        width:100%;
+        justify-content:center;
+    }
+
+    .gi-topbar h1{
+        text-align:center;
+        font-size:1.25rem;
+        line-height:1.25;
+    }
+
+    .gi-topbar p{
+        text-align:center;
+        font-size:.8rem;
+    }
+
+    .gi-topbar > div > div{
+        flex-direction:column !important;
+        width:100%;
+    }
+
+    .gi-topbar > div > div a,
+    .gi-topbar > div > div span{
+        width:100%;
+        justify-content:center;
+    }
+
+    .gi-body{
+        flex-direction:column;
+        overflow:visible;
+        gap:16px;
+    }
+
+    .gi-cols-wrap{
+        flex-direction:column;
+        gap:16px;
+        overflow:visible;
+    }
+
+    .gi-col-card{
+        width:100%;
+        min-height:auto;
+        padding:14px;
+        border-radius:18px;
+    }
+
+    .gi-slots-stack{
+        display:grid;
+        grid-template-columns:1fr;
+        gap:10px;
+        overflow:visible;
+    }
+
+    .gi-slot-empty{
+        min-height:180px;
+        flex:none;
+    }
+
+    .gi-slot-item{
+        height:190px;
+        min-height:190px;
+        flex:none;
+    }
+
+    .gi-img-box{
+        height:100%;
+        min-height:190px;
+    }
+
+    .btn-clear{
+        opacity:1;
+        width:32px;
+        height:32px;
+        top:8px;
+        right:8px;
+    }
+
+    .btn-upload-col{
+        padding:13px;
+        font-size:.9rem;
+    }
+
+    .gi-hint{
+        font-size:.7rem;
+    }
+
+    .gi-preview-panel{
+        width:100%;
+        min-height:auto;
+        padding:14px;
+    }
+
+    .gi-mini-canvas{
+        min-height:220px;
+        flex:none;
+    }
+
+    .btn-save{
+        position:fixed;
+        left:12px;
+        right:12px;
+        bottom:12px;
+        width:calc(100% - 24px);
+        z-index:999;
+        box-shadow:0 10px 26px rgba(47,114,101,.35);
+    }
+
+    .gi-toast{
+        bottom:82px;
+        width:calc(100% - 32px);
+        justify-content:center;
+        text-align:center;
+        white-space:normal;
+    }
+}
 </style>
 
 @php

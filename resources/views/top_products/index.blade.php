@@ -134,6 +134,257 @@ header, footer, .whatsapp, #whatsapp { display: none !important; }
 .toast-green-sync.show { opacity: 1; transform: translateY(0); }
 
 .badge-section { background: #e6f4ea; color: #198754; padding: 3px 10px; border-radius: 50px; font-size: 0.78rem; font-weight: 600; }
+
+/* ===== Productos destacados: tabla responsive en celular ===== */
+@media (max-width: 768px){
+
+    .container{
+        max-width:100% !important;
+        padding-left:12px !important;
+        padding-right:12px !important;
+        margin-top:20px !important;
+    }
+
+    .panel-box{
+        padding:16px 12px !important;
+        overflow:hidden;
+    }
+
+    .panel-title{
+        width:100%;
+        text-align:center;
+        font-size:1.35rem;
+        line-height:1.2;
+    }
+
+    .green-table-responsive{
+        width:100%;
+        max-width:100%;
+        overflow-x:auto !important;
+        overflow-y:hidden;
+        -webkit-overflow-scrolling:touch;
+        border-radius:10px;
+    }
+
+    .table-green{
+        min-width:720px;
+        width:720px;
+    }
+
+    .table-green thead{
+        display:table-header-group !important;
+    }
+
+    .table-green tbody{
+        display:table-row-group !important;
+    }
+
+    .table-green tr{
+        display:table-row !important;
+    }
+
+    .table-green th,
+    .table-green td{
+        display:table-cell !important;
+        white-space:nowrap;
+        vertical-align:middle;
+        font-size:.82rem;
+        padding:10px 12px;
+    }
+
+    .product-thumb,
+    .product-thumb-placeholder{
+        width:42px;
+        height:42px;
+    }
+
+    .btn-table-delete{
+        width:auto;
+        padding:7px 11px;
+        font-size:.82rem;
+    }
+
+    .green-table-responsive::after{
+        content:"← Desliza para ver toda la tabla →";
+        display:block;
+        text-align:center;
+        font-size:12px;
+        color:#6c757d;
+        padding:8px 0 2px;
+    }
+}
+
+/* ===== Productos destacados: vista móvil para tabla de eliminar productos ===== */
+@media (max-width: 768px){
+
+    html,
+    body{
+        max-width:100%;
+        overflow-x:hidden !important;
+    }
+
+    .container{
+        width:100% !important;
+        max-width:100% !important;
+        padding-left:12px !important;
+        padding-right:12px !important;
+        margin-top:20px !important;
+    }
+
+    .panel-box{
+        padding:16px 12px !important;
+        border-radius:16px;
+        overflow:hidden;
+    }
+
+    .panel-title{
+        width:100%;
+        text-align:center;
+        font-size:1.35rem;
+        line-height:1.2;
+    }
+
+    .section-tabs{
+        flex-wrap:nowrap !important;
+        overflow-x:auto !important;
+        overflow-y:hidden !important;
+        padding-bottom:8px;
+        scrollbar-width:none;
+    }
+
+    .section-tabs::-webkit-scrollbar{
+        display:none;
+    }
+
+    .section-tab{
+        flex:0 0 auto;
+        white-space:nowrap;
+    }
+
+    .search-wrap{
+        width:100% !important;
+        min-width:0 !important;
+    }
+
+    #buscarProducto{
+        width:100% !important;
+        min-width:0 !important;
+    }
+
+    /* Ocultar encabezado de tabla en móvil */
+    .green-table-responsive{
+        border:none !important;
+        overflow:visible !important;
+    }
+
+    .table-green{
+        display:block !important;
+        width:100% !important;
+        min-width:0 !important;
+    }
+
+    .table-green thead{
+        display:none !important;
+    }
+
+    .table-green tbody{
+        display:flex !important;
+        flex-direction:column;
+        gap:12px;
+        width:100%;
+    }
+
+    .table-green tbody tr{
+        display:grid !important;
+        grid-template-columns:58px 1fr;
+        gap:8px 12px;
+        width:100%;
+        background:#fff !important;
+        border:1px solid #dee2e6 !important;
+        border-radius:14px;
+        padding:12px;
+        box-shadow:0 4px 14px rgba(0,0,0,.06);
+    }
+
+    .table-green tbody td{
+        display:block !important;
+        padding:0 !important;
+        border:none !important;
+        background:transparent !important;
+        white-space:normal !important;
+    }
+
+    /* Columna # */
+    .table-green tbody td:nth-child(1){
+        grid-column:1 / 2;
+        grid-row:1 / 3;
+        display:flex !important;
+        align-items:center;
+        justify-content:center;
+        width:42px;
+        height:42px;
+        border-radius:50%;
+        background:#e6f4ea !important;
+        color:#198754 !important;
+        font-weight:800;
+        font-size:.85rem;
+    }
+
+    /* Imagen */
+    .table-green tbody td:nth-child(2){
+        grid-column:1 / 2;
+        grid-row:2 / 4;
+    }
+
+    .product-thumb,
+    .product-thumb-placeholder{
+        width:54px !important;
+        height:54px !important;
+        border-radius:10px;
+    }
+
+    /* Nombre / ID producto */
+    .table-green tbody td:nth-child(3){
+        grid-column:2 / 3;
+        grid-row:1 / 2;
+        font-size:.9rem;
+        font-weight:800;
+        color:#198754;
+        word-break:break-word;
+    }
+
+    /* Secciones */
+    .table-green tbody td:nth-child(4){
+        grid-column:2 / 3;
+        grid-row:2 / 3;
+        display:flex !important;
+        flex-wrap:wrap;
+        gap:5px;
+    }
+
+    .badge-section{
+        display:inline-flex;
+        width:max-content;
+        font-size:.72rem;
+        padding:4px 9px;
+    }
+
+    /* Acciones */
+    .table-green tbody td:nth-child(5){
+        grid-column:1 / 3;
+        grid-row:4 / 5;
+        text-align:center !important;
+        margin-top:8px;
+    }
+
+    .btn-table-delete{
+        width:100%;
+        padding:10px 12px;
+        font-size:.9rem;
+        font-weight:800;
+        border-radius:10px;
+    }
+}
 </style>
 </head>
 
